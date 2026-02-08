@@ -1,31 +1,32 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { useAuthStore } from './store/authStore';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import DemoBadge from './components/DemoBadge';
 import ErrorBoundary from './components/ErrorBoundary';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import TherapistDashboard from './pages/TherapistDashboard';
-import PatientDashboard from './pages/PatientDashboard';
-import VideoCall from './pages/VideoCall';
-import NotFound from './pages/NotFound';
-import PatientMaterials from './pages/PatientMaterials';
-import QuestionnaireBuilder from './pages/QuestionnaireBuilder';
-import PatientQuestionnaires from './pages/PatientQuestionnaires';
-import DocumentRequests from './pages/DocumentRequests';
-import SymptomDiary from './pages/SymptomDiary';
-import TherapyNotes from './pages/TherapyNotes';
-import PsychScreenings from './pages/PsychScreenings';
+import Billing from './pages/Billing';
 import CrisisPlan from './pages/CrisisPlan';
-import MedicationTracker from './pages/MedicationTracker';
+import DocumentRequests from './pages/DocumentRequests';
 import Exercises from './pages/Exercises';
+import Login from './pages/Login';
+import MedicationTracker from './pages/MedicationTracker';
+import NotFound from './pages/NotFound';
+import PatientDashboard from './pages/PatientDashboard';
+import PatientMaterials from './pages/PatientMaterials';
+import PatientQuestionnaires from './pages/PatientQuestionnaires';
+import PsychScreenings from './pages/PsychScreenings';
+import QuestionnaireBuilder from './pages/QuestionnaireBuilder';
+import Register from './pages/Register';
 import ReminderSettings from './pages/ReminderSettings';
 import Reports from './pages/Reports';
-import WaitingRoom from './pages/WaitingRoom';
+import SymptomDiary from './pages/SymptomDiary';
+import TherapistDashboard from './pages/TherapistDashboard';
 import TherapistQueue from './pages/TherapistQueue';
-import Billing from './pages/Billing';
+import TherapyNotes from './pages/TherapyNotes';
 import TwoFASetup from './pages/TwoFASetup';
 import TwoFAVerify from './pages/TwoFAVerify';
+import VideoCall from './pages/VideoCall';
+import WaitingRoom from './pages/WaitingRoom';
+import { useAuthStore } from './store/authStore';
 
 function App() {
   const { user, loading, checkAuth } = useAuthStore();
@@ -44,6 +45,7 @@ function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <Toaster position="top-right" />
+        <DemoBadge />
         <Routes>
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />

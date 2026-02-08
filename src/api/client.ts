@@ -55,12 +55,15 @@ api.interceptors.request.use(
         return config;
       }
 
-      // Kein Match: Im Demo-Modus trotzdem nicht ans Backend (würde fehlschlagen)
+      // Kein Match: Im Demo-Modus warnen statt still verschlucken
+      if (import.meta.env.DEV) {
+        console.warn(`[Demo] Unmocked endpoint: ${method.toUpperCase()} ${url}`);
+      }
       config.adapter = () =>
         Promise.resolve({
-          data: [],
+          data: { _demo: true, _unmocked: true, message: `Demo: Kein Mock für ${url}` },
           status: 200,
-          statusText: 'OK (Demo Fallback)',
+          statusText: 'OK (Demo Fallback – unmocked)',
           headers: {},
           config,
         });
@@ -98,6 +101,14 @@ export function isLogoutInProgress(): boolean {
   return logoutInProgress;
 }
 
+// Separate Axios-Instanz NUR für Token-Refresh (ohne Interceptors → keine Loops)
+const refreshClient = axios.create({
+  baseURL: BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+  timeout: 10000,
+});
+
 async function refreshAccessToken(): Promise<string | null> {
   if (logoutInProgress) return null;
   if (isRefreshing && refreshPromise) return refreshPromise;
@@ -105,7 +116,7 @@ async function refreshAccessToken(): Promise<string | null> {
   isRefreshing = true;
   refreshPromise = (async () => {
     try {
-      const res = await api.post('/auth/refresh', {});
+      const res = await refreshClient.post('/auth/refresh', {});
       const token = (res.data?.accessToken || res.data?.token) as string | undefined;
       if (!token) return null;
       setAccessToken(token);

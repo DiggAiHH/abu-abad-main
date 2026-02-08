@@ -191,10 +191,29 @@ export function getDemoResponse(method: string, url: string, userId: string): Ax
   }
 
   // ─── QUESTIONNAIRES ───────────────────────────
+  // Sub-Pfade zuerst (spezifischer vor generisch)
+  if (u.match(/\/questionnaires\/templates/) && m === 'GET') {
+    return mockResponse([
+      { id: 'qt1', title: 'PHQ-9 Template', category: 'depression', questionCount: 9 },
+      { id: 'qt2', title: 'GAD-7 Template', category: 'anxiety', questionCount: 7 },
+    ]);
+  }
+  if (u.match(/\/questionnaires\/templates/) && (m === 'POST' || m === 'PUT' || m === 'DELETE')) {
+    return mockResponse({ message: 'Template-Aktion ausgeführt (Demo)' });
+  }
+  if (u.match(/\/questionnaires\/requests/) && m === 'GET') {
+    return mockResponse([{ id: 'qr1', questionnaireId: 'q1', status: 'pending', patientId: userId }]);
+  }
+  if (u.match(/\/questionnaires\/\w+\/responses/) && m === 'GET') {
+    return mockResponse([{ id: 'resp1', answers: [{ questionId: 'q1-1', value: 3 }], completedAt: new Date().toISOString() }]);
+  }
+  if (u.match(/\/questionnaires\/\w+\/submit/) && m === 'POST') {
+    return mockResponse({ message: 'Fragebogen eingereicht (Demo)' });
+  }
   if (u.startsWith('/questionnaires') && m === 'GET') {
     return mockResponse(demoQuestionnaires);
   }
-  if (u.startsWith('/questionnaires') && m === 'POST') {
+  if (u.startsWith('/questionnaires') && (m === 'POST' || m === 'PUT' || m === 'DELETE')) {
     return mockResponse({ id: 'q-new', message: 'Fragebogen gespeichert (Demo)' }, 201);
   }
 
@@ -202,27 +221,45 @@ export function getDemoResponse(method: string, url: string, userId: string): Ax
   if (u.startsWith('/document-requests') && m === 'GET') {
     return mockResponse(demoDocumentRequests);
   }
-  if (u.startsWith('/document-requests') && m === 'POST') {
-    return mockResponse({ id: 'dr-new', message: 'Anfrage erstellt (Demo)' }, 201);
+  if (u.startsWith('/document-requests') && (m === 'POST' || m === 'PATCH' || m === 'PUT')) {
+    return mockResponse({ id: 'dr-new', message: 'Anfrage bearbeitet (Demo)' }, 201);
+  }
+  if (u.startsWith('/document-requests') && m === 'DELETE') {
+    return mockResponse({ message: 'Anfrage gelöscht (Demo)' });
   }
 
   // ─── PATIENT MATERIALS ────────────────────────
+  if (u.match(/\/patient-materials\/\w+\/download/)) {
+    return mockResponse(new Blob(['Demo-Datei-Inhalt'], { type: 'application/pdf' }));
+  }
   if (u.startsWith('/patient-materials') && m === 'GET') {
     return mockResponse(demoMaterials);
   }
-  if (u.startsWith('/patient-materials') && m === 'POST') {
+  if (u.startsWith('/patient-materials') && (m === 'POST' || m === 'PATCH' || m === 'PUT')) {
     return mockResponse({ id: 'mat-new', message: 'Material gespeichert (Demo)' }, 201);
+  }
+  if (u.startsWith('/patient-materials') && m === 'DELETE') {
+    return mockResponse({ message: 'Material gelöscht (Demo)' });
   }
 
   // ─── SYMPTOM DIARY ────────────────────────────
+  if (u.match(/\/(diary|symptom-diary)\/stats/)) {
+    return mockResponse({ averageMood: 6.7, averageEnergy: 5.7, averageSleep: 6.7, averageAnxiety: 3.7, totalEntries: 3 });
+  }
   if ((u.startsWith('/diary') || u.startsWith('/symptom-diary')) && m === 'GET') {
     return mockResponse(demoDiaryEntries);
   }
-  if ((u.startsWith('/diary') || u.startsWith('/symptom-diary')) && m === 'POST') {
+  if ((u.startsWith('/diary') || u.startsWith('/symptom-diary')) && (m === 'POST' || m === 'PUT')) {
     return mockResponse({ id: 'de-new', message: 'Eintrag gespeichert (Demo)' }, 201);
+  }
+  if ((u.startsWith('/diary') || u.startsWith('/symptom-diary')) && m === 'DELETE') {
+    return mockResponse({ message: 'Eintrag gelöscht (Demo)' });
   }
 
   // ─── CRISIS PLAN ──────────────────────────────
+  if (u.match(/\/crisis(-plan)?\/defaults/) && m === 'GET') {
+    return mockResponse({ defaultSignals: ['Schlaflosigkeit'], defaultStrategies: ['Atemübungen'] });
+  }
   if ((u.startsWith('/crisis-plan') || u.startsWith('/crisis')) && m === 'GET') {
     return mockResponse(demoCrisisPlan);
   }
@@ -231,59 +268,137 @@ export function getDemoResponse(method: string, url: string, userId: string): Ax
   }
 
   // ─── MEDICATIONS ──────────────────────────────
+  if (u.match(/\/medications?\/\w+\/intake-logs/) && m === 'GET') {
+    return mockResponse([{ id: 'il1', medicationId: 'med1', takenAt: new Date().toISOString(), status: 'taken' }]);
+  }
+  if (u.match(/\/medications?\/\w+\/intake-logs/) && m === 'POST') {
+    return mockResponse({ id: 'il-new', message: 'Einnahme protokolliert (Demo)' }, 201);
+  }
+  if (u.match(/\/medications?\/adherence/) && m === 'GET') {
+    return mockResponse({ adherenceRate: 0.85, totalDoses: 30, takenDoses: 25 });
+  }
   if ((u.startsWith('/medications') || u.startsWith('/medication')) && m === 'GET') {
     return mockResponse(demoMedications);
   }
-  if ((u.startsWith('/medications') || u.startsWith('/medication')) && (m === 'POST' || m === 'PUT')) {
+  if ((u.startsWith('/medications') || u.startsWith('/medication')) && (m === 'POST' || m === 'PUT' || m === 'PATCH')) {
     return mockResponse({ id: 'med-new', message: 'Medikament gespeichert (Demo)' }, 201);
+  }
+  if ((u.startsWith('/medications') || u.startsWith('/medication')) && m === 'DELETE') {
+    return mockResponse({ message: 'Medikament gelöscht (Demo)' });
   }
 
   // ─── EXERCISES ────────────────────────────────
+  if (u.match(/\/exercises\/\w+\/completions/) && m === 'GET') {
+    return mockResponse([{ id: 'ec1', exerciseId: 'ex2', completedAt: new Date(Date.now() - 43200000).toISOString(), notes: 'Gut gelaufen' }]);
+  }
+  if (u.match(/\/exercises\/stats/) && m === 'GET') {
+    return mockResponse({ totalAssigned: 3, completed: 1, inProgress: 1, pending: 1, completionRate: 0.33 });
+  }
   if (u.startsWith('/exercises') && m === 'GET') {
     return mockResponse(demoExercises);
   }
-  if (u.startsWith('/exercises') && (m === 'POST' || m === 'PUT')) {
+  if (u.startsWith('/exercises') && (m === 'POST' || m === 'PUT' || m === 'PATCH')) {
     return mockResponse({ id: 'ex-new', message: 'Übung gespeichert (Demo)' }, 201);
+  }
+  if (u.startsWith('/exercises') && m === 'DELETE') {
+    return mockResponse({ message: 'Übung gelöscht (Demo)' });
   }
 
   // ─── SCREENINGS ───────────────────────────────
+  if (u.match(/\/screenings\/templates/) && m === 'GET') {
+    return mockResponse([{ id: 'st1', type: 'PHQ-9', title: 'PHQ-9', questionCount: 9, maxScore: 27 }, { id: 'st2', type: 'GAD-7', title: 'GAD-7', questionCount: 7, maxScore: 21 }]);
+  }
+  if (u.match(/\/screenings\/results/) && m === 'GET') {
+    return mockResponse(demoScreenings.filter(s => s.status === 'completed'));
+  }
+  if (u.match(/\/screenings\/pending/) && m === 'GET') {
+    return mockResponse(demoScreenings.filter(s => s.status === 'pending'));
+  }
+  if (u.match(/\/screenings\/\w+\/questions/) && m === 'GET') {
+    return mockResponse([{ id: 'sq1', text: 'Wie oft fühlten Sie sich niedergeschlagen?', type: 'scale', min: 0, max: 3 }]);
+  }
   if (u.startsWith('/screenings') && m === 'GET') {
     return mockResponse(demoScreenings);
   }
-  if (u.startsWith('/screenings') && m === 'POST') {
+  if (u.startsWith('/screenings') && (m === 'POST' || m === 'PUT')) {
     return mockResponse({ id: 'scr-new', message: 'Screening gespeichert (Demo)' }, 201);
   }
 
   // ─── THERAPY NOTES ────────────────────────────
+  if (u.match(/\/therapy-notes\/\w+/) && m === 'GET') {
+    return mockResponse(demoTherapyNotes[0]);
+  }
   if (u.startsWith('/therapy-notes') && m === 'GET') {
     return mockResponse(demoTherapyNotes);
   }
   if (u.startsWith('/therapy-notes') && (m === 'POST' || m === 'PUT')) {
     return mockResponse({ id: 'tn-new', message: 'Notiz gespeichert (Demo)' }, 201);
   }
+  if (u.startsWith('/therapy-notes') && m === 'DELETE') {
+    return mockResponse({ message: 'Notiz gelöscht (Demo)' });
+  }
 
   // ─── REMINDERS ────────────────────────────────
+  if (u.match(/\/reminders\/upcoming/) && m === 'GET') {
+    return mockResponse([{ id: 'rem1', type: 'appointment', title: 'Termin morgen um 10:00', dueAt: new Date(Date.now() + 86400000).toISOString() }]);
+  }
+  if (u.match(/\/reminders\/history/) && m === 'GET') {
+    return mockResponse([{ id: 'rh1', type: 'medication', title: 'Sertralin eingenommen', sentAt: new Date(Date.now() - 86400000).toISOString() }]);
+  }
+  if (u.match(/\/reminders\/times/) && m === 'GET') {
+    return mockResponse({ morning: '08:00', evening: '20:00' });
+  }
+  if (u.match(/\/reminders\/preferences/) && m === 'GET') {
+    return mockResponse(demoReminders);
+  }
   if (u.startsWith('/reminders') && m === 'GET') {
     return mockResponse(demoReminders);
   }
-  if (u.startsWith('/reminders') && (m === 'POST' || m === 'PUT')) {
+  if (u.startsWith('/reminders') && (m === 'POST' || m === 'PUT' || m === 'PATCH')) {
     return mockResponse({ ...demoReminders, message: 'Einstellungen gespeichert (Demo)' });
+  }
+  if (u.startsWith('/reminders') && m === 'DELETE') {
+    return mockResponse({ message: 'Erinnerung gelöscht (Demo)' });
   }
 
   // ─── BILLING ──────────────────────────────────
+  if (u.match(/\/billing\/invoices/) && m === 'GET') {
+    return mockResponse(demoBilling);
+  }
+  if (u.match(/\/billing\/invoices\/\w+\/generate/) && m === 'POST') {
+    return mockResponse({ message: 'Rechnung generiert (Demo)', url: '#demo-invoice.pdf' });
+  }
+  if (u.match(/\/billing\/settings/) && m === 'GET') {
+    return mockResponse({ taxRate: 19, currency: 'EUR', bankAccount: 'DE89 3704 0044 0532 0130 00', paymentTermDays: 14 });
+  }
+  if (u.match(/\/billing\/settings/) && m === 'PUT') {
+    return mockResponse({ message: 'Abrechnungseinstellungen gespeichert (Demo)' });
+  }
+  if (u.match(/\/billing\/stats/) && m === 'GET') {
+    return mockResponse({ totalRevenue: 390, pendingPayments: 150, paidInvoices: 2, openInvoices: 1 });
+  }
   if (u.startsWith('/billing') && m === 'GET') {
     return mockResponse(demoBilling);
   }
-  if (u.startsWith('/billing') && m === 'POST') {
+  if (u.startsWith('/billing') && (m === 'POST' || m === 'PUT')) {
     return mockResponse({ id: 'bill-new', message: 'Rechnung erstellt (Demo)' }, 201);
   }
 
   // ─── REPORTS ──────────────────────────────────
+  if (u.match(/\/reports\/templates/) && m === 'GET') {
+    return mockResponse([{ id: 'rt1', title: 'Behandlungsbericht', type: 'treatment_report' }, { id: 'rt2', title: 'Verlaufsbericht', type: 'progress_report' }]);
+  }
+  if (u.match(/\/reports\/\w+\/download/) && m === 'GET') {
+    return mockResponse({ url: '#demo-report.pdf', message: 'Report-Download (Demo)' });
+  }
   if (u.startsWith('/reports') && m === 'GET') {
     return mockResponse(demoReports);
   }
-  if (u.startsWith('/reports') && m === 'POST') {
+  if (u.startsWith('/reports') && (m === 'POST' || m === 'PUT')) {
     return mockResponse({ id: 'rep-new', message: 'Bericht erstellt (Demo)' }, 201);
+  }
+  if (u.startsWith('/reports') && m === 'DELETE') {
+    return mockResponse({ message: 'Bericht gelöscht (Demo)' });
   }
 
   // ─── USERS / PROFILE ─────────────────────────
@@ -312,6 +427,15 @@ export function getDemoResponse(method: string, url: string, userId: string): Ax
   }
 
   // ─── WAITING ROOM ─────────────────────────────
+  if (u.match(/\/waiting-room\/status/) && m === 'GET') {
+    return mockResponse({ position: 1, estimatedWait: 5, isActive: true });
+  }
+  if (u.match(/\/waiting-room\/pre-session/) && m === 'GET') {
+    return mockResponse({ appointmentId: 'demo-a1', therapistName: 'Dr. Sarah Müller', checklist: ['Kamera testen', 'Mikrofon testen', 'Ruhige Umgebung'], ready: false });
+  }
+  if (u.match(/\/queue\/\w+\/admit/) && m === 'POST') {
+    return mockResponse({ message: 'Patient zugelassen (Demo)', roomUrl: '#demo-room' });
+  }
   if ((u.startsWith('/waiting-room') || u.startsWith('/queue')) && m === 'GET') {
     if (userId.includes('therapist')) {
       return mockResponse(demoTherapistQueue);
@@ -322,7 +446,58 @@ export function getDemoResponse(method: string, url: string, userId: string): Ax
     return mockResponse({ message: 'Aktion ausgeführt (Demo)' });
   }
 
+  // ─── VIDEO SESSION ────────────────────────────
+  if (u.match(/\/video-sessions?\/\w+\/token/) && m === 'GET') {
+    return mockResponse({ token: 'demo-video-token', peerId: 'demo-peer-id', roomId: 'demo-room' });
+  }
+  if (u.startsWith('/video-session') && m === 'GET') {
+    return mockResponse({ id: 'vs1', appointmentId: 'demo-a1', status: 'waiting', peerId: 'demo-peer-id' });
+  }
+  if (u.startsWith('/video-session') && (m === 'POST' || m === 'PUT' || m === 'PATCH')) {
+    return mockResponse({ message: 'Video-Sitzung aktualisiert (Demo)' });
+  }
+
+  // ─── CONSENT / EINWILLIGUNG ───────────────────
+  if (u.match(/\/consent\/status/) && m === 'GET') {
+    return mockResponse({ dataProcessing: true, healthData: true, videoRecording: false, updatedAt: new Date(Date.now() - 2592000000).toISOString() });
+  }
+  if (u.startsWith('/consent') && m === 'GET') {
+    return mockResponse([
+      { id: 'c1', type: 'dataProcessing', granted: true, grantedAt: new Date(Date.now() - 2592000000).toISOString() },
+      { id: 'c2', type: 'healthData', granted: true, grantedAt: new Date(Date.now() - 2592000000).toISOString() },
+      { id: 'c3', type: 'videoRecording', granted: false, grantedAt: null },
+    ]);
+  }
+  if (u.startsWith('/consent') && (m === 'POST' || m === 'PUT')) {
+    return mockResponse({ message: 'Einwilligung gespeichert (Demo)' });
+  }
+
+  // ─── ANALYTICS / DASHBOARD ────────────────────
+  if (u.match(/\/analytics\/dashboard/) && m === 'GET') {
+    return mockResponse({ totalPatients: 3, activeAppointments: 2, completedToday: 1, revenue: 390, avgRating: 4.8 });
+  }
+  if (u.startsWith('/analytics') && m === 'GET') {
+    return mockResponse({ period: 'month', sessions: 12, newPatients: 2, cancellations: 1 });
+  }
+
+  // ─── NOTIFICATIONS ────────────────────────────
+  if (u.match(/\/notifications\/unread/) && m === 'GET') {
+    return mockResponse({ count: 2 });
+  }
+  if (u.startsWith('/notifications') && m === 'GET') {
+    return mockResponse([
+      { id: 'n1', type: 'appointment', message: 'Termin morgen um 10:00', read: false, createdAt: new Date(Date.now() - 3600000).toISOString() },
+      { id: 'n2', type: 'message', message: 'Neue Nachricht von Dr. Müller', read: false, createdAt: new Date(Date.now() - 7200000).toISOString() },
+    ]);
+  }
+  if (u.startsWith('/notifications') && (m === 'PUT' || m === 'PATCH')) {
+    return mockResponse({ message: 'Benachrichtigung aktualisiert (Demo)' });
+  }
+
   // ─── PAYMENTS ─────────────────────────────────
+  if (u.match(/\/payments\/\w+\/receipt/) && m === 'GET') {
+    return mockResponse({ url: '#demo-receipt.pdf', message: 'Quittung (Demo)' });
+  }
   if (u.startsWith('/payments') && m === 'GET') {
     return mockResponse([
       { id: 'pay1', appointmentId: 'demo-a1', amount: 120, currency: 'EUR', status: 'completed', createdAt: new Date(Date.now() - 604800000).toISOString() },
