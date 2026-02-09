@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-  Users,
-  Clock,
-  Video,
-  CheckCircle,
-  AlertCircle,
-  RefreshCw,
-  Eye,
-  Heart,
-  Moon,
-  MessageSquare,
-  ArrowLeft,
-  Pill,
+    AlertCircle,
+    ArrowLeft,
+    CheckCircle,
+    Clock,
+    Eye,
+    Heart,
+    MessageSquare,
+    Moon,
+    Pill,
+    RefreshCw,
+    Users,
+    Video,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 
 interface QueueItem {
@@ -44,6 +45,7 @@ interface PreSessionDetails {
 }
 
 export default function TherapistQueue() {
+  const { t } = useTranslation(['video', 'common', 'appointments']);
   const navigate = useNavigate();
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,7 +76,7 @@ export default function TherapistQueue() {
       setPreSessionDetails(res.data);
       setSelectedPatient(appointmentId);
     } catch (error) {
-      toast.error('Fehler beim Laden der Daten');
+      toast.error(t('video:errorLoadingQueueData'));
     }
   };
 
@@ -82,12 +84,12 @@ export default function TherapistQueue() {
     setAdmitting(appointmentId);
     try {
       const res = await api.post('/waiting-room/admit', { appointmentId });
-      toast.success('Patient wird aufgerufen');
+      toast.success(t('video:patientCalledUp', { name: '' }));
       setTimeout(() => {
         navigate(`/call/${res.data?.roomId}`);
       }, 1000);
     } catch (error) {
-      toast.error('Netzwerkfehler');
+      toast.error(t('common:networkError'));
     } finally {
       setAdmitting(null);
     }
@@ -122,19 +124,19 @@ export default function TherapistQueue() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 rtl:flip" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">👥 Wartezimmer-Übersicht</h1>
+              <h1 className="text-xl font-bold text-gray-900">👥 {t('video:queueTitle')}</h1>
               <p className="text-sm text-gray-500">
-                {queue.length} Patient{queue.length !== 1 ? 'en' : ''} wartend
+                {t('video:patientsWaiting', { count: queue.length })}
               </p>
             </div>
           </div>
           <button
             onClick={fetchQueue}
             className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-            title="Aktualisieren"
+            title={t('common:refresh')}
           >
             <RefreshCw className="w-5 h-5" />
           </button>
@@ -149,10 +151,10 @@ export default function TherapistQueue() {
               <div className="bg-white rounded-xl shadow-sm p-12 text-center">
                 <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Keine Patienten warten
+                  {t('video:noPatientsWaiting')}
                 </h3>
                 <p className="text-gray-500">
-                  Neue Patienten erscheinen hier, sobald sie dem Wartezimmer beitreten.
+                  {t('video:patientsAppearHere')}
                 </p>
               </div>
             ) : (
@@ -174,11 +176,11 @@ export default function TherapistQueue() {
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
-                              Termin: {formatTime(patient.startTime)}
+                              {t('video:appointment')} {formatTime(patient.startTime)}
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="w-4 h-4 text-orange-500" />
-                              Wartet: {patient.waitingMinutes} Min.
+                              {t('video:waitingTime', { min: patient.waitingMinutes })}
                             </span>
                           </div>
                         </div>
@@ -191,7 +193,7 @@ export default function TherapistQueue() {
                             className="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg flex items-center gap-2"
                           >
                             <Eye className="w-4 h-4" />
-                            Fragebogen
+                            {t('video:viewQuestionnaire')}
                           </button>
                         )}
                         <button
@@ -204,7 +206,7 @@ export default function TherapistQueue() {
                           ) : (
                             <Video className="w-4 h-4" />
                           )}
-                          Aufrufen
+                          {t('video:admitPatient')}
                         </button>
                       </div>
                     </div>
@@ -221,12 +223,12 @@ export default function TherapistQueue() {
                         {patient.preSessionCompleted ? (
                           <>
                             <CheckCircle className="w-3 h-3 inline mr-1" />
-                            Fragebogen ausgefüllt
+                            {t('video:questionnaireFilled')}
                           </>
                         ) : (
                           <>
                             <AlertCircle className="w-3 h-3 inline mr-1" />
-                            Fragebogen ausstehend
+                            {t('video:questionnairePending')}
                           </>
                         )}
                       </span>
@@ -243,7 +245,7 @@ export default function TherapistQueue() {
               <div className="bg-white rounded-xl shadow-sm p-6 sticky top-6">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <MessageSquare className="w-5 h-5 text-blue-600" />
-                  Vor-Sitzungs-Daten
+                  {t('video:preSessionData')}
                 </h3>
                 <p className="text-sm text-gray-500 mb-4">{preSessionDetails.patientName}</p>
 
@@ -254,7 +256,7 @@ export default function TherapistQueue() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600 flex items-center gap-2">
                           <Heart className="w-4 h-4 text-red-500" />
-                          Stimmung
+                          {t('video:moodLabel')}
                         </span>
                         <span className={`font-semibold ${getMoodColor(preSessionDetails.data.currentMood)}`}>
                           {preSessionDetails.data.currentMood}/10
@@ -269,7 +271,7 @@ export default function TherapistQueue() {
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600 flex items-center gap-2">
                             <AlertCircle className="w-4 h-4 text-orange-500" />
-                            Angst-Level
+                            {t('video:anxietyLabel')}
                           </span>
                           <span className="font-semibold">{preSessionDetails.data.anxietyLevel}/10</span>
                         </div>
@@ -282,7 +284,7 @@ export default function TherapistQueue() {
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600 flex items-center gap-2">
                             <Moon className="w-4 h-4 text-indigo-500" />
-                            Schlafqualität
+                            {t('video:sleepLabel')}
                           </span>
                           <span className="font-semibold">
                             {'⭐'.repeat(preSessionDetails.data.sleepQuality)}
@@ -297,14 +299,14 @@ export default function TherapistQueue() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600 flex items-center gap-2">
                           <Pill className="w-4 h-4 text-green-500" />
-                          Medikamente genommen
+                          {t('video:medicationTakenLabel')}
                         </span>
                         <span
                           className={`font-semibold ${
                             preSessionDetails.data.medicationTaken ? 'text-green-600' : 'text-red-600'
                           }`}
                         >
-                          {preSessionDetails.data.medicationTaken ? 'Ja' : 'Nein'}
+                          {preSessionDetails.data.medicationTaken ? t('common:yes') : t('common:no')}
                         </span>
                       </div>
                     </div>
@@ -312,7 +314,7 @@ export default function TherapistQueue() {
                     {/* Hauptanliegen */}
                     {preSessionDetails.data.mainConcerns && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Hauptanliegen:</h4>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">{t('video:mainConcerns')}</h4>
                         <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
                           {preSessionDetails.data.mainConcerns}
                         </p>
@@ -322,7 +324,7 @@ export default function TherapistQueue() {
                     {/* Fragen */}
                     {preSessionDetails.data.questionsForTherapist && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Fragen an Sie:</h4>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">{t('video:questionsForYou')}</h4>
                         <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
                           {preSessionDetails.data.questionsForTherapist}
                         </p>
@@ -332,7 +334,7 @@ export default function TherapistQueue() {
                     {/* Ereignisse */}
                     {preSessionDetails.data.significantEvents && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Besondere Ereignisse:</h4>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">{t('video:significantEvents')}</h4>
                         <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
                           {preSessionDetails.data.significantEvents}
                         </p>
@@ -341,7 +343,7 @@ export default function TherapistQueue() {
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500 italic">
-                    Fragebogen wurde noch nicht ausgefüllt.
+                    {t('video:questionnaireNotFilled')}
                   </p>
                 )}
 
@@ -352,16 +354,16 @@ export default function TherapistQueue() {
                   }}
                   className="w-full mt-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
                 >
-                  Schließen
+                  {t('common:close')}
                 </button>
               </div>
             ) : (
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="text-center py-8">
                   <Eye className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="font-medium text-gray-900 mb-2">Vor-Sitzungs-Daten</h3>
+                  <h3 className="font-medium text-gray-900 mb-2">{t('video:preSessionData')}</h3>
                   <p className="text-sm text-gray-500">
-                    Wählen Sie einen Patienten aus, um dessen Fragebogen einzusehen.
+                    {t('video:selectPatientToView')}
                   </p>
                 </div>
               </div>

@@ -4,12 +4,13 @@
  * Auto-Save Drafts, Progress Tracking, DSGVO-konforme Verschlüsselung
  */
 
-import { useState, useEffect } from 'react';
 import { Check, Clock, Save } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { apiClient } from '../api/client';
-import { logger } from '../utils/logger';
 import { QuestionnaireFormFields, normalizeFormSchema } from '../components/QuestionnaireFormFields';
+import { logger } from '../utils/logger';
 
 interface QuestionnaireRequest {
   id: string;
@@ -26,6 +27,7 @@ interface QuestionnaireRequest {
 type FormResponses = Record<string, any>;
 
 export default function PatientQuestionnaires() {
+  const { t } = useTranslation(['questionnaires', 'common']);
   const [requests, setRequests] = useState<QuestionnaireRequest[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -62,7 +64,8 @@ export default function PatientQuestionnaires() {
   const loadRequests = async () => {
     try {
       const response = await apiClient.get('/questionnaires/requests');
-      const mapped: QuestionnaireRequest[] = (response.data.requests || []).map((r: any) => ({
+      const rawRequests = Array.isArray(response.data?.requests) ? response.data.requests : Array.isArray(response.data) ? response.data : [];
+      const mapped: QuestionnaireRequest[] = rawRequests.map((r: any) => ({
         id: r.id,
         templateTitle: r.templateTitle,
         templateDescription: r.instructions || undefined,
@@ -77,7 +80,7 @@ export default function PatientQuestionnaires() {
       setRequests(mapped);
     } catch (error: any) {
       logger.error('PatientQuestionnaires: Error loading requests', error);
-      toast.error('Fehler beim Laden der Fragebögen');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -140,7 +143,7 @@ export default function PatientQuestionnaires() {
     });
     
     if (missingFields.length > 0) {
-      toast.error('Bitte füllen Sie alle Pflichtfelder aus');
+      toast.error(t('common:fillAllRequiredFields'));
       return;
     }
 
@@ -152,13 +155,13 @@ export default function PatientQuestionnaires() {
         status: 'submitted'
       });
 
-      toast.success('Fragebogen eingereicht');
+      toast.success(t('questionnaires:submitted'));
       setActiveRequest(null);
       setResponses({});
       await loadRequests();
     } catch (error: any) {
       logger.error('PatientQuestionnaires: Error submitting questionnaire', error);
-      toast.error('Fehler beim Einreichen');
+      toast.error(t('common:errorSaving'));
     } finally {
       setSaving(false);
     }
@@ -187,12 +190,12 @@ export default function PatientQuestionnaires() {
     }
   };
 
-  const getPriorityLabel = (priority: string) => {
+  const getPriorityLabel = (priority: string): string => {
     switch (priority) {
-      case 'urgent': return 'Dringend';
-      case 'high': return 'Dringend';
-      case 'normal': return 'Normal';
-      default: return 'Niedrig';
+      case 'urgent': return t('questionnaires:priority') + ': !';
+      case 'high': return t('questionnaires:priority') + ': !';
+      case 'normal': return t('questionnaires:priority');
+      default: return t('questionnaires:priority');
     }
   };
 
@@ -215,14 +218,14 @@ export default function PatientQuestionnaires() {
           <div className="mb-6">
             <button
               onClick={() => {
-                if (confirm('Möchten Sie wirklich abbrechen? Ihr Fortschritt wurde gespeichert.')) {
+                if (confirm(t('common:unsavedChanges'))) {
                   setActiveRequest(null);
                   setResponses({});
                 }
               }}
               className="text-blue-600 hover:text-blue-800 mb-4"
             >
-              ← Zurück zur Übersicht
+              ← {t('common:back')}
             </button>
             
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -235,7 +238,7 @@ export default function PatientQuestionnaires() {
             {/* Progress Bar */}
             <div className="mb-4">
               <div className="flex justify-between text-sm text-gray-600 mb-1">
-                <span>Fortschritt</span>
+                <span>{t('questionnaires:progress')}</span>
                 <span>{progress}%</span>
               </div>
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -250,7 +253,7 @@ export default function PatientQuestionnaires() {
             {saving && (
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Save className="w-4 h-4 animate-pulse" />
-                Wird gespeichert...
+                {t('common:saving')}
               </div>
             )}
           </div>
@@ -269,14 +272,14 @@ export default function PatientQuestionnaires() {
               disabled={saving}
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50"
             >
-              Entwurf speichern
+              {t('questionnaires:draftSaved')}
             </button>
             <button
               onClick={handleSubmit}
               disabled={saving || progress < 100}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              Einreichen
+              {t('questionnaires:submitQuestionnaire')}
             </button>
           </div>
         </div>
@@ -289,14 +292,14 @@ export default function PatientQuestionnaires() {
     <div className="max-w-6xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          Meine Fragebögen
+          {t('questionnaires:patientTitle')}
         </h1>
 
         {requests.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <Clock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p>Keine offenen Fragebögen</p>
-            <p className="text-sm">Ihr Therapeut hat noch keine Fragebögen angefordert</p>
+            <p>{t('questionnaires:noPending')}</p>
+            <p className="text-sm">{t('questionnaires:patientSubtitle')}</p>
           </div>
         ) : (
           <div className="grid gap-4">
@@ -323,7 +326,7 @@ export default function PatientQuestionnaires() {
                     {request.dueDate && (
                       <p className="text-xs text-gray-500 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        Fällig: {new Date(request.dueDate).toLocaleDateString('de-DE')}
+                        {t('questionnaires:dueDate')}: {new Date(request.dueDate).toLocaleDateString('de-DE')}
                       </p>
                     )}
 
@@ -336,7 +339,7 @@ export default function PatientQuestionnaires() {
                           />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
-                          {request.progress || 0}% abgeschlossen
+                          {request.progress || 0}% {t('common:completed')}
                         </p>
                       </div>
                     )}
@@ -346,14 +349,14 @@ export default function PatientQuestionnaires() {
                     {request.status === 'completed' ? (
                       <span className="flex items-center gap-1 px-3 py-2 bg-green-100 text-green-800 rounded-lg text-sm">
                         <Check className="w-4 h-4" />
-                        Abgeschlossen
+                        {t('common:completed')}
                       </span>
                     ) : (
                       <button
                         onClick={() => handleStartQuestionnaire(request)}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                       >
-                        {request.status === 'in_progress' ? 'Fortsetzen' : 'Beginnen'}
+                        {request.status === 'in_progress' ? t('questionnaires:continueQuestionnaire') : t('questionnaires:startQuestionnaire')}
                       </button>
                     )}
                   </div>

@@ -1,13 +1,14 @@
 import { loadStripe } from '@stripe/stripe-js';
 import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
 import { Calendar, Clock, CreditCard, LogOut, MessageSquare, User, Video } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { appointmentAPI, messageAPI, paymentAPI } from '../api/client';
 import { useAuthStore } from '../store/authStore';
 import { Appointment, Message } from '../types';
+import { getDateLocale } from '../utils/dateLocale';
 import { logger } from '../utils/logger';
 
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
@@ -16,6 +17,7 @@ const stripePromise = STRIPE_PUBLISHABLE_KEY
   : Promise.resolve(null);
 
 export default function PatientDashboard() {
+  const { t } = useTranslation(['dashboard', 'nav', 'common', 'appointments', 'auth']);
   const { user, logout } = useAuthStore();
   const isDemo = useAuthStore((state) => state.isDemo);
   const navigate = useNavigate();
@@ -69,7 +71,7 @@ export default function PatientDashboard() {
     try {
       // Guard clause: User muss existieren
       if (!user?.id) {
-        throw new Error('Benutzer nicht authentifiziert');
+        throw new Error(t('common:userNotAuthenticated'));
       }
       
       const [apptRes, availRes, msgRes] = await Promise.all([
@@ -98,13 +100,13 @@ export default function PatientDashboard() {
       logger.error('PatientDashboard: Fehler beim Laden', error);
       
       if (error.response?.status === 401) {
-        toast.error('Sitzung abgelaufen. Bitte neu anmelden.');
+        toast.error(t('common:sessionExpired'));
         void logout();
         navigate('/login');
       } else if (!error.response) {
-        toast.error('Keine Verbindung zum Server. Daten werden nicht aktualisiert.');
+        toast.error(t('common:noConnectionServerUpdate'));
       } else {
-        toast.error('Fehler beim Laden der Daten');
+        toast.error(t('common:errorLoadingData'));
       }
     } finally {
       setLoading(false);
@@ -114,17 +116,17 @@ export default function PatientDashboard() {
   const handleLogout = () => {
     void logout();
     navigate('/login');
-    toast.success('Erfolgreich abgemeldet');
+    toast.success(t('auth:logoutSuccess'));
   };
 
   const bookAppointment = async (appointmentId: string) => {
     if (!appointmentId) {
-      toast.error('Ungültige Termin-ID');
+      toast.error(t('common:invalidId'));
       return;
     }
     
     if (!user?.id) {
-      toast.error('Sie müssen angemeldet sein');
+      toast.error(t('common:mustBeLoggedIn'));
       navigate('/login');
       return;
     }
@@ -133,18 +135,18 @@ export default function PatientDashboard() {
     
     try {
       await appointmentAPI.book(appointmentId);
-      toast.success('Termin gebucht! Sie werden zur Zahlung weitergeleitet...');
+      toast.success(t('appointments:bookedSuccess'));
       
       // Stripe Checkout
       const { data } = await paymentAPI.createCheckout(appointmentId);
       const stripe = await stripePromise;
       
       if (!stripe) {
-        throw new Error('Stripe konnte nicht geladen werden');
+        throw new Error(t('appointments:stripeLoadError'));
       }
       
       if (!data?.sessionId) {
-        throw new Error('Keine Stripe Session erhalten');
+        throw new Error(t('appointments:noStripeSession'));
       }
       
       const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
@@ -154,7 +156,7 @@ export default function PatientDashboard() {
       }
     } catch (error: any) {
       logger.error('PatientDashboard: Buchungsfehler', error);
-      toast.error(error.message || 'Buchung fehlgeschlagen');
+      toast.error(error.message || t('appointments:bookingFailed'));
       await loadData(); // Daten neu laden nach Fehler
     } finally {
       setLoading(false);
@@ -181,25 +183,26 @@ export default function PatientDashboard() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Patienten-Dashboard
+                {t('dashboard:patientDashboard')}
               </h1>
               <p className="text-sm text-gray-600">
-                Willkommen, {user?.firstName} {user?.lastName}
+                {t('dashboard:welcomeUser', { name: `${user?.firstName} ${user?.lastName}` })}
               </p>
             </div>
             <button
               onClick={handleLogout}
+              aria-label={t('auth:logout')}
               className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
             >
               <LogOut size={20} />
-              Abmelden
+              {t('auth:logout')}
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -208,7 +211,7 @@ export default function PatientDashboard() {
                 <Calendar className="text-blue-600" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Meine Termine</p>
+                <p className="text-sm text-gray-600">{t('dashboard:myAppointments')}</p>
                 <p className="text-2xl font-bold">{appointments.length}</p>
               </div>
             </div>
@@ -220,7 +223,7 @@ export default function PatientDashboard() {
                 <Clock className="text-green-600" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Verfügbare Slots</p>
+                <p className="text-sm text-gray-600">{t('dashboard:availableSlots')}</p>
                 <p className="text-2xl font-bold">{availableSlots.length}</p>
               </div>
             </div>
@@ -232,7 +235,7 @@ export default function PatientDashboard() {
                 <MessageSquare className="text-purple-600" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Neue Nachrichten</p>
+                <p className="text-sm text-gray-600">{t('dashboard:newMessages')}</p>
                 <p className="text-2xl font-bold">
                   {messages.filter(m => !m.read).length}
                 </p>
@@ -240,17 +243,17 @@ export default function PatientDashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition" onClick={() => navigate('/materials')}>
+          <button type="button" onClick={() => navigate('/materials')} aria-label={t('dashboard:materialsLink')} className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition text-left w-full border-0">
             <div className="flex items-center gap-4">
               <div className="bg-orange-100 p-3 rounded-lg">
                 <User className="text-orange-600" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Vorbereitung</p>
-                <p className="text-lg font-bold">Materialien</p>
+                <p className="text-sm text-gray-600">{t('dashboard:preparation')}</p>
+                <p className="text-lg font-bold">{t('dashboard:materialsLink')}</p>
               </div>
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Quick Actions */}
@@ -259,102 +262,111 @@ export default function PatientDashboard() {
             onClick={() => navigate('/diary')}
             className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-lg shadow-lg p-5 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-lg font-bold mb-1">📔 Tagebuch</h3>
-            <p className="text-indigo-100 text-sm">Stimmung & Symptome</p>
+            <h3 className="text-lg font-bold mb-1">📔 {t('nav:diary')}</h3>
+            <p className="text-indigo-100 text-sm">{t('nav:diarySubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/screenings')}
             className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-lg shadow-lg p-5 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-lg font-bold mb-1">📊 Screenings</h3>
-            <p className="text-teal-100 text-sm">PHQ-9, GAD-7 Tests</p>
+            <h3 className="text-lg font-bold mb-1">📊 {t('nav:screenings')}</h3>
+            <p className="text-teal-100 text-sm">{t('nav:screeningsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/crisis-plan')}
             className="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg shadow-lg p-5 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-lg font-bold mb-1">🆘 Krisenplan</h3>
-            <p className="text-red-100 text-sm">Notfall-Kontakte</p>
+            <h3 className="text-lg font-bold mb-1">🆘 {t('nav:crisisPlan')}</h3>
+            <p className="text-red-100 text-sm">{t('nav:crisisPlanSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/medications')}
             className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-lg shadow-lg p-5 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-lg font-bold mb-1">💊 Medikamente</h3>
-            <p className="text-emerald-100 text-sm">Tracker & Einnahme</p>
+            <h3 className="text-lg font-bold mb-1">💊 {t('nav:medications')}</h3>
+            <p className="text-emerald-100 text-sm">{t('nav:medicationsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/exercises')}
             className="bg-gradient-to-br from-violet-500 to-violet-600 text-white rounded-lg shadow-lg p-5 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-lg font-bold mb-1">📚 Übungen</h3>
-            <p className="text-violet-100 text-sm">Hausaufgaben</p>
+            <h3 className="text-lg font-bold mb-1">📚 {t('nav:exercises')}</h3>
+            <p className="text-violet-100 text-sm">{t('nav:exercisesSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/materials')}
             className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-5 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-lg font-bold mb-1">📝 Materialien</h3>
-            <p className="text-blue-100 text-sm">Dateien hochladen</p>
+            <h3 className="text-lg font-bold mb-1">📝 {t('nav:materials')}</h3>
+            <p className="text-blue-100 text-sm">{t('nav:materialsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/questionnaires')}
             className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow-lg p-5 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-lg font-bold mb-1">📋 Fragebögen</h3>
-            <p className="text-green-100 text-sm">Zugewiesene Bögen</p>
+            <h3 className="text-lg font-bold mb-1">📋 {t('nav:questionnaires')}</h3>
+            <p className="text-green-100 text-sm">{t('nav:questionnairesSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/documents')}
             className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-5 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-lg font-bold mb-1">📄 Dokumente</h3>
-            <p className="text-purple-100 text-sm">Uploads verwalten</p>
+            <h3 className="text-lg font-bold mb-1">📄 {t('nav:documents')}</h3>
+            <p className="text-purple-100 text-sm">{t('nav:documentsSubtitle')}</p>
           </button>
         </div>
 
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow">
           <div className="border-b border-gray-200">
-            <nav className="flex -mb-px">
+            <nav className="flex -mb-px" role="tablist" aria-label={t('common:mainNavigation')}>
               <button
                 onClick={() => setActiveTab('my-appointments')}
+                aria-label={t('dashboard:myAppointments')}
+                aria-selected={activeTab === 'my-appointments'}
+                role="tab"
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === 'my-appointments'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Meine Termine
+                {t('dashboard:myAppointments')}
               </button>
               <button
                 onClick={() => setActiveTab('book')}
+                aria-label={t('dashboard:bookAppointment')}
+                aria-selected={activeTab === 'book'}
+                role="tab"
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === 'book'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Termin buchen
+                {t('dashboard:bookAppointment')}
               </button>
               <button
                 onClick={() => setActiveTab('messages')}
+                aria-label={t('dashboard:messagesTab')}
+                aria-selected={activeTab === 'messages'}
+                role="tab"
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === 'messages'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Nachrichten
+                {t('dashboard:messagesTab')}
                 {messages.filter(m => !m.read).length > 0 && (
-                  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  <span className="ms-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {messages.filter(m => !m.read).length}
                   </span>
                 )}
@@ -365,11 +377,11 @@ export default function PatientDashboard() {
           <div className="p-6">
             {activeTab === 'my-appointments' && (
               <div>
-                <h2 className="text-xl font-semibold mb-6">Meine gebuchten Termine</h2>
+                <h2 className="text-xl font-semibold mb-6">{t('dashboard:myBookedAppointments')}</h2>
                 <div className="space-y-4">
                   {appointments.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">
-                      Keine Termine gebucht
+                      {t('dashboard:noAppointmentsBooked')}
                     </p>
                   ) : (
                     appointments.map((apt) => (
@@ -382,7 +394,7 @@ export default function PatientDashboard() {
                             <div className="flex items-center gap-2 mb-2">
                               <Clock size={16} className="text-gray-400" />
                               <span className="font-medium">
-                                {format(new Date(apt.startTime), 'dd.MM.yyyy HH:mm', { locale: de })} - 
+                                {format(new Date(apt.startTime), 'dd.MM.yyyy HH:mm', { locale: getDateLocale() })} - 
                                 {format(new Date(apt.endTime), 'HH:mm')}
                               </span>
                             </div>
@@ -404,9 +416,9 @@ export default function PatientDashboard() {
                                     : 'bg-red-100 text-red-800'
                                 }`}
                               >
-                                {apt.status === 'booked' && 'Gebucht'}
-                                {apt.status === 'completed' && 'Abgeschlossen'}
-                                {apt.status === 'cancelled' && 'Abgesagt'}
+                                {apt.status === 'booked' && t('appointments:statusBooked')}
+                                {apt.status === 'completed' && t('appointments:statusCompleted')}
+                                {apt.status === 'cancelled' && t('appointments:statusCancelled')}
                               </span>
                               <span
                                 className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
@@ -415,7 +427,7 @@ export default function PatientDashboard() {
                                     : 'bg-yellow-100 text-yellow-800'
                                 }`}
                               >
-                                {apt.paymentStatus === 'completed' ? 'Bezahlt' : 'Zahlung ausstehend'}
+                                {apt.paymentStatus === 'completed' ? t('appointments:paymentCompleted') : t('appointments:paymentPending')}
                               </span>
                             </div>
                           </div>
@@ -426,7 +438,7 @@ export default function PatientDashboard() {
                                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
                               >
                                 <Video size={16} />
-                                Beitreten
+                                {t('appointments:joinCall')}
                               </button>
                             )}
                           </div>
@@ -440,11 +452,11 @@ export default function PatientDashboard() {
 
             {activeTab === 'book' && (
               <div>
-                <h2 className="text-xl font-semibold mb-6">Verfügbare Termine</h2>
+                <h2 className="text-xl font-semibold mb-6">{t('dashboard:availableAppointments')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {availableSlots.length === 0 ? (
                     <p className="col-span-2 text-center text-gray-500 py-8">
-                      Keine freien Termine verfügbar
+                      {t('dashboard:noSlotsAvailable')}
                     </p>
                   ) : (
                     availableSlots.map((slot) => (
@@ -455,14 +467,14 @@ export default function PatientDashboard() {
                         <div className="flex items-center gap-2 mb-3">
                           <Calendar size={18} className="text-blue-600" />
                           <span className="font-medium">
-                            {format(new Date(slot.startTime), 'EEEE, dd.MM.yyyy', { locale: de })}
+                            {format(new Date(slot.startTime), 'EEEE, dd.MM.yyyy', { locale: getDateLocale() })}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mb-3 text-sm text-gray-600">
                           <Clock size={16} />
                           <span>
                             {format(new Date(slot.startTime), 'HH:mm')} - 
-                            {format(new Date(slot.endTime), 'HH:mm')} Uhr
+                            {format(new Date(slot.endTime), 'HH:mm')} {t('common:timeOClock')}
                           </span>
                         </div>
                         {slot.therapist && (
@@ -482,7 +494,7 @@ export default function PatientDashboard() {
                             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
                           >
                             <CreditCard size={16} />
-                            Jetzt buchen
+                            {t('appointments:bookNow')}
                           </button>
                         </div>
                       </div>
@@ -494,11 +506,11 @@ export default function PatientDashboard() {
 
             {activeTab === 'messages' && (
               <div>
-                <h2 className="text-xl font-semibold mb-6">Nachrichten</h2>
+                <h2 className="text-xl font-semibold mb-6">{t('dashboard:messagesTab')}</h2>
                 <div className="space-y-3">
                   {messages.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">
-                      Keine Nachrichten
+                      {t('dashboard:noMessages')}
                     </p>
                   ) : (
                     messages.map((msg) => (
@@ -520,7 +532,7 @@ export default function PatientDashboard() {
                           </div>
                           {!msg.read && (
                             <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                              Neu
+                              {t('dashboard:newBadge')}
                             </span>
                           )}
                         </div>

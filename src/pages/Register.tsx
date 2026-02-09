@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import toast from 'react-hot-toast';
 import { logger } from '../utils/logger';
 
 export default function Register() {
+  const { t } = useTranslation(['auth', 'common']);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,22 +26,22 @@ export default function Register() {
 
     // Client-side validation
     if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
-      toast.error('Bitte füllen Sie alle Pflichtfelder aus');
+      toast.error(t('common:fillAllRequiredFields'));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwörter stimmen nicht überein');
+      toast.error(t('auth:passwordsMismatch'));
       return;
     }
 
     if (formData.password.length < 8) {
-      toast.error('Passwort muss mindestens 8 Zeichen haben');
+      toast.error(t('auth:passwordMinLength'));
       return;
     }
 
     if (!formData.gdprConsent) {
-      toast.error('Bitte akzeptieren Sie die Datenschutzerklärung');
+      toast.error(t('auth:acceptGdpr'));
       return;
     }
 
@@ -48,20 +50,20 @@ export default function Register() {
     try {
       const { confirmPassword, ...registerData } = formData;
       await register(registerData);
-      toast.success('Registrierung erfolgreich!');
+      toast.success(t('auth:registrationSuccess'));
       navigate('/dashboard');
     } catch (error: any) {
       logger.error('Register: error', error);
       
       if (error?.response?.status === 409) {
-        toast.error('Diese E-Mail-Adresse existiert bereits');
+        toast.error(t('auth:emailAlreadyExists'));
       } else if (error?.response?.status === 400) {
-        const errorMessage = error.response?.data?.error || 'Ungültige Eingabedaten';
+        const errorMessage = error.response?.data?.error || t('auth:invalidInputData');
         toast.error(errorMessage);
       } else if (!error?.response) {
-        toast.error('Keine Verbindung zum Server möglich');
+        toast.error(t('common:noConnectionToServer'));
       } else if (error?.code === 'ECONNABORTED') {
-        toast.error('Zeitüberschreitung. Bitte versuchen Sie es erneut.');
+        toast.error(t('common:timeout'));
       }
       // Andere Fehler werden vom Axios Interceptor behandelt
     } finally {
@@ -70,18 +72,18 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-12">
+    <main id="main-content" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-12">
       <div className="max-w-2xl w-full bg-white rounded-lg shadow-xl p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Abu-Abbad Registrierung</h1>
-          <p className="text-gray-600 mt-2">Willkommen bei Abu-Abbad - Ihrer DSGVO-konformen Therapeuten-Plattform</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('auth:registerTitle')}</h1>
+          <p className="text-gray-600 mt-2">{t('auth:registerSubtitle')}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" aria-label={t('auth:registerTitle')}>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Vorname *
+                {t('auth:firstNameLabel')}
               </label>
               <input
                 type="text"
@@ -90,7 +92,8 @@ export default function Register() {
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 required
-                placeholder="Vorname"
+                aria-required="true"
+                placeholder={t('auth:firstNamePlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
                 data-testid="register-firstname"
               />
@@ -98,7 +101,7 @@ export default function Register() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nachname *
+                {t('auth:lastNameLabel')}
               </label>
               <input
                 type="text"
@@ -107,7 +110,8 @@ export default function Register() {
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 required
-                placeholder="Nachname"
+                aria-required="true"
+                placeholder={t('auth:lastNamePlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
               />
             </div>
@@ -115,7 +119,7 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              E-Mail *
+              {t('auth:emailLabel')}
             </label>
             <input
               type="email"
@@ -124,13 +128,14 @@ export default function Register() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
+              aria-required="true"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Telefon (optional)
+              {t('auth:phoneLabelOptional')}
             </label>
             <input
               type="tel"
@@ -145,7 +150,7 @@ export default function Register() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Passwort *
+                {t('auth:passwordLabelRequired')}
               </label>
               <input
                 type="password"
@@ -154,15 +159,16 @@ export default function Register() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
+                aria-required="true"
                 minLength={8}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
-                placeholder="Min. 8 Zeichen"
+                placeholder={t('auth:passwordMinChars')}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Passwort bestätigen *
+                {t('auth:confirmPasswordLabel')}
               </label>
               <input
                 type="password"
@@ -171,7 +177,8 @@ export default function Register() {
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
-                placeholder="Passwort bestätigen"
+                aria-required="true"
+                placeholder={t('auth:confirmPasswordPlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
               />
             </div>
@@ -179,20 +186,20 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ich bin... *
+              {t('auth:iAmLabel')}
             </label>
-            <div className="flex gap-6" role="radiogroup" aria-label="Benutzerrolle auswählen">
+            <div className="flex gap-6" role="radiogroup" aria-label={t('auth:roleSelectAriaLabel')}>
               <label className="flex items-center cursor-pointer group">
                 <input
                   type="radio"
                   value="patient"
                   checked={formData.role === 'patient'}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as 'patient' })}
-                  className="w-4 h-4 mr-3 text-primary-600 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2"
-                  aria-label="Patient"
+                  className="w-4 h-4 me-3 text-primary-600 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2"
+                  aria-label={t('common:rolePatient')}
                 />
                 <span className="text-base font-medium text-gray-900 group-hover:text-primary-600 transition-colors">
-                  Patient
+                  {t('common:rolePatient')}
                 </span>
               </label>
               <label className="flex items-center cursor-pointer group">
@@ -201,11 +208,11 @@ export default function Register() {
                   value="therapist"
                   checked={formData.role === 'therapist'}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as 'therapist' })}
-                  className="w-4 h-4 mr-3 text-primary-600 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2"
-                  aria-label="Therapeut"
+                  className="w-4 h-4 me-3 text-primary-600 focus:ring-2 focus:ring-primary-600 focus:ring-offset-2"
+                  aria-label={t('common:roleTherapist')}
                 />
                 <span className="text-base font-medium text-gray-900 group-hover:text-primary-600 transition-colors">
-                  Therapeut
+                  {t('common:roleTherapist')}
                 </span>
               </label>
             </div>
@@ -218,11 +225,11 @@ export default function Register() {
                 checked={formData.gdprConsent}
                 onChange={(e) => setFormData({ ...formData, gdprConsent: e.target.checked })}
                 required
-                className="mt-1 mr-3"
+                aria-required="true"
+                className="mt-1 me-3"
               />
               <span className="text-sm text-gray-700">
-                Ich akzeptiere die <a href="#" className="text-primary-600 hover:underline">Datenschutzerklärung</a> (DSGVO) 
-                und stimme der Verarbeitung meiner Daten zu medizinischen Zwecken zu. *
+                {t('auth:gdprConsentText').split(t('auth:gdprLinkText'))[0]}<a href="#" className="text-primary-600 hover:underline">{t('auth:gdprLinkText')}</a>{t('auth:gdprConsentText').split(t('auth:gdprLinkText'))[1]}
               </span>
             </label>
           </div>
@@ -233,17 +240,17 @@ export default function Register() {
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 font-medium"
             data-testid="register-submit"
           >
-            {loading ? 'Wird registriert...' : 'Registrieren'}
+            {loading ? t('auth:registering') : t('auth:registerButton')}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
-          Bereits registriert?{' '}
+          {t('auth:alreadyRegistered')}{' '}
           <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
-            Jetzt anmelden
+            {t('auth:loginNow')}
           </Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }

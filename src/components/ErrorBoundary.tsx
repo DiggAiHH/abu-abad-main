@@ -1,5 +1,6 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { Component, ErrorInfo, ReactNode } from 'react';
+import i18n from '../i18n';
 
 interface Props {
   children: ReactNode;
@@ -37,9 +38,10 @@ class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // HISTORY-AWARE: Use existing logging infrastructure
     // DSGVO-SAFE: No external error tracking, local-only
-    if (window && (window as any).logError) {
-      (window as any).logError(error, 'ErrorBoundary', errorInfo);
-    } else {
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      const win = window as Window & { logError?: (err: unknown, ctx: string, info?: unknown) => void };
+      win.logError?.(error, 'ErrorBoundary', errorInfo);
+    } else if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
     
@@ -71,10 +73,14 @@ class ErrorBoundary extends Component<Props, State> {
         body: JSON.stringify(errorReport),
       }).catch(() => {
         // Silent fail - don't crash on error reporting
-        console.warn('Failed to send error report to backend');
+        if (import.meta.env.DEV) {
+          console.warn('Failed to send error report to backend');
+        }
       });
     } catch (err) {
-      console.error('Error reporting failed:', err);
+      if (import.meta.env.DEV) {
+        console.error('Error reporting failed:', err);
+      }
     }
   };
 
@@ -144,17 +150,17 @@ class ErrorBoundary extends Component<Props, State> {
             </div>
             
             <h1 className="text-2xl font-bold text-gray-900 text-center mb-4">
-              Ein Fehler ist aufgetreten
+              {i18n.t('errors:errorOccurred')}
             </h1>
             
             <p className="text-gray-600 text-center mb-6">
-              Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.
+              {i18n.t('errors:sorryTryAgain')}
             </p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mb-6 p-4 bg-gray-100 rounded-lg">
                 <summary className="cursor-pointer font-medium text-sm text-gray-700 mb-2">
-                  Fehlerdetails (nur in Entwicklung sichtbar)
+                  {i18n.t('errors:errorDetailsDevOnly')}
                 </summary>
                 <div className="text-xs text-gray-600 overflow-auto">
                   <p className="font-bold mb-2">{this.state.error.toString()}</p>
@@ -168,7 +174,7 @@ class ErrorBoundary extends Component<Props, State> {
             {/* PHASE 3: User Feedback for Error Report */}
             <div className="mb-6">
               <label htmlFor="user-feedback" className="block text-sm font-medium text-gray-700 mb-2">
-                Was ist passiert? (Optional - hilft uns bei der Fehlersuche)
+                {i18n.t('errors:whatHappened')}
               </label>
               <textarea
                 id="user-feedback"
@@ -176,7 +182,7 @@ class ErrorBoundary extends Component<Props, State> {
                 value={this.state.userFeedback}
                 onChange={(e) => this.setState({ userFeedback: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="z.B. 'Ich habe auf den Button geklickt und dann...'"
+                placeholder={i18n.t('errors:whatHappenedPlaceholder')}
               />
             </div>
 
@@ -190,26 +196,26 @@ class ErrorBoundary extends Component<Props, State> {
                     : 'bg-orange-600 text-white hover:bg-orange-700'
                 }`}
               >
-                {this.state.copied ? '✓ Fehlerbericht kopiert!' : '📋 Fehlerbericht kopieren'}
+                {this.state.copied ? i18n.t('errors:errorReportCopied') : i18n.t('errors:copyErrorReport')}
               </button>
               
               <button
                 onClick={this.handleReset}
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-medium"
               >
-                Zur Startseite
+                {i18n.t('errors:goToHome')}
               </button>
               
               <button
                 onClick={() => window.location.reload()}
                 className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition font-medium"
               >
-                Seite neu laden
+                {i18n.t('errors:reloadPage')}
               </button>
             </div>
 
             <p className="mt-6 text-xs text-gray-500 text-center">
-              Wenn das Problem weiterhin besteht, kopieren Sie den Fehlerbericht und kontaktieren Sie den Support.
+              {i18n.t('errors:persistentErrorNotice')}
             </p>
           </div>
         </div>

@@ -1,0 +1,123 @@
+const video = {
+  title: 'جلسه ویدئویی',
+  // ─── اتصال ──────────────────────────────────────
+  connectionEstablished: 'اتصال برقرار شد',
+  connectionErrorDuringCall: 'خطای اتصال حین تماس',
+  connectionLost: 'اتصال قطع شد',
+  connectionError: 'خطای اتصال',
+  connectionInterrupted: 'اتصال قطع شد، در حال تلاش برای بازیابی...',
+  connectionEndedInfo: 'اتصال پایان یافت',
+  connectionLostReconnect: 'اتصال از دست رفت. لطفاً مجدداً متصل شوید.',
+  connecting: 'در حال اتصال...',
+  connected: 'متصل',
+  waitingForConnection: 'در انتظار اتصال...',
+  live: 'زنده',
+
+  // ─── تماس ──────────────────────────────────────
+  callEnded: 'تماس پایان یافت',
+  callEndedSuccess: 'تماس پایان یافت',
+  callCouldNotStart: 'تماس نتوانست شروع شود',
+  callAlreadyOpen: 'تماس در تب دیگری در حال اجرا است',
+  endCall: 'پایان تماس',
+  errorAnsweringCall: 'خطا در پاسخ‌گویی به تماس',
+  errorStartingCall: 'خطا در شروع تماس',
+  errorInitializingCall: 'خطا در راه‌اندازی تماس',
+  errorConnectingTherapist: 'خطا در اتصال به درمانگر',
+  connectionToTherapistFailed: 'اتصال به درمانگر ناموفق بود',
+
+  // ─── شبکه/همتا ──────────────────────────────────
+  peerUnavailable: 'طرف مقابل در دسترس نیست. منتظر پیوستن درمانگر بمانید.',
+  peerServerUnreachable: 'سرور PeerJS در دسترس نیست. اتصال ناموفق بود.',
+  peerNotInitialized: 'اتصال همتا راه‌اندازی نشده است',
+  serverError: 'خطای سرور. لطفاً بعداً دوباره تلاش کنید.',
+  timeoutTherapist: 'درمانگر پاسخ نمی‌دهد. لطفاً بعداً دوباره تلاش کنید.',
+  therapistNotOnline: 'درمانگر آنلاین نیست یا در دسترس نمی‌باشد',
+  slowNetwork: 'اتصال شبکه کند تشخیص داده شد. کیفیت کاهش یافت.',
+
+  // ─── رسانه/دوربین ───────────────────────────────
+  browserNoWebRTC: 'مرورگر از WebRTC پشتیبانی نمی‌کند.',
+  cameraAccessDenied: 'دسترسی به دوربین/میکروفون رد شد. لطفاً مجوزها را بررسی کنید.',
+  noDeviceFound: 'هیچ دوربین یا میکروفونی یافت نشد.',
+  cameraTimeout: 'مهلت دوربین – حالت صوتی استفاده می‌شود',
+  audioOnlyMode: 'حالت صوتی فعال',
+  audioOnlyActive: 'فقط حالت صوتی فعال است (دوربین در دسترس نیست)',
+  videoOff: 'خاموش کردن دوربین',
+  videoOn: 'روشن کردن دوربین',
+  micOff: 'خاموش کردن میکروفون',
+  micOn: 'روشن کردن میکروفون',
+  cameraActiveAriaLabel: 'دوربین فعال',
+  cameraMutedAriaLabel: 'دوربین خاموش',
+  micActiveAriaLabel: 'میکروفون فعال',
+  micMutedAriaLabel: 'میکروفون بی‌صدا',
+
+  // ─── اشتراک‌گذاری صفحه ─────────────────────────
+  screenShareStarted: 'اشتراک‌گذاری صفحه شروع شد',
+  screenShareFailed: 'اشتراک‌گذاری صفحه ناموفق بود',
+  screenShareEnded: 'اشتراک‌گذاری صفحه پایان یافت',
+  stopScreenShare: 'توقف اشتراک‌گذاری صفحه',
+  startScreenShare: 'اشتراک‌گذاری صفحه',
+
+  // ─── گفتگو ──────────────────────────────────────
+  openChat: 'باز کردن گفتگو',
+
+  // ─── سایر ──────────────────────────────────────
+  participantConnectedNoVideo: 'شرکت‌کننده متصل شد (ویدئو در دسترس نیست)',
+  waitingForOtherParticipant: 'در انتظار شرکت‌کننده دیگر...',
+  otherParticipantLeft: 'شرکت‌کننده دیگر تماس را ترک کرد.',
+  backToDashboard: 'بازگشت به داشبورد',
+  noRoomId: 'شناسه اتاق موجود نیست',
+
+  // ─── اتاق انتظار ────────────────────────────────
+  waitingRoom: 'اتاق انتظار',
+  waitingRoomPreparing: 'اتاق انتظار در حال آماده‌سازی...',
+  waitingForTherapist: 'در انتظار درمانگر',
+  notifiedWhenReady: 'هنگامی که درمانگر شما آماده شود، به شما اطلاع داده می‌شود',
+  therapistReady: 'درمانگر شما آماده است!',
+  redirectingToSession: 'در حال انتقال به جلسه ویدئویی...',
+  statusInWaitingRoom: 'در اتاق انتظار',
+  statusFillQuestionnaire: 'پر کردن پرسشنامه',
+  statusTherapistCalling: 'درمانگر فرامی‌خواند',
+  statusStartSession: 'شروع جلسه ویدئویی',
+  questionnaireSaved: 'پرسشنامه ذخیره شد',
+
+  // ─── پرسشنامه پیش از جلسه ────────────────────
+  currentMoodLabel: 'خلق فعلی شما چگونه است؟',
+  anxietyLevelLabel: 'سطح اضطراب/تنش',
+  sleepQualityLabel: 'کیفیت خواب شب گذشته',
+  noAnxiety: 'بدون اضطراب',
+  veryStrong: 'بسیار شدید',
+  medicationTakenToday: 'داروهای امروز مصرف شده',
+  mainConcernsLabel: 'چه موضوعی را می‌خواهید امروز مطرح کنید؟',
+  mainConcernsPlaceholder: 'موضوعات اصلی شما برای جلسه امروز...',
+  questionsForTherapistLabel: 'آیا سؤالی از درمانگر خود دارید؟',
+  questionsPlaceholder: 'سؤالاتی که می‌خواهید بپرسید...',
+  significantEventsLabel: 'رویدادهای مهم از جلسه قبل',
+  eventsPlaceholder: 'رویدادها و تغییرات مهم...',
+  submitQuestionnaire: 'ارسال پرسشنامه',
+
+  // ─── صف درمانگر ──────────────────────────────────
+  queueTitle: 'نمای کلی اتاق انتظار',
+  patientsWaiting: '{{count}} بیمار در انتظار',
+  noPatientsWaiting: 'هیچ بیماری در انتظار نیست',
+  patientsAppearHere: 'بیماران جدید پس از ورود به اتاق انتظار در اینجا نمایش داده می‌شوند.',
+  appointment: 'نوبت:',
+  waitingTime: 'در انتظار: {{min}} دقیقه',
+  viewQuestionnaire: 'پرسشنامه',
+  admitPatient: 'فراخوانی',
+  questionnaireFilled: 'پرسشنامه پر شده',
+  questionnairePending: 'پرسشنامه در انتظار',
+  preSessionData: 'اطلاعات پیش از جلسه',
+  selectPatientToView: 'برای مشاهده پرسشنامه، بیماری را انتخاب کنید.',
+  moodLabel: 'خلق',
+  anxietyLabel: 'سطح اضطراب',
+  sleepLabel: 'کیفیت خواب',
+  medicationTakenLabel: 'داروها مصرف شده',
+  mainConcerns: 'موضوعات اصلی:',
+  questionsForYou: 'سؤالات برای شما:',
+  significantEvents: 'رویدادهای مهم:',
+  questionnaireNotFilled: 'پرسشنامه هنوز پر نشده است.',
+  patientCalledUp: 'بیمار {{name}} فراخوانی شد',
+  errorLoadingQueueData: 'خطا در بارگذاری اطلاعات',
+};
+
+export default video;

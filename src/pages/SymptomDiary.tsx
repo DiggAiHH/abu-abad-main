@@ -1,29 +1,30 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import toast from 'react-hot-toast';
 import { format, parseISO } from 'date-fns';
-import { de } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
-import { logger } from '../utils/logger';
 import {
-  ArrowLeft,
-  Plus,
-  Calendar,
-  Smile,
-  Frown,
-  Meh,
-  Moon,
-  Activity,
-  AlertTriangle,
-  Pill,
-  Edit2,
-  Trash2,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Save,
-  X,
+    Activity,
+    AlertTriangle,
+    ArrowLeft,
+    Calendar,
+    Edit2,
+    Frown,
+    Meh,
+    Minus,
+    Moon,
+    Pill,
+    Plus,
+    Save,
+    Smile,
+    Trash2,
+    TrendingDown,
+    TrendingUp,
+    X,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
+import { getDateLocale } from '../utils/dateLocale';
+import { logger } from '../utils/logger';
 
 // ===== TYPES =====
 interface MoodEntry {
@@ -56,43 +57,43 @@ interface DiaryStats {
 }
 
 // ===== CONSTANTS =====
-const COMMON_SYMPTOMS = [
-  'Kopfschmerzen',
-  'Müdigkeit',
-  'Schlafstörungen',
-  'Appetitlosigkeit',
-  'Konzentrationsprobleme',
-  'Innere Unruhe',
-  'Herzrasen',
-  'Schwindel',
-  'Grübeln',
-  'Antriebslosigkeit',
+const SYMPTOM_KEYS = [
+  'diary:symptomHeadache',
+  'diary:symptomFatigue',
+  'diary:symptomInsomnia',
+  'diary:symptomAppetiteLoss',
+  'diary:symptomConcentration',
+  'diary:symptomAnxiety',
+  'diary:symptomDizziness',
+  'diary:symptomNausea',
+  'diary:symptomSadness',
+  'diary:symptomMusclePain',
 ];
 
-const COMMON_TRIGGERS = [
-  'Arbeitsstress',
-  'Beziehungsprobleme',
-  'Familienkonflikte',
-  'Finanzielle Sorgen',
-  'Gesundheitliche Sorgen',
-  'Einsamkeit',
-  'Überforderung',
-  'Schlafmangel',
-  'Negative Nachrichten',
-  'Soziale Medien',
+const TRIGGER_KEYS = [
+  'diary:triggerStress',
+  'diary:triggerSleepLack',
+  'diary:triggerConflict',
+  'diary:triggerLoneliness',
+  'diary:triggerOverwork',
+  'diary:triggerWeather',
+  'diary:triggerAlcohol',
+  'diary:triggerCaffeine',
+  'diary:triggerMedForgotten',
+  'diary:triggerSocialEvent',
 ];
 
-const COMMON_ACTIVITIES = [
-  'Sport/Bewegung',
-  'Spaziergang',
-  'Meditation',
-  'Soziale Kontakte',
-  'Hobbys',
-  'Arbeit',
-  'Entspannung',
-  'Hausarbeit',
-  'Lesen',
-  'Musik hören',
+const ACTIVITY_KEYS = [
+  'diary:activitySports',
+  'diary:activityWalk',
+  'diary:activityMeditation',
+  'diary:activitySocial',
+  'diary:activityCreativity',
+  'diary:activityRelaxation',
+  'diary:activityReading',
+  'diary:activityMusic',
+  'diary:activityCooking',
+  'diary:activityGardening',
 ];
 
 // ===== HELPER COMPONENTS =====
@@ -130,6 +131,7 @@ function ScoreBar({ value, max, color }: { value: number; max: number; color: st
 // ===== MAIN COMPONENT =====
 export default function SymptomDiary() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['diary', 'common', 'screenings']);
 
   const [entries, setEntries] = useState<MoodEntry[]>([]);
   const [stats, setStats] = useState<DiaryStats | null>(null);
@@ -168,7 +170,7 @@ export default function SymptomDiary() {
       setStats(statsRes.data || null);
     } catch (error) {
       logger.error('SymptomDiary: Fehler beim Laden', error);
-      toast.error('Fehler beim Laden der Einträge');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -198,10 +200,10 @@ export default function SymptomDiary() {
     try {
       if (editingEntry) {
         await api.put(`/symptom-diary/${editingEntry.id}`, formData);
-        toast.success('Eintrag aktualisiert');
+        toast.success(t('diary:entrySaved'));
       } else {
         await api.post('/symptom-diary', formData);
-        toast.success('Eintrag erstellt');
+        toast.success(t('diary:entrySaved'));
       }
       
       setShowForm(false);
@@ -209,9 +211,9 @@ export default function SymptomDiary() {
       loadData();
     } catch (error: any) {
       if (error.response?.status === 409) {
-        toast.error('Für dieses Datum existiert bereits ein Eintrag');
+        toast.error(t('common:error'));
       } else {
-        toast.error('Fehler beim Speichern');
+        toast.error(t('common:errorSaving'));
       }
     }
   };
@@ -240,14 +242,14 @@ export default function SymptomDiary() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Möchten Sie diesen Eintrag wirklich löschen?')) return;
+    if (!confirm(t('common:confirmDelete'))) return;
     
     try {
       await api.delete(`/symptom-diary/${id}`);
-      toast.success('Eintrag gelöscht');
+      toast.success(t('diary:entryDeleted'));
       loadData();
     } catch (error) {
-      toast.error('Fehler beim Löschen');
+      toast.error(t('common:errorDeleting'));
     }
   };
 
@@ -309,14 +311,14 @@ export default function SymptomDiary() {
                 onClick={() => navigate('/dashboard')}
                 className="p-2 hover:bg-gray-100 rounded-lg"
               >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={24} className="rtl:flip" />
               </button>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Symptom-Tagebuch
+                  {t('diary:title')}
                 </h1>
                 <p className="text-sm text-gray-600">
-                  Verfolgen Sie Ihre tägliche Stimmung und Symptome
+                  {t('diary:subtitle')}
                 </p>
               </div>
             </div>
@@ -328,7 +330,7 @@ export default function SymptomDiary() {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               <Plus size={20} />
-              Neuer Eintrag
+              {t('diary:newEntry')}
             </button>
           </div>
         </div>
@@ -341,9 +343,9 @@ export default function SymptomDiary() {
             <div className="bg-white rounded-lg shadow p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Durchschnitt Stimmung</p>
+                  <p className="text-sm text-gray-600">{t('diary:averageMood')}</p>
                   <p className="text-2xl font-bold">
-                    {stats.averages.mood?.toFixed(1) || '-'}
+                    {stats.averages?.mood?.toFixed(1) || '-'}
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
@@ -352,19 +354,19 @@ export default function SymptomDiary() {
               </div>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Ø Schlaf</p>
+              <p className="text-sm text-gray-600">{t('diary:averageSleep')}</p>
               <p className="text-2xl font-bold">
-                {stats.averages.sleepHours?.toFixed(1) || '-'}h
+                {stats.averages?.sleepHours?.toFixed(1) || '-'}h
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Ø Angst</p>
+              <p className="text-sm text-gray-600">{t('diary:averageAnxiety')}</p>
               <p className="text-2xl font-bold">
-                {stats.averages.anxiety?.toFixed(1) || '-'}/10
+                {stats.averages?.anxiety?.toFixed(1) || '-'}/10
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Einträge gesamt</p>
+              <p className="text-sm text-gray-600">{t('diary:totalEntries')}</p>
               <p className="text-2xl font-bold">{stats.totalEntries}</p>
             </div>
           </div>
@@ -376,7 +378,7 @@ export default function SymptomDiary() {
             <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold">
-                  {editingEntry ? 'Eintrag bearbeiten' : 'Neuer Tagebucheintrag'}
+                  {editingEntry ? t('diary:editEntry') : t('diary:newEntry')}
                 </h2>
                 <button
                   onClick={() => {
@@ -393,8 +395,8 @@ export default function SymptomDiary() {
                 {/* Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Calendar className="inline mr-2" size={16} />
-                    Datum
+                    <Calendar className="inline me-2" size={16} />
+                    {t('common:date')}
                   </label>
                   <input
                     type="date"
@@ -411,8 +413,8 @@ export default function SymptomDiary() {
                 {/* Mood Score */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Smile className="inline mr-2" size={16} />
-                    Stimmung: {formData.moodScore}/10
+                    <Smile className="inline me-2" size={16} />
+                    {t('diary:mood')}: {formData.moodScore}/10
                   </label>
                   <input
                     type="range"
@@ -428,16 +430,16 @@ export default function SymptomDiary() {
                     className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-blue-600"
                   />
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Sehr schlecht</span>
-                    <span>Sehr gut</span>
+                    <span>{t('common:less')}</span>
+                    <span>{t('common:more')}</span>
                   </div>
                 </div>
 
                 {/* Anxiety Level */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <AlertTriangle className="inline mr-2" size={16} />
-                    Angst/Anspannung: {formData.anxietyLevel}/10
+                    <AlertTriangle className="inline me-2" size={16} />
+                    {t('diary:anxiety')}: {formData.anxietyLevel}/10
                   </label>
                   <input
                     type="range"
@@ -458,8 +460,8 @@ export default function SymptomDiary() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <Moon className="inline mr-2" size={16} />
-                      Schlafqualität
+                      <Moon className="inline me-2" size={16} />
+                      {t('diary:sleepQuality')}
                     </label>
                     <select
                       value={formData.sleepQuality}
@@ -471,16 +473,16 @@ export default function SymptomDiary() {
                       }
                       className="w-full border rounded-lg px-3 py-2"
                     >
-                      <option value={1}>Sehr schlecht</option>
-                      <option value={2}>Schlecht</option>
-                      <option value={3}>Mittelmäßig</option>
-                      <option value={4}>Gut</option>
-                      <option value={5}>Sehr gut</option>
+                      <option value={1}>{t('common:less')}</option>
+                      <option value={2}>{t('screenings:severityMild')}</option>
+                      <option value={3}>{t('screenings:severityModerate')}</option>
+                      <option value={4}>{t('common:more')}</option>
+                      <option value={5}>{t('common:more')}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Schlafstunden
+                      {t('diary:sleepHours')}
                     </label>
                     <input
                       type="number"
@@ -503,8 +505,8 @@ export default function SymptomDiary() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <Activity className="inline mr-2" size={16} />
-                      Energie: {formData.energyLevel}/10
+                      <Activity className="inline me-2" size={16} />
+                      {t('diary:energy')}: {formData.energyLevel}/10
                     </label>
                     <input
                       type="range"
@@ -522,7 +524,7 @@ export default function SymptomDiary() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Stress: {formData.stressLevel}/10
+                      {t('diary:stress')}: {formData.stressLevel}/10
                     </label>
                     <input
                       type="range"
@@ -543,83 +545,92 @@ export default function SymptomDiary() {
                 {/* Symptoms */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Symptome heute
+                    {t('diary:symptoms')}
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {COMMON_SYMPTOMS.map((symptom) => (
+                    {SYMPTOM_KEYS.map((key) => {
+                      const label = t(key);
+                      return (
                       <button
-                        key={symptom}
+                        key={key}
                         type="button"
-                        onClick={() => toggleArrayItem('symptoms', symptom)}
+                        onClick={() => toggleArrayItem('symptoms', label)}
                         className={`px-3 py-1 rounded-full text-sm transition ${
-                          formData.symptoms.includes(symptom)
+                          formData.symptoms.includes(label)
                             ? 'bg-red-100 text-red-700 border-red-300 border'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {symptom}
+                        {label}
                       </button>
-                    ))}
+                    );
+                    })}
                   </div>
                 </div>
 
                 {/* Triggers */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Auslöser/Trigger
+                    {t('diary:triggers')}
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {COMMON_TRIGGERS.map((trigger) => (
+                    {TRIGGER_KEYS.map((key) => {
+                      const label = t(key);
+                      return (
                       <button
-                        key={trigger}
+                        key={key}
                         type="button"
-                        onClick={() => toggleArrayItem('triggers', trigger)}
+                        onClick={() => toggleArrayItem('triggers', label)}
                         className={`px-3 py-1 rounded-full text-sm transition ${
-                          formData.triggers.includes(trigger)
+                          formData.triggers.includes(label)
                             ? 'bg-orange-100 text-orange-700 border-orange-300 border'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {trigger}
+                        {label}
                       </button>
-                    ))}
+                    );
+                    })}
                   </div>
                 </div>
 
                 {/* Activities */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Aktivitäten heute
+                    {t('diary:activities')}
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {COMMON_ACTIVITIES.map((activity) => (
+                    {ACTIVITY_KEYS.map((key) => {
+                      const label = t(key);
+                      return (
                       <button
-                        key={activity}
+                        key={key}
                         type="button"
-                        onClick={() => toggleArrayItem('activities', activity)}
+                        onClick={() => toggleArrayItem('activities', label)}
                         className={`px-3 py-1 rounded-full text-sm transition ${
-                          formData.activities.includes(activity)
+                          formData.activities.includes(label)
                             ? 'bg-green-100 text-green-700 border-green-300 border'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {activity}
+                        {label}
                       </button>
-                    ))}
+                    );
+                    })}
                   </div>
                 </div>
 
                 {/* Medications */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Pill className="inline mr-2" size={16} />
-                    Medikamente
+                    <Pill className="inline me-2" size={16} />
+                    {t('common:patient')}
                   </label>
                   {formData.medications.map((med, index) => (
                     <div key={index} className="flex gap-2 mb-2">
                       <input
                         type="text"
-                        placeholder="Medikament"
+                        placeholder={t('medications:medicationName')}
                         value={med.name}
                         onChange={(e) =>
                           updateMedication(index, 'name', e.target.value)
@@ -628,7 +639,7 @@ export default function SymptomDiary() {
                       />
                       <input
                         type="text"
-                        placeholder="Dosierung"
+                        placeholder={t('medications:dosage')}
                         value={med.dosage}
                         onChange={(e) =>
                           updateMedication(index, 'dosage', e.target.value)
@@ -660,14 +671,14 @@ export default function SymptomDiary() {
                     onClick={addMedication}
                     className="text-sm text-blue-600 hover:text-blue-700"
                   >
-                    + Medikament hinzufügen
+                    + {t('medications:addMedication')}
                   </button>
                 </div>
 
                 {/* Notes */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Notizen
+                    {t('common:notes')}
                   </label>
                   <textarea
                     value={formData.notes}
@@ -675,7 +686,7 @@ export default function SymptomDiary() {
                       setFormData({ ...formData, notes: e.target.value })
                     }
                     rows={4}
-                    placeholder="Wie war Ihr Tag? Was haben Sie beobachtet?"
+                    placeholder={t('diary:notesPlaceholder')}
                     className="w-full border rounded-lg px-3 py-2 resize-none"
                     maxLength={2000}
                   />
@@ -691,14 +702,14 @@ export default function SymptomDiary() {
                     }}
                     className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
                   >
-                    Abbrechen
+                    {t('common:cancel')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     <Save size={20} />
-                    Speichern
+                    {t('common:save')}
                   </button>
                 </div>
               </form>
@@ -713,17 +724,16 @@ export default function SymptomDiary() {
               <Calendar size={48} className="mx-auto" />
             </div>
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              Noch keine Einträge
+              {t('diary:noEntries')}
             </h3>
             <p className="text-gray-500 mb-4">
-              Beginnen Sie mit Ihrem ersten Tagebucheintrag, um Ihre Stimmung
-              und Symptome zu verfolgen.
+              {t('diary:startTracking')}
             </p>
             <button
               onClick={() => setShowForm(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              Ersten Eintrag erstellen
+              {t('diary:newEntry')}
             </button>
           </div>
         ) : (
@@ -739,12 +749,12 @@ export default function SymptomDiary() {
                     <div>
                       <p className="font-semibold">
                         {format(parseISO(entry.entry_date), 'EEEE, d. MMMM yyyy', {
-                          locale: de,
+                          locale: getDateLocale(),
                         })}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Stimmung: {entry.mood_score}/10 | Schlaf:{' '}
-                        {entry.sleep_hours}h | Angst: {entry.anxiety_level || 0}
+                        {t('diary:mood')}: {entry.mood_score}/10 | {t('diary:sleep')}:{' '}
+                        {entry.sleep_hours}h | {t('diary:anxiety')}: {entry.anxiety_level || 0}
                         /10
                       </p>
                     </div>
@@ -768,7 +778,7 @@ export default function SymptomDiary() {
                 {/* Visual Bars */}
                 <div className="grid grid-cols-3 gap-4 mt-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Stimmung</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('diary:mood')}</p>
                     <ScoreBar
                       value={entry.mood_score}
                       max={10}
@@ -776,7 +786,7 @@ export default function SymptomDiary() {
                     />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Energie</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('diary:energy')}</p>
                     <ScoreBar
                       value={entry.energy_level || 5}
                       max={10}
@@ -784,7 +794,7 @@ export default function SymptomDiary() {
                     />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Stress</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('diary:stress')}</p>
                     <ScoreBar
                       value={entry.stress_level || 0}
                       max={10}
@@ -806,12 +816,12 @@ export default function SymptomDiary() {
                         {s}
                       </span>
                     ))}
-                    {entry.triggers?.map((t) => (
+                    {entry.triggers?.map((trigger) => (
                       <span
-                        key={t}
+                        key={trigger}
                         className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full"
                       >
-                        {t}
+                        {trigger}
                       </span>
                     ))}
                     {entry.activities?.map((a) => (

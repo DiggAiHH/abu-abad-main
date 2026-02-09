@@ -1,0 +1,47 @@
+const exercises = {
+  title: 'Therapeutische Übungen',
+  subtitle: 'Ihre zugewiesenen Übungen und Fortschritte',
+  myExercises: 'Meine Übungen',
+  completionLog: 'Durchführungs-Log',
+  stats: 'Statistik',
+  markComplete: 'Als erledigt markieren',
+  completeExercise: 'Übung abschließen',
+  exerciseCompleted: 'Übung als erledigt markiert! 🎉',
+  duration: 'Dauer (Minuten)',
+  difficulty: 'Schwierigkeit',
+  moodBefore: 'Stimmung vorher',
+  moodAfter: 'Stimmung nachher',
+  barriers: 'Hindernisse',
+  notesPlaceholder: 'Wie ist es gelaufen?',
+  noExercises: 'Keine Übungen zugewiesen',
+  noCompletions: 'Noch keine Durchführungen',
+  activeExercises: 'aktive Übungen',
+  completedToday: 'heute erledigt',
+  totalExercises: 'Übungen',
+  totalCompletions: 'Durchführungen',
+  avgMoodChange: 'Ø Stimmungsänderung',
+  byCategory: 'Nach Kategorie',
+  weeklyActivity: 'Wöchentliche Aktivität',
+  completionRate: 'Abschlussrate',
+  dueDate: 'Fällig am',
+  assignedBy: 'Zugewiesen von',
+  statusPending: 'Ausstehend',
+  statusInProgress: 'In Bearbeitung',
+  statusCompleted: 'Abgeschlossen',
+
+  // Frequenz
+  frequencyDaily: 'Täglich',
+  frequencyWeekly: 'Wöchentlich',
+  frequencyBiweekly: 'Alle 2 Wochen',
+  frequencyAsNeeded: 'Bei Bedarf',
+
+  // Kategorien
+  categoryRelaxation: 'Entspannung',
+  categoryCognitive: 'Kognitiv',
+  categoryMindfulness: 'Achtsamkeit',
+  categoryBehavioral: 'Verhaltensaktivierung',
+  categoryExposure: 'Exposition',
+  categorySocial: 'Soziale Kompetenz',
+};
+
+export default exercises;

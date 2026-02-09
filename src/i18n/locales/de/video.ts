@@ -1,0 +1,123 @@
+const video = {
+  title: 'Video-Sitzung',
+  // ─── Verbindung ──────────────────────────────────
+  connectionEstablished: 'Verbindung hergestellt',
+  connectionErrorDuringCall: 'Verbindungsfehler während des Anrufs',
+  connectionLost: 'Verbindung unterbrochen',
+  connectionError: 'Verbindungsfehler',
+  connectionInterrupted: 'Verbindung unterbrochen, versuche Wiederherstellung...',
+  connectionEndedInfo: 'Verbindung beendet',
+  connectionLostReconnect: 'Verbindung verloren. Bitte erneut verbinden.',
+  connecting: 'Verbinde...',
+  connected: 'Verbunden',
+  waitingForConnection: 'Warten auf Verbindung...',
+  live: 'Live',
+
+  // ─── Anruf ──────────────────────────────────────
+  callEnded: 'Anruf beendet',
+  callEndedSuccess: 'Anruf beendet',
+  callCouldNotStart: 'Anruf konnte nicht gestartet werden',
+  callAlreadyOpen: 'Anruf läuft bereits in einem anderen Tab',
+  endCall: 'Anruf beenden',
+  errorAnsweringCall: 'Fehler beim Annehmen des Anrufs',
+  errorStartingCall: 'Fehler beim Starten des Anrufs',
+  errorInitializingCall: 'Fehler beim Initialisieren des Anrufs',
+  errorConnectingTherapist: 'Fehler beim Verbinden mit Therapeut',
+  connectionToTherapistFailed: 'Verbindung zum Therapeuten fehlgeschlagen',
+
+  // ─── Peer/Netzwerk ──────────────────────────────
+  peerUnavailable: 'Gegenstelle nicht erreichbar. Warten Sie, bis der Therapeut beitritt.',
+  peerServerUnreachable: 'PeerJS Server nicht erreichbar. Verbindung fehlgeschlagen.',
+  peerNotInitialized: 'Peer-Verbindung nicht initialisiert',
+  serverError: 'Server-Fehler. Bitte später erneut versuchen.',
+  timeoutTherapist: 'Therapeut antwortet nicht. Bitte versuchen Sie es später erneut.',
+  therapistNotOnline: 'Therapeut ist nicht online oder nicht erreichbar',
+  slowNetwork: 'Langsame Netzwerkverbindung erkannt. Qualität reduziert.',
+
+  // ─── Media/Kamera ───────────────────────────────
+  browserNoWebRTC: 'Browser unterstützt WebRTC nicht.',
+  cameraAccessDenied: 'Kamera/Mikrofon-Zugriff verweigert. Bitte Berechtigungen prüfen.',
+  noDeviceFound: 'Keine Kamera oder Mikrofon gefunden.',
+  cameraTimeout: 'Kamera-Timeout – nur Audio-Modus wird genutzt',
+  audioOnlyMode: 'Audio-Only Modus aktiv',
+  audioOnlyActive: 'Nur Audio-Modus aktiv (Kamera nicht verfügbar)',
+  videoOff: 'Kamera ausschalten',
+  videoOn: 'Kamera einschalten',
+  micOff: 'Mikrofon ausschalten',
+  micOn: 'Mikrofon einschalten',
+  cameraActiveAriaLabel: 'Kamera aktiv',
+  cameraMutedAriaLabel: 'Kamera ausgeschaltet',
+  micActiveAriaLabel: 'Mikrofon aktiv',
+  micMutedAriaLabel: 'Mikrofon stummgeschaltet',
+
+  // ─── Bildschirmfreigabe ─────────────────────────
+  screenShareStarted: 'Bildschirmfreigabe gestartet',
+  screenShareFailed: 'Bildschirmfreigabe fehlgeschlagen',
+  screenShareEnded: 'Bildschirmfreigabe beendet',
+  stopScreenShare: 'Bildschirmfreigabe beenden',
+  startScreenShare: 'Bildschirm teilen',
+
+  // ─── Chat ───────────────────────────────────────
+  openChat: 'Chat öffnen',
+
+  // ─── Sonstiges ──────────────────────────────────
+  participantConnectedNoVideo: 'Teilnehmer verbunden (kein Video verfügbar)',
+  waitingForOtherParticipant: 'Warten auf anderen Teilnehmer...',
+  otherParticipantLeft: 'Der andere Teilnehmer hat den Call verlassen.',
+  backToDashboard: 'Zurück zum Dashboard',
+  noRoomId: 'Keine Raum-ID vorhanden',
+
+  // ─── Wartezimmer ────────────────────────────────
+  waitingRoom: 'Wartezimmer',
+  waitingRoomPreparing: 'Wartezimmer wird vorbereitet...',
+  waitingForTherapist: 'Warten auf Therapeuten',
+  notifiedWhenReady: 'Sie werden benachrichtigt, sobald Ihr Therapeut bereit ist',
+  therapistReady: 'Ihr Therapeut ist bereit!',
+  redirectingToSession: 'Sie werden jetzt zur Videositzung weitergeleitet...',
+  statusInWaitingRoom: 'Im Wartezimmer',
+  statusFillQuestionnaire: 'Fragebogen ausfüllen',
+  statusTherapistCalling: 'Therapeut ruft auf',
+  statusStartSession: 'Videositzung starten',
+  questionnaireSaved: 'Fragebogen gespeichert',
+
+  // ─── Vor-Sitzungs-Fragebogen ────────────────────
+  currentMoodLabel: 'Wie ist Ihre aktuelle Stimmung?',
+  anxietyLevelLabel: 'Angst-/Anspannungslevel',
+  sleepQualityLabel: 'Schlafqualität letzte Nacht',
+  noAnxiety: 'Keine Angst',
+  veryStrong: 'Sehr stark',
+  medicationTakenToday: 'Medikamente heute eingenommen',
+  mainConcernsLabel: 'Was möchten Sie heute besprechen?',
+  mainConcernsPlaceholder: 'Ihre Hauptthemen für die heutige Sitzung...',
+  questionsForTherapistLabel: 'Haben Sie Fragen an Ihren Therapeuten?',
+  questionsPlaceholder: 'Fragen, die Sie stellen möchten...',
+  significantEventsLabel: 'Besondere Ereignisse seit der letzten Sitzung',
+  eventsPlaceholder: 'Wichtige Ereignisse, Veränderungen...',
+  submitQuestionnaire: 'Fragebogen absenden',
+
+  // ─── Therapeuten-Queue ──────────────────────────
+  queueTitle: 'Wartezimmer-Übersicht',
+  patientsWaiting: '{{count}} Patient(en) warten',
+  noPatientsWaiting: 'Keine Patienten warten',
+  patientsAppearHere: 'Neue Patienten erscheinen hier, sobald sie dem Wartezimmer beitreten.',
+  appointment: 'Termin:',
+  waitingTime: 'Wartet: {{min}} Min.',
+  viewQuestionnaire: 'Fragebogen',
+  admitPatient: 'Aufrufen',
+  questionnaireFilled: 'Fragebogen ausgefüllt',
+  questionnairePending: 'Fragebogen ausstehend',
+  preSessionData: 'Vor-Sitzungs-Daten',
+  selectPatientToView: 'Wählen Sie einen Patienten aus, um dessen Fragebogen einzusehen.',
+  moodLabel: 'Stimmung',
+  anxietyLabel: 'Angst-Level',
+  sleepLabel: 'Schlafqualität',
+  medicationTakenLabel: 'Medikamente genommen',
+  mainConcerns: 'Hauptanliegen:',
+  questionsForYou: 'Fragen an Sie:',
+  significantEvents: 'Besondere Ereignisse:',
+  questionnaireNotFilled: 'Fragebogen wurde noch nicht ausgefüllt.',
+  patientCalledUp: 'Patient {{name}} aufgerufen',
+  errorLoadingQueueData: 'Fehler beim Laden der Daten',
+};
+
+export default video;

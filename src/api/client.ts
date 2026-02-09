@@ -8,7 +8,7 @@ function coerceErrorMessage(value: unknown): string {
   if (typeof value === 'string') return value;
   if (!value || typeof value !== 'object') return 'Ein Fehler ist aufgetreten';
 
-  const obj = value as any;
+  const obj = value as Record<string, unknown>;
   // Häufige Backend-Formate: { error: string } oder { error: { message: string } }
   if (typeof obj.error === 'string') return obj.error;
   if (obj.error) return coerceErrorMessage(obj.error);
@@ -136,7 +136,7 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<{ error: string }>) => {
     const message = coerceErrorMessage(error.response?.data);
-    const originalRequest: any = error.config;
+    const originalRequest = error.config as typeof error.config & { _retry?: boolean };
     const requestUrl = String(originalRequest?.url || '');
     const isAuthLoginCall = requestUrl.includes('/auth/login');
     const isAuthRefreshCall = requestUrl.includes('/auth/refresh');
@@ -182,9 +182,10 @@ api.interceptors.response.use(
       toast.error(message);
     }
     
-    // Logging
-    if (window && (window as any).logError) {
-      (window as any).logError(error, 'axios.response');
+    // Error reporting (typed, no unsafe window access)
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      const win = window as Window & { logError?: (err: unknown, ctx: string) => void };
+      win.logError?.(error, 'axios.response');
     }
     
     return Promise.reject(error);

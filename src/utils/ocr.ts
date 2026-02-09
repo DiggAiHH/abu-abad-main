@@ -1,30 +1,32 @@
-export async function extractTextFromImageFile(file: File): Promise<string> {
-  // Rein lokal: Browser TextDetector API (kein Upload, keine externen Modelle)
-  // Hinweis: Nicht in allen Browsern verfügbar.
-  const TextDetectorCtor = (window as any).TextDetector as
-    | (new () => { detect: (image: ImageBitmap) => Promise<Array<{ rawValue?: string }>> })
-    | undefined;
+import Tesseract from 'tesseract.js';
 
-  if (!TextDetectorCtor) {
-    throw new Error('OCR/Text-Erkennung wird von diesem Browser nicht unterstützt.');
+/**
+ * Extrahiert Text aus einem Bild mittels Tesseract.js (clientseitige OCR).
+ * Unterstützt Deutsch und Englisch. Funktioniert in allen modernen Browsern.
+ *
+ * @param file - Die Bild-Datei (File-Objekt)
+ * @returns Der extrahierte Text
+ */
+export async function extractTextFromImageFile(file: File): Promise<string> {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Die Datei ist kein unterstütztes Bildformat.');
   }
 
-  const imageBitmap = await createImageBitmap(file);
   try {
-    const detector = new TextDetectorCtor();
-    const results = await detector.detect(imageBitmap);
-    const text = (results || [])
-      .map((r) => (r?.rawValue || '').trim())
-      .filter(Boolean)
-      .join('\n');
+    const { data } = await Tesseract.recognize(file, 'deu+eng', {
+      logger: () => {}, // Stille Logs
+    });
 
-    return text
+    const text = (data.text || '')
       .replace(/\r\n/g, '\n')
       .replace(/\r/g, '\n')
       .replace(/[\t ]+/g, ' ')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
-  } finally {
-    imageBitmap.close();
+
+    return text;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unbekannter Fehler';
+    throw new Error(`OCR-Texterkennung fehlgeschlagen: ${message}`);
   }
 }

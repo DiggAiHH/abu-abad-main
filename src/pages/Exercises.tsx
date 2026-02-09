@@ -1,22 +1,23 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import { logger } from '../utils/logger';
 import {
   ArrowLeft,
   BookOpen,
+  Calendar,
   Check,
-  Clock,
-  Play,
   ChevronDown,
   ChevronUp,
-  TrendingUp,
-  Calendar,
-  Target,
-  Smile,
+  Clock,
   Frown,
+  Play,
+  Smile,
+  Target,
+  TrendingUp,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
+import { logger } from '../utils/logger';
 
 // ===== TYPES =====
 interface Exercise {
@@ -71,15 +72,16 @@ const CATEGORY_COLORS: Record<string, string> = {
   other: 'bg-gray-500',
 };
 
-const FREQUENCY_LABELS: Record<string, string> = {
-  once: 'Einmalig',
-  daily: 'Täglich',
-  weekly: 'Wöchentlich',
-  as_needed: 'Bei Bedarf',
+const FREQUENCY_KEYS: Record<string, string> = {
+  once: 'exercises:frequencyDaily',
+  daily: 'exercises:frequencyDaily',
+  weekly: 'exercises:frequencyWeekly',
+  as_needed: 'exercises:frequencyAsNeeded',
 };
 
 export default function Exercises() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['exercises', 'common']);
 
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [completions, setCompletions] = useState<Completion[]>([]);
@@ -112,12 +114,12 @@ export default function Exercises() {
         api.get('/exercises/stats?days=30'),
       ]);
 
-      setExercises(exercisesRes.data);
-      setCompletions(completionsRes.data);
-      setStats(statsRes.data);
+      setExercises(Array.isArray(exercisesRes.data) ? exercisesRes.data : []);
+      setCompletions(Array.isArray(completionsRes.data) ? completionsRes.data : []);
+      setStats(statsRes.data ?? { totalAssigned: 0, completed: 0, inProgress: 0, pending: 0, completionRate: 0 });
     } catch (error) {
       logger.error('Exercises: Fehler beim Laden', error);
-      toast.error('Fehler beim Laden der Übungen');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -131,7 +133,7 @@ export default function Exercises() {
         completed: true,
         ...completionData,
       });
-      toast.success('Übung als erledigt markiert! 🎉');
+      toast.success(t('exercises:exerciseCompleted'));
       setCompletingExercise(null);
       setCompletionData({
         duration: 0,
@@ -143,7 +145,7 @@ export default function Exercises() {
       });
       loadData();
     } catch (error) {
-      toast.error('Fehler beim Speichern');
+      toast.error(t('common:errorSaving'));
     }
   };
 
@@ -170,15 +172,15 @@ export default function Exercises() {
                 onClick={() => navigate('/dashboard')}
                 className="p-2 hover:bg-white/20 rounded-lg"
               >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={24} className="rtl:flip" />
               </button>
               <div>
                 <h1 className="text-2xl font-bold flex items-center gap-2">
                   <BookOpen size={28} />
-                  Übungen & Hausaufgaben
+                  {t('exercises:title')}
                 </h1>
                 <p className="text-purple-100">
-                  {exercises.length} aktive Übungen · {todayCompleted} heute erledigt
+                  {exercises.length} {t('exercises:activeExercises')} · {todayCompleted} {t('exercises:completedToday')}
                 </p>
               </div>
             </div>
@@ -198,7 +200,7 @@ export default function Exercises() {
             }`}
           >
             <Target size={16} className="inline mr-1" />
-            Aktive Übungen
+            {t('exercises:myExercises')}
           </button>
           <button
             onClick={() => setActiveTab('history')}
@@ -209,7 +211,7 @@ export default function Exercises() {
             }`}
           >
             <Calendar size={16} className="inline mr-1" />
-            Verlauf
+            {t('exercises:completionLog')}
           </button>
           <button
             onClick={() => setActiveTab('stats')}
@@ -220,7 +222,7 @@ export default function Exercises() {
             }`}
           >
             <TrendingUp size={16} className="inline mr-1" />
-            Statistik
+            {t('exercises:stats')}
           </button>
         </div>
       </div>
@@ -232,9 +234,9 @@ export default function Exercises() {
             {exercises.length === 0 ? (
               <div className="bg-white rounded-lg shadow p-8 text-center">
                 <BookOpen size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">Keine aktiven Übungen</p>
+                <p className="text-gray-500">{t('exercises:noExercises')}</p>
                 <p className="text-sm text-gray-400 mt-2">
-                  Ihr Therapeut kann Ihnen Übungen zuweisen
+                  {t('exercises:assignedBy')}
                 </p>
               </div>
             ) : (
@@ -265,13 +267,13 @@ export default function Exercises() {
                                   {exercise.estimatedMinutes} Min
                                 </span>
                               )}
-                              <span>{FREQUENCY_LABELS[exercise.frequency]}</span>
+                              <span>{t(FREQUENCY_KEYS[exercise.frequency] || 'exercises:frequencyDaily')}</span>
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-gray-500">
-                            {exercise.completionCount}x erledigt
+                            {exercise.completionCount}x {t('common:completed')}
                           </span>
                           {isExpanded ? <ChevronUp /> : <ChevronDown />}
                         </div>
@@ -286,7 +288,7 @@ export default function Exercises() {
 
                         {exercise.instructions && (
                           <div className="mt-4">
-                            <h4 className="font-medium mb-2">Anleitung:</h4>
+                            <h4 className="font-medium mb-2">{t('common:description')}:</h4>
                             <pre className="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 p-3 rounded">
                               {exercise.instructions}
                             </pre>
@@ -295,13 +297,13 @@ export default function Exercises() {
 
                         {exercise.dueDate && (
                           <p className="text-sm text-gray-500 mt-3">
-                            Fällig bis: {new Date(exercise.dueDate).toLocaleDateString('de-DE')}
+                            {t('exercises:dueDate')}: {new Date(exercise.dueDate).toLocaleDateString('de-DE')}
                           </p>
                         )}
 
                         {exercise.lastCompleted && (
                           <p className="text-sm text-green-600 mt-2">
-                            Zuletzt erledigt:{' '}
+                            {t('common:completed')}:{' '}
                             {new Date(exercise.lastCompleted).toLocaleString('de-DE', {
                               day: '2-digit',
                               month: '2-digit',
@@ -319,7 +321,7 @@ export default function Exercises() {
                           className="mt-4 w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 flex items-center justify-center gap-2"
                         >
                           <Play size={20} />
-                          Übung durchführen & als erledigt markieren
+                          {t('exercises:completeExercise')}
                         </button>
                       </div>
                     )}
@@ -336,7 +338,7 @@ export default function Exercises() {
             {completions.length === 0 ? (
               <div className="bg-white rounded-lg shadow p-8 text-center">
                 <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">Noch keine erledigten Übungen</p>
+                <p className="text-gray-500">{t('exercises:noCompletions')}</p>
               </div>
             ) : (
               completions.map((completion) => {
@@ -362,7 +364,7 @@ export default function Exercises() {
                       {completion.completed && (
                         <span className="flex items-center gap-1 text-green-600 bg-green-100 px-2 py-1 rounded-full text-sm">
                           <Check size={14} />
-                          Erledigt
+                          {t('common:completed')}
                         </span>
                       )}
                     </div>
@@ -376,12 +378,12 @@ export default function Exercises() {
                       )}
                       {completion.difficulty && (
                         <span className="text-gray-600">
-                          Schwierigkeit: {completion.difficulty}/10
+                          {t('exercises:difficulty')}: {completion.difficulty}/10
                         </span>
                       )}
                       {moodChange !== null && (
                         <span className={moodChange > 0 ? 'text-green-600' : moodChange < 0 ? 'text-red-600' : 'text-gray-600'}>
-                          Stimmung: {moodChange > 0 ? '+' : ''}{moodChange}
+                          {t('diary:mood')}: {moodChange > 0 ? '+' : ''}{moodChange}
                         </span>
                       )}
                     </div>
@@ -407,13 +409,13 @@ export default function Exercises() {
                 <p className="text-3xl font-bold text-purple-600">
                   {stats.totalExercises}
                 </p>
-                <p className="text-sm text-gray-500">Übungen</p>
+                <p className="text-sm text-gray-500">{t('exercises:totalExercises')}</p>
               </div>
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <p className="text-3xl font-bold text-green-600">
                   {stats.totalCompletions}
                 </p>
-                <p className="text-sm text-gray-500">Durchführungen</p>
+                <p className="text-sm text-gray-500">{t('exercises:totalCompletions')}</p>
               </div>
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <p className={`text-3xl font-bold ${
@@ -427,22 +429,22 @@ export default function Exercises() {
                     ? (parseFloat(stats.avgMoodChange) > 0 ? '+' : '') + stats.avgMoodChange
                     : '—'}
                 </p>
-                <p className="text-sm text-gray-500">Ø Stimmungsänderung</p>
+                <p className="text-sm text-gray-500">{t('exercises:avgMoodChange')}</p>
               </div>
             </div>
 
             {/* By Category */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">Nach Kategorie</h2>
-              {stats.byCategory.filter(c => c.completions > 0).length === 0 ? (
-                <p className="text-gray-500 text-center">Keine Daten</p>
+              <h2 className="text-lg font-bold mb-4">{t('exercises:byCategory')}</h2>
+              {(stats.byCategory || []).filter(c => c.completions > 0).length === 0 ? (
+                <p className="text-gray-500 text-center">{t('common:noData')}</p>
               ) : (
                 <div className="space-y-3">
-                  {stats.byCategory
+                  {(stats.byCategory || [])
                     .filter((c) => c.completions > 0)
                     .sort((a, b) => b.completions - a.completions)
                     .map((cat) => {
-                      const maxCompletions = Math.max(...stats.byCategory.map(c => c.completions));
+                      const maxCompletions = Math.max(...(stats.byCategory || []).map(c => c.completions));
                       const width = (cat.completions / maxCompletions) * 100;
                       const colorClass = CATEGORY_COLORS[cat.category] || 'bg-gray-500';
 
@@ -466,12 +468,12 @@ export default function Exercises() {
             </div>
 
             {/* Weekly Activity */}
-            {stats.weeklyActivity.length > 0 && (
+            {(stats.weeklyActivity || []).length > 0 && (
               <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-bold mb-4">Wöchentliche Aktivität</h2>
+                <h2 className="text-lg font-bold mb-4">{t('exercises:weeklyActivity')}</h2>
                 <div className="flex items-end gap-2 h-32">
-                  {stats.weeklyActivity.slice(0, 8).reverse().map((week, i) => {
-                    const maxComp = Math.max(...stats.weeklyActivity.map(w => w.completions));
+                  {(stats.weeklyActivity || []).slice(0, 8).reverse().map((week, i) => {
+                    const maxComp = Math.max(...(stats.weeklyActivity || []).map(w => w.completions));
                     const height = (week.completions / maxComp) * 100;
 
                     return (
@@ -499,7 +501,7 @@ export default function Exercises() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="bg-purple-600 text-white p-4 rounded-t-lg">
-              <h2 className="text-xl font-bold">Übung erledigt?</h2>
+              <h2 className="text-xl font-bold">{t('exercises:completeExercise')}</h2>
               <p>{completingExercise.title}</p>
             </div>
 
@@ -507,7 +509,7 @@ export default function Exercises() {
               {/* Duration */}
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Dauer (Minuten)
+                  {t('exercises:duration')}
                 </label>
                 <input
                   type="number"
@@ -526,7 +528,7 @@ export default function Exercises() {
               {/* Mood Before */}
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Stimmung vorher: {completionData.moodBefore}/10
+                  {t('exercises:moodBefore')}: {completionData.moodBefore}/10
                 </label>
                 <div className="flex items-center gap-2">
                   <Frown className="text-red-500" size={20} />
@@ -550,7 +552,7 @@ export default function Exercises() {
               {/* Mood After */}
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Stimmung nachher: {completionData.moodAfter}/10
+                  {t('exercises:moodAfter')}: {completionData.moodAfter}/10
                 </label>
                 <div className="flex items-center gap-2">
                   <Frown className="text-red-500" size={20} />
@@ -574,7 +576,7 @@ export default function Exercises() {
               {/* Difficulty */}
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Schwierigkeit: {completionData.difficulty}/10
+                  {t('exercises:difficulty')}: {completionData.difficulty}/10
                 </label>
                 <input
                   type="range"
@@ -594,7 +596,7 @@ export default function Exercises() {
               {/* Notes */}
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Notizen (optional)
+                  {t('common:notes')}
                 </label>
                 <textarea
                   value={completionData.notes}
@@ -605,7 +607,7 @@ export default function Exercises() {
                     })
                   }
                   rows={3}
-                  placeholder="Wie haben Sie sich gefühlt? Was haben Sie bemerkt?"
+                  placeholder={t('exercises:notesPlaceholder')}
                   className="w-full border rounded px-3 py-2"
                 />
               </div>
@@ -616,14 +618,14 @@ export default function Exercises() {
                 onClick={() => setCompletingExercise(null)}
                 className="px-4 py-2 border rounded-lg hover:bg-gray-50"
               >
-                Abbrechen
+                {t('common:cancel')}
               </button>
               <button
                 onClick={handleCompleteExercise}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
               >
                 <Check size={20} />
-                Als erledigt speichern
+                {t('exercises:markComplete')}
               </button>
             </div>
           </div>

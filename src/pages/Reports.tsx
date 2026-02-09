@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-  FileText,
-  Plus,
-  Download,
-  Eye,
-  Trash2,
-  Calendar,
-  User,
-  FileCheck,
-  ArrowLeft,
-  Printer,
+    ArrowLeft,
+    Calendar,
+    Download,
+    Eye,
+    FileCheck,
+    FileText,
+    Plus,
+    Printer,
+    Trash2,
+    User,
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { logger } from '../utils/logger';
 
@@ -43,6 +44,7 @@ interface Patient {
 }
 
 const Reports: React.FC = () => {
+  const { t } = useTranslation(['reports', 'common']);
   const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -87,12 +89,12 @@ const Reports: React.FC = () => {
         api.get('/patients'),
       ]);
 
-      setReports(reportsRes.data || []);
-      setTemplates(templatesRes.data?.templates || []);
-      setPatients(patientsRes.data || []);
+      setReports(Array.isArray(reportsRes.data) ? reportsRes.data : []);
+      setTemplates(Array.isArray(templatesRes.data?.templates) ? templatesRes.data.templates : Array.isArray(templatesRes.data) ? templatesRes.data : []);
+      setPatients(Array.isArray(patientsRes.data) ? patientsRes.data : []);
     } catch (error) {
       logger.error('Reports: Fehler', error);
-      toast.error('Fehler beim Laden der Daten');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -100,17 +102,17 @@ const Reports: React.FC = () => {
 
   const createReport = async () => {
     if (!newReport.patientId) {
-      toast.error('Bitte wählen Sie einen Patienten');
+      toast.error(t('reports:selectPatient'));
       return;
     }
     if (!newReport.title.trim()) {
-      toast.error('Bitte geben Sie einen Titel ein');
+      toast.error(t('reports:enterTitle'));
       return;
     }
 
     try {
       await api.post('/reports', newReport);
-        toast.success('Bericht erstellt');
+        toast.success(t('reports:reportCreated'));
         setActiveTab('list');
         fetchData();
         setNewReport({
@@ -136,7 +138,7 @@ const Reports: React.FC = () => {
         });
     } catch (error) {
       logger.error('Reports: Fehler', error);
-      toast.error('Netzwerkfehler');
+      toast.error(t('common:networkError'));
     }
   };
 
@@ -145,11 +147,11 @@ const Reports: React.FC = () => {
       const res = await api.post(`/reports/${reportId}/generate`, {});
       setPreviewHtml(res.data?.html || '');
       setActiveTab('preview');
-      toast.success('Bericht generiert');
+      toast.success(t('reports:reportGenerated'));
       fetchData();
     } catch (error) {
       logger.error('Reports: Fehler', error);
-      toast.error('Netzwerkfehler');
+      toast.error(t('common:networkError'));
     }
   };
 
@@ -161,7 +163,7 @@ const Reports: React.FC = () => {
         setPreviewHtml(data.generatedHtml);
         setActiveTab('preview');
       } else {
-        toast.error('Bericht noch nicht generiert');
+        toast.error(t('reports:notGenerated'));
       }
     } catch (error) {
       logger.error('Reports: Fehler', error);
@@ -169,15 +171,15 @@ const Reports: React.FC = () => {
   };
 
   const deleteReport = async (reportId: number) => {
-    if (!confirm('Bericht wirklich löschen?')) return;
+    if (!confirm(t('common:confirmDelete'))) return;
 
     try {
       await api.delete(`/reports/${reportId}`);
-      toast.success('Bericht gelöscht');
+      toast.success(t('common:delete'));
       fetchData();
     } catch (error) {
       logger.error('Reports: Fehler', error);
-      toast.error('Fehler beim Löschen');
+      toast.error(t('common:errorDeleting'));
     }
   };
 
@@ -209,10 +211,10 @@ const Reports: React.FC = () => {
       sent: 'bg-purple-100 text-purple-700',
     };
     const labels: Record<string, string> = {
-      draft: 'Entwurf',
-      generated: 'Generiert',
-      finalized: 'Finalisiert',
-      sent: 'Versendet',
+      draft: t('reports:statusDraft'),
+      generated: t('reports:statusGenerated'),
+      finalized: t('reports:statusFinalized'),
+      sent: t('reports:statusSent'),
     };
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || styles.draft}`}>
@@ -243,8 +245,8 @@ const Reports: React.FC = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">📄 Behandlungsberichte</h1>
-              <p className="text-sm text-gray-500">Berichte erstellen und verwalten</p>
+              <h1 className="text-xl font-bold text-gray-900">📄 {t('reports:title')}</h1>
+              <p className="text-sm text-gray-500">{t('reports:subtitle')}</p>
             </div>
           </div>
         </div>
@@ -261,8 +263,8 @@ const Reports: React.FC = () => {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <FileText className="w-4 h-4 inline mr-2" />
-            Übersicht
+            <FileText className="w-4 h-4 inline me-2" />
+            {t('reports:list')}
           </button>
           <button
             onClick={() => setActiveTab('create')}
@@ -272,8 +274,8 @@ const Reports: React.FC = () => {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <Plus className="w-4 h-4 inline mr-2" />
-            Neuer Bericht
+            <Plus className="w-4 h-4 inline me-2" />
+            {t('reports:createReport')}
           </button>
           {previewHtml && (
             <button
@@ -284,8 +286,8 @@ const Reports: React.FC = () => {
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              <Eye className="w-4 h-4 inline mr-2" />
-              Vorschau
+              <Eye className="w-4 h-4 inline me-2" />
+              {t('reports:preview')}
             </button>
           )}
         </div>
@@ -296,14 +298,14 @@ const Reports: React.FC = () => {
             {reports.length === 0 ? (
               <div className="p-12 text-center">
                 <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Keine Berichte</h3>
-                <p className="text-gray-500 mb-4">Erstellen Sie Ihren ersten Behandlungsbericht</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('reports:noReports')}</h3>
+                <p className="text-gray-500 mb-4">{t('reports:createReport')}</p>
                 <button
                   onClick={() => setActiveTab('create')}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  <Plus className="w-4 h-4 inline mr-2" />
-                  Bericht erstellen
+                  <Plus className="w-4 h-4 inline me-2" />
+                  {t('reports:createReport')}
                 </button>
               </div>
             ) : (
@@ -311,22 +313,22 @@ const Reports: React.FC = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Titel
+                      {t('common:title')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Patient
+                      {t('common:patient')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Typ
+                      {t('common:type')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Status
+                      {t('common:status')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Erstellt
+                      {t('common:date')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                      Aktionen
+                      {t('common:actions')}
                     </th>
                   </tr>
                 </thead>
@@ -346,7 +348,7 @@ const Reports: React.FC = () => {
                             <button
                               onClick={() => generateReport(report.id)}
                               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                              title="Generieren"
+                              title={t('reports:generateReport')}
                             >
                               <FileCheck className="w-4 h-4" />
                             </button>
@@ -355,7 +357,7 @@ const Reports: React.FC = () => {
                             <button
                               onClick={() => viewReport(report.id)}
                               className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-                              title="Anzeigen"
+                              title={t('reports:preview')}
                             >
                               <Eye className="w-4 h-4" />
                             </button>
@@ -363,7 +365,7 @@ const Reports: React.FC = () => {
                           <button
                             onClick={() => deleteReport(report.id)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                            title="Löschen"
+                            title={t('common:delete')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -380,14 +382,14 @@ const Reports: React.FC = () => {
         {/* Neuer Bericht */}
         {activeTab === 'create' && (
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-6">Neuen Bericht erstellen</h2>
+            <h2 className="text-lg font-semibold mb-6">{t('reports:createReport')}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Patient */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <User className="w-4 h-4 inline mr-1" />
-                  Patient
+                  {t('common:patient')}
                 </label>
                 <select
                   value={newReport.patientId}
@@ -396,7 +398,7 @@ const Reports: React.FC = () => {
                   }
                   className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value={0}>Patient auswählen...</option>
+                  <option value={0}>{t('reports:selectPatient')}</option>
                   {patients.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -409,16 +411,16 @@ const Reports: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <FileText className="w-4 h-4 inline mr-1" />
-                  Berichtstyp
+                  {t('reports:reportType')}
                 </label>
                 <select
                   value={newReport.reportType}
                   onChange={(e) => setNewReport({ ...newReport, reportType: e.target.value })}
                   className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
                 >
-                  {templates.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
+                  {templates.map((tmpl) => (
+                    <option key={tmpl.id} value={tmpl.id}>
+                      {tmpl.name}
                     </option>
                   ))}
                 </select>
@@ -426,12 +428,12 @@ const Reports: React.FC = () => {
 
               {/* Titel */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Titel</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('common:title')}</label>
                 <input
                   type="text"
                   value={newReport.title}
                   onChange={(e) => setNewReport({ ...newReport, title: e.target.value })}
-                  placeholder="z.B. Verlaufsbericht Q4 2024"
+                  placeholder={t('common:title')}
                   className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -440,7 +442,7 @@ const Reports: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Von
+                  {t('reports:dateFrom')}
                 </label>
                 <input
                   type="date"
@@ -452,7 +454,7 @@ const Reports: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Bis
+                  {t('reports:dateTo')}
                 </label>
                 <input
                   type="date"
@@ -465,15 +467,15 @@ const Reports: React.FC = () => {
 
             {/* Inhalt */}
             <div className="mt-6">
-              <h3 className="font-medium text-gray-900 mb-4">Berichtsinhalte</h3>
+              <h3 className="font-medium text-gray-900 mb-4">{t('reports:reportType')}</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {[
-                  { key: 'patientInfo', label: 'Patienteninformationen' },
-                  { key: 'diagnoses', label: 'Diagnosen' },
-                  { key: 'medications', label: 'Medikation' },
-                  { key: 'therapyNotes', label: 'Therapieverlauf' },
-                  { key: 'screeningResults', label: 'Screening-Ergebnisse' },
-                  { key: 'treatmentPlan', label: 'Behandlungsplan' },
+                  { key: 'patientInfo', label: t('reports:includePatientInfo') },
+                  { key: 'diagnoses', label: t('reports:includeDiagnoses') },
+                  { key: 'medications', label: t('reports:includeMedications') },
+                  { key: 'therapyNotes', label: t('reports:includeTherapyNotes') },
+                  { key: 'screeningResults', label: t('reports:includeScreeningResults') },
+                  { key: 'treatmentPlan', label: t('reports:includeTreatmentPlan') },
                 ].map(({ key, label }) => (
                   <label key={key} className="flex items-center gap-2">
                     <input
@@ -496,7 +498,7 @@ const Reports: React.FC = () => {
             {/* Empfehlungen */}
             <div className="mt-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Empfehlungen / Anmerkungen
+                {t('reports:recommendations')}
               </label>
               <textarea
                 value={newReport.content.recommendations}
@@ -507,17 +509,17 @@ const Reports: React.FC = () => {
                   })
                 }
                 rows={4}
-                placeholder="Weitere Empfehlungen für den Bericht..."
+                placeholder={t('reports:recommendations')}
                 className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             {/* Empfänger */}
             <div className="mt-6">
-              <h3 className="font-medium text-gray-900 mb-4">Empfänger (optional)</h3>
+              <h3 className="font-medium text-gray-900 mb-4">{t('reports:recipientName')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Name</label>
+                  <label className="block text-sm text-gray-600 mb-1">{t('common:name')}</label>
                   <input
                     type="text"
                     value={newReport.recipientInfo.name}
@@ -527,12 +529,12 @@ const Reports: React.FC = () => {
                         recipientInfo: { ...newReport.recipientInfo, name: e.target.value },
                       })
                     }
-                    placeholder="Dr. Max Mustermann"
+                    placeholder={t('reports:recipientName')}
                     className="w-full border rounded-lg px-4 py-2"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Institution</label>
+                  <label className="block text-sm text-gray-600 mb-1">{t('reports:recipientInstitution')}</label>
                   <input
                     type="text"
                     value={newReport.recipientInfo.institution}
@@ -542,12 +544,12 @@ const Reports: React.FC = () => {
                         recipientInfo: { ...newReport.recipientInfo, institution: e.target.value },
                       })
                     }
-                    placeholder="Universitätsklinikum"
+                    placeholder={t('reports:recipientInstitution')}
                     className="w-full border rounded-lg px-4 py-2"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Adresse</label>
+                  <label className="block text-sm text-gray-600 mb-1">{t('reports:recipientAddress')}</label>
                   <input
                     type="text"
                     value={newReport.recipientInfo.address}
@@ -557,7 +559,7 @@ const Reports: React.FC = () => {
                         recipientInfo: { ...newReport.recipientInfo, address: e.target.value },
                       })
                     }
-                    placeholder="Musterstr. 1, 12345 Stadt"
+                    placeholder={t('reports:recipientAddress')}
                     className="w-full border rounded-lg px-4 py-2"
                   />
                 </div>
@@ -570,14 +572,14 @@ const Reports: React.FC = () => {
                 onClick={() => setActiveTab('list')}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
               >
-                Abbrechen
+                {t('common:cancel')}
               </button>
               <button
                 onClick={createReport}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                <Plus className="w-4 h-4 inline mr-2" />
-                Bericht erstellen
+                <Plus className="w-4 h-4 inline me-2" />
+                {t('reports:createReport')}
               </button>
             </div>
           </div>
@@ -591,22 +593,22 @@ const Reports: React.FC = () => {
                 onClick={printReport}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
               >
-                <Printer className="w-4 h-4 inline mr-2" />
-                Drucken
+                <Printer className="w-4 h-4 inline me-2" />
+                {t('common:print')}
               </button>
               <button
                 onClick={downloadReport}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                <Download className="w-4 h-4 inline mr-2" />
-                Download HTML
+                <Download className="w-4 h-4 inline me-2" />
+                {t('reports:downloadPdf')}
               </button>
             </div>
             <div className="bg-white rounded-xl shadow-sm p-8">
               <iframe
                 srcDoc={previewHtml}
                 className="w-full h-[800px] border rounded-lg"
-                title="Berichtsvorschau"
+                title={t('reports:preview')}
               />
             </div>
           </div>

@@ -38,7 +38,7 @@ export function InfoTip(props: { label: string; title?: string; children: string
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-500 hover:text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="ms-2 inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-500 hover:text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <Info className="h-4 w-4" />
       </button>

@@ -1,0 +1,123 @@
+const video = {
+  title: 'Видеосеанс',
+  // ─── Соединение ──────────────────────────────────
+  connectionEstablished: 'Соединение установлено',
+  connectionErrorDuringCall: 'Ошибка соединения во время звонка',
+  connectionLost: 'Соединение потеряно',
+  connectionError: 'Ошибка соединения',
+  connectionInterrupted: 'Соединение прервано, попытка восстановления...',
+  connectionEndedInfo: 'Соединение завершено',
+  connectionLostReconnect: 'Соединение потеряно. Пожалуйста, подключитесь заново.',
+  connecting: 'Подключение...',
+  connected: 'Подключено',
+  waitingForConnection: 'Ожидание подключения...',
+  live: 'В эфире',
+
+  // ─── Звонок ──────────────────────────────────────
+  callEnded: 'Звонок завершён',
+  callEndedSuccess: 'Звонок завершён',
+  callCouldNotStart: 'Не удалось начать звонок',
+  callAlreadyOpen: 'Звонок уже открыт в другой вкладке',
+  endCall: 'Завершить звонок',
+  errorAnsweringCall: 'Ошибка при ответе на звонок',
+  errorStartingCall: 'Ошибка при начале звонка',
+  errorInitializingCall: 'Ошибка при инициализации звонка',
+  errorConnectingTherapist: 'Ошибка при подключении к терапевту',
+  connectionToTherapistFailed: 'Не удалось подключиться к терапевту',
+
+  // ─── Одноранговое соединение/Сеть ────────────────
+  peerUnavailable: 'Абонент недоступен. Подождите, пока терапевт присоединится.',
+  peerServerUnreachable: 'Сервер PeerJS недоступен. Ошибка подключения.',
+  peerNotInitialized: 'Одноранговое соединение не инициализировано',
+  serverError: 'Ошибка сервера. Пожалуйста, попробуйте позже.',
+  timeoutTherapist: 'Терапевт не отвечает. Пожалуйста, попробуйте позже.',
+  therapistNotOnline: 'Терапевт не в сети или недоступен',
+  slowNetwork: 'Обнаружено медленное сетевое соединение. Качество снижено.',
+
+  // ─── Медиа/Камера ───────────────────────────────
+  browserNoWebRTC: 'Браузер не поддерживает WebRTC.',
+  cameraAccessDenied: 'Доступ к камере/микрофону отклонён. Пожалуйста, проверьте разрешения.',
+  noDeviceFound: 'Камера или микрофон не найдены.',
+  cameraTimeout: 'Таймаут камеры — используется режим только аудио',
+  audioOnlyMode: 'Режим только аудио активен',
+  audioOnlyActive: 'Активен режим только аудио (камера недоступна)',
+  videoOff: 'Выключить камеру',
+  videoOn: 'Включить камеру',
+  micOff: 'Выключить микрофон',
+  micOn: 'Включить микрофон',
+  cameraActiveAriaLabel: 'Камера активна',
+  cameraMutedAriaLabel: 'Камера выключена',
+  micActiveAriaLabel: 'Микрофон активен',
+  micMutedAriaLabel: 'Микрофон выключен',
+
+  // ─── Демонстрация экрана ─────────────────────────
+  screenShareStarted: 'Демонстрация экрана начата',
+  screenShareFailed: 'Ошибка демонстрации экрана',
+  screenShareEnded: 'Демонстрация экрана завершена',
+  stopScreenShare: 'Остановить демонстрацию экрана',
+  startScreenShare: 'Поделиться экраном',
+
+  // ─── Чат ─────────────────────────────────────────
+  openChat: 'Открыть чат',
+
+  // ─── Прочее ──────────────────────────────────────
+  participantConnectedNoVideo: 'Участник подключён (видео недоступно)',
+  waitingForOtherParticipant: 'Ожидание другого участника...',
+  otherParticipantLeft: 'Другой участник покинул звонок.',
+  backToDashboard: 'Вернуться на панель',
+  noRoomId: 'Идентификатор комнаты отсутствует',
+
+  // ─── Комната ожидания ────────────────────────────
+  waitingRoom: 'Комната ожидания',
+  waitingRoomPreparing: 'Подготовка комнаты ожидания...',
+  waitingForTherapist: 'Ожидание терапевта',
+  notifiedWhenReady: 'Вы получите уведомление, когда терапевт будет готов',
+  therapistReady: 'Ваш терапевт готов!',
+  redirectingToSession: 'Вы будете перенаправлены к видеосеансу...',
+  statusInWaitingRoom: 'В комнате ожидания',
+  statusFillQuestionnaire: 'Заполнение опросника',
+  statusTherapistCalling: 'Терапевт вызывает',
+  statusStartSession: 'Начать видеосеанс',
+  questionnaireSaved: 'Опросник сохранён',
+
+  // ─── Предсеансовый опросник ──────────────────────
+  currentMoodLabel: 'Как ваше текущее настроение?',
+  anxietyLevelLabel: 'Уровень тревоги/напряжения',
+  sleepQualityLabel: 'Качество сна прошлой ночью',
+  noAnxiety: 'Нет тревоги',
+  veryStrong: 'Очень сильная',
+  medicationTakenToday: 'Медикаменты приняты сегодня',
+  mainConcernsLabel: 'Что вы хотели бы обсудить сегодня?',
+  mainConcernsPlaceholder: 'Основные темы для сегодняшнего сеанса...',
+  questionsForTherapistLabel: 'Есть вопросы к терапевту?',
+  questionsPlaceholder: 'Вопросы, которые вы хотели бы задать...',
+  significantEventsLabel: 'Важные события после последнего сеанса',
+  eventsPlaceholder: 'Важные события, изменения...',
+  submitQuestionnaire: 'Отправить опросник',
+
+  // ─── Очередь терапевта ───────────────────────────
+  queueTitle: 'Обзор комнаты ожидания',
+  patientsWaiting: '{{count}} пациент(ов) ожидает',
+  noPatientsWaiting: 'Нет ожидающих пациентов',
+  patientsAppearHere: 'Новые пациенты появятся здесь, как только присоединятся к комнате ожидания.',
+  appointment: 'Приём:',
+  waitingTime: 'Ожидание: {{min}} мин.',
+  viewQuestionnaire: 'Опросник',
+  admitPatient: 'Вызвать',
+  questionnaireFilled: 'Опросник заполнен',
+  questionnairePending: 'Опросник не заполнен',
+  preSessionData: 'Данные перед сеансом',
+  selectPatientToView: 'Выберите пациента, чтобы просмотреть его опросник.',
+  moodLabel: 'Настроение',
+  anxietyLabel: 'Уровень тревоги',
+  sleepLabel: 'Качество сна',
+  medicationTakenLabel: 'Медикаменты приняты',
+  mainConcerns: 'Основные проблемы:',
+  questionsForYou: 'Вопросы к вам:',
+  significantEvents: 'Важные события:',
+  questionnaireNotFilled: 'Опросник ещё не заполнен.',
+  patientCalledUp: 'Пациент {{name}} вызван',
+  errorLoadingQueueData: 'Ошибка при загрузке данных',
+};
+
+export default video;

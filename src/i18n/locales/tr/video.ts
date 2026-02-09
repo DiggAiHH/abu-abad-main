@@ -1,0 +1,123 @@
+const video = {
+  title: 'Video Seans',
+  // ─── Bağlantı ────────────────────────────────────
+  connectionEstablished: 'Bağlantı kuruldu',
+  connectionErrorDuringCall: 'Arama sırasında bağlantı hatası',
+  connectionLost: 'Bağlantı kesildi',
+  connectionError: 'Bağlantı hatası',
+  connectionInterrupted: 'Bağlantı kesildi, yeniden bağlanmaya çalışılıyor...',
+  connectionEndedInfo: 'Bağlantı sona erdi',
+  connectionLostReconnect: 'Bağlantı kesildi. Lütfen tekrar bağlanın.',
+  connecting: 'Bağlanılıyor...',
+  connected: 'Bağlandı',
+  waitingForConnection: 'Bağlantı bekleniyor...',
+  live: 'Canlı',
+
+  // ─── Arama ──────────────────────────────────────
+  callEnded: 'Arama sona erdi',
+  callEndedSuccess: 'Arama sona erdi',
+  callCouldNotStart: 'Arama başlatılamadı',
+  callAlreadyOpen: 'Arama zaten başka bir sekmede açık',
+  endCall: 'Aramayı sonlandır',
+  errorAnsweringCall: 'Arama yanıtlanırken hata oluştu',
+  errorStartingCall: 'Arama başlatılırken hata oluştu',
+  errorInitializingCall: 'Arama başlatılırken hata oluştu',
+  errorConnectingTherapist: 'Terapiste bağlanırken hata oluştu',
+  connectionToTherapistFailed: 'Terapiste bağlantı başarısız oldu',
+
+  // ─── Eş/Ağ ──────────────────────────────────────
+  peerUnavailable: 'Karşı taraf ulaşılamıyor. Terapistin katılmasını bekleyin.',
+  peerServerUnreachable: 'PeerJS sunucusuna ulaşılamıyor. Bağlantı başarısız.',
+  peerNotInitialized: 'Eşler arası bağlantı başlatılmadı',
+  serverError: 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.',
+  timeoutTherapist: 'Terapist yanıt vermiyor. Lütfen daha sonra tekrar deneyin.',
+  therapistNotOnline: 'Terapist çevrimiçi değil veya ulaşılamıyor',
+  slowNetwork: 'Yavaş ağ bağlantısı algılandı. Kalite düşürüldü.',
+
+  // ─── Medya/Kamera ───────────────────────────────
+  browserNoWebRTC: 'Tarayıcınız WebRTC\'yi desteklemiyor.',
+  cameraAccessDenied: 'Kamera/mikrofon erişimi reddedildi. Lütfen izinleri kontrol edin.',
+  noDeviceFound: 'Kamera veya mikrofon bulunamadı.',
+  cameraTimeout: 'Kamera zaman aşımı – yalnızca ses modu kullanılıyor',
+  audioOnlyMode: 'Yalnızca ses modu aktif',
+  audioOnlyActive: 'Yalnızca ses modu aktif (kamera kullanılamıyor)',
+  videoOff: 'Kamerayı kapat',
+  videoOn: 'Kamerayı aç',
+  micOff: 'Mikrofonu kapat',
+  micOn: 'Mikrofonu aç',
+  cameraActiveAriaLabel: 'Kamera aktif',
+  cameraMutedAriaLabel: 'Kamera kapalı',
+  micActiveAriaLabel: 'Mikrofon aktif',
+  micMutedAriaLabel: 'Mikrofon sessize alındı',
+
+  // ─── Ekran Paylaşımı ────────────────────────────
+  screenShareStarted: 'Ekran paylaşımı başlatıldı',
+  screenShareFailed: 'Ekran paylaşımı başarısız oldu',
+  screenShareEnded: 'Ekran paylaşımı sona erdi',
+  stopScreenShare: 'Ekran paylaşımını durdur',
+  startScreenShare: 'Ekranı paylaş',
+
+  // ─── Sohbet ─────────────────────────────────────
+  openChat: 'Sohbeti aç',
+
+  // ─── Diğer ──────────────────────────────────────
+  participantConnectedNoVideo: 'Katılımcı bağlandı (video mevcut değil)',
+  waitingForOtherParticipant: 'Diğer katılımcı bekleniyor...',
+  otherParticipantLeft: 'Diğer katılımcı aramadan ayrıldı.',
+  backToDashboard: 'Panele dön',
+  noRoomId: 'Oda kimliği bulunamadı',
+
+  // ─── Bekleme Odası ──────────────────────────────
+  waitingRoom: 'Bekleme Odası',
+  waitingRoomPreparing: 'Bekleme odası hazırlanıyor...',
+  waitingForTherapist: 'Terapist bekleniyor',
+  notifiedWhenReady: 'Terapistiniz hazır olduğunda bilgilendirileceksiniz',
+  therapistReady: 'Terapistiniz hazır!',
+  redirectingToSession: 'Video seansına yönlendiriliyorsunuz...',
+  statusInWaitingRoom: 'Bekleme odasında',
+  statusFillQuestionnaire: 'Anketi doldurun',
+  statusTherapistCalling: 'Terapist çağırıyor',
+  statusStartSession: 'Video seansını başlat',
+  questionnaireSaved: 'Anket kaydedildi',
+
+  // ─── Seans Öncesi Anketi ────────────────────────
+  currentMoodLabel: 'Şu anki ruh haliniz nasıl?',
+  anxietyLevelLabel: 'Kaygı/gerginlik düzeyi',
+  sleepQualityLabel: 'Dün gece uyku kalitesi',
+  noAnxiety: 'Kaygı yok',
+  veryStrong: 'Çok şiddetli',
+  medicationTakenToday: 'Bugün ilaçlar alındı',
+  mainConcernsLabel: 'Bugün ne konuşmak istiyorsunuz?',
+  mainConcernsPlaceholder: 'Bugünkü seans için ana konularınız...',
+  questionsForTherapistLabel: 'Terapistinize sorularınız var mı?',
+  questionsPlaceholder: 'Sormak istediğiniz sorular...',
+  significantEventsLabel: 'Son seanstan bu yana önemli olaylar',
+  eventsPlaceholder: 'Önemli olaylar, değişiklikler...',
+  submitQuestionnaire: 'Anketi gönder',
+
+  // ─── Terapist Kuyruğu ──────────────────────────
+  queueTitle: 'Bekleme Odası Genel Görünümü',
+  patientsWaiting: '{{count}} hasta bekliyor',
+  noPatientsWaiting: 'Bekleyen hasta bulunmamaktadır',
+  patientsAppearHere: 'Yeni hastalar bekleme odasına katıldıklarında burada görünecektir.',
+  appointment: 'Randevu:',
+  waitingTime: 'Bekleme: {{min}} dk.',
+  viewQuestionnaire: 'Anket',
+  admitPatient: 'Çağır',
+  questionnaireFilled: 'Anket dolduruldu',
+  questionnairePending: 'Anket beklemede',
+  preSessionData: 'Seans öncesi veriler',
+  selectPatientToView: 'Anketini görüntülemek için bir hasta seçin.',
+  moodLabel: 'Ruh hali',
+  anxietyLabel: 'Kaygı düzeyi',
+  sleepLabel: 'Uyku kalitesi',
+  medicationTakenLabel: 'İlaçlar alındı',
+  mainConcerns: 'Ana konular:',
+  questionsForYou: 'Size sorular:',
+  significantEvents: 'Önemli olaylar:',
+  questionnaireNotFilled: 'Anket henüz doldurulmadı.',
+  patientCalledUp: 'Hasta {{name}} çağrıldı',
+  errorLoadingQueueData: 'Veriler yüklenirken hata oluştu',
+};
+
+export default video;

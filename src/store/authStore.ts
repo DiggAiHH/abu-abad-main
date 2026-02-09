@@ -52,9 +52,9 @@ export const useAuthStore = create<AuthState>()(
 
       clearTwoFactor: () => {
         try {
-          localStorage.removeItem('2fa_temp_token');
-        } catch {
-          // ignore
+          sessionStorage.removeItem('2fa_temp_token');
+        } catch (e) {
+          if (import.meta.env.DEV) console.warn('[Auth] sessionStorage cleanup failed', e);
         }
         set({ twoFactorRequired: false, twoFactorTempToken: null });
       },
@@ -102,8 +102,9 @@ export const useAuthStore = create<AuthState>()(
 
           const response = await authAPI.login(email, password);
 
-          const twoFactorRequired = Boolean((response as any)?.data?.twoFactorRequired);
-          const tempToken = (response as any)?.data?.tempToken as string | undefined;
+          const responseData = (response as { data?: { twoFactorRequired?: boolean; tempToken?: string } })?.data;
+          const twoFactorRequired = Boolean(responseData?.twoFactorRequired);
+          const tempToken = responseData?.tempToken;
           if (twoFactorRequired) {
             if (!tempToken || typeof tempToken !== 'string') {
               set({ error: 'Ungültige Server-Antwort', loading: false });
@@ -111,9 +112,9 @@ export const useAuthStore = create<AuthState>()(
             }
 
             try {
-              localStorage.setItem('2fa_temp_token', tempToken);
-            } catch {
-              // ignore
+              sessionStorage.setItem('2fa_temp_token', tempToken);
+            } catch (e) {
+              if (import.meta.env.DEV) console.warn('[Auth] sessionStorage write failed', e);
             }
 
             set({
@@ -163,9 +164,9 @@ export const useAuthStore = create<AuthState>()(
           setAccessToken(token);
 
           try {
-            localStorage.removeItem('2fa_temp_token');
-          } catch {
-            // ignore
+            sessionStorage.removeItem('2fa_temp_token');
+          } catch (e) {
+            if (import.meta.env.DEV) console.warn('[Auth] sessionStorage cleanup failed', e);
           }
 
           set({
@@ -269,9 +270,9 @@ export const useAuthStore = create<AuthState>()(
         } finally {
           clearAccessToken();
           try {
-            localStorage.removeItem('2fa_temp_token');
-          } catch {
-            // ignore
+            sessionStorage.removeItem('2fa_temp_token');
+          } catch (e) {
+            if (import.meta.env.DEV) console.warn('[Auth] sessionStorage cleanup failed', e);
           }
           set({ user: null, token: null, twoFactorRequired: false, twoFactorTempToken: null, error: null, loading: false, isDemo: false });
           setLogoutInProgress(false);

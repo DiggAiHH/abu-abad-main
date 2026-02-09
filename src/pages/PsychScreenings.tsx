@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import toast from 'react-hot-toast';
 import { format, parseISO } from 'date-fns';
-import { de } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
-import { logger } from '../utils/logger';
 import {
-  ArrowLeft,
-  ClipboardCheck,
-  AlertTriangle,
-  ChevronRight,
-  CheckCircle,
-  Clock,
+    AlertTriangle,
+    ArrowLeft,
+    CheckCircle,
+    ChevronRight,
+    ClipboardCheck,
+    Clock,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
+import { getDateLocale } from '../utils/dateLocale';
+import { logger } from '../utils/logger';
 
 // ===== TYPES =====
 interface ScreeningTemplate {
@@ -72,6 +73,7 @@ const SEVERITY_COLORS: Record<string, string> = {
 // ===== MAIN COMPONENT =====
 export default function PsychScreenings() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['screenings', 'common', 'crisis']);
 
   const [templates, setTemplates] = useState<ScreeningTemplate[]>([]);
   const [results, setResults] = useState<ScreeningResult[]>([]);
@@ -105,7 +107,7 @@ export default function PsychScreenings() {
       setPending(pendingRes.data || []);
     } catch (error) {
       logger.error('PsychScreenings: Fehler beim Laden', error);
-      toast.error('Fehler beim Laden der Daten');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -122,7 +124,7 @@ export default function PsychScreenings() {
       });
       setAnswers({});
     } catch (error) {
-      toast.error('Fehler beim Laden des Fragebogens');
+      toast.error(t('common:errorLoadingData'));
     }
   };
 
@@ -134,7 +136,7 @@ export default function PsychScreenings() {
       (q) => answers[q.id] === undefined
     );
     if (unanswered.length > 0) {
-      toast.error(`Bitte beantworten Sie alle Fragen (${unanswered.length} fehlen)`);
+      toast.error(t('screenings:answerAllQuestions'));
       return;
     }
 
@@ -154,7 +156,7 @@ export default function PsychScreenings() {
       setActiveScreening(null);
       loadData();
     } catch (error) {
-      toast.error('Fehler beim Absenden');
+      toast.error(t('common:errorSaving'));
     }
   };
 
@@ -182,7 +184,7 @@ export default function PsychScreenings() {
         <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
           <div className="text-center mb-6">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold">Fragebogen abgeschlossen</h2>
+            <h2 className="text-2xl font-bold">{t('screenings:completed')}</h2>
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
@@ -218,11 +220,10 @@ export default function PsychScreenings() {
               <div className="flex items-start gap-3">
                 <AlertTriangle className="text-red-500 flex-shrink-0" />
                 <div>
-                  <p className="font-bold text-red-700">Wichtiger Hinweis</p>
+                  <p className="font-bold text-red-700">{t('common:error')}</p>
                   <p className="text-sm text-red-600">{data.criticalAlert}</p>
                   <p className="text-sm text-red-600 mt-2">
-                    Bitte wenden Sie sich an Ihren Therapeuten oder bei akuter
-                    Not an die Telefonseelsorge: 0800 111 0 111
+                    {t('crisis:crisisHotlines')}: 0800 111 0 111
                   </p>
                 </div>
               </div>
@@ -233,7 +234,7 @@ export default function PsychScreenings() {
             onClick={() => setShowResult(null)}
             className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
-            Zurück zur Übersicht
+            {t('common:back')}
           </button>
         </div>
       </div>
@@ -254,7 +255,7 @@ export default function PsychScreenings() {
                 onClick={() => setActiveScreening(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
               >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={24} className="rtl:flip" />
               </button>
               <span className="text-sm text-gray-500">
                 {answeredCount} / {activeScreening.questions.length}
@@ -272,8 +273,7 @@ export default function PsychScreenings() {
         <main className="max-w-3xl mx-auto px-4 py-6">
           <h2 className="text-xl font-bold mb-2">{activeScreening.name}</h2>
           <p className="text-gray-600 mb-6">
-            In den letzten 2 Wochen, wie oft wurden Sie von den folgenden
-            Problemen beeinträchtigt?
+            {t('screenings:questionOf', { current: answeredCount, total: activeScreening.questions.length })}
           </p>
 
           <div className="space-y-6">
@@ -308,7 +308,7 @@ export default function PsychScreenings() {
             disabled={answeredCount < activeScreening.questions.length}
             className="w-full mt-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Fragebogen absenden
+            {t('screenings:submitScreening')}
           </button>
         </main>
       </div>
@@ -325,14 +325,14 @@ export default function PsychScreenings() {
               onClick={() => navigate('/dashboard')}
               className="p-2 hover:bg-gray-100 rounded-lg"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={24} className="rtl:flip" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Psychologische Fragebögen
+                {t('screenings:title')}
               </h1>
               <p className="text-sm text-gray-600">
-                PHQ-9, GAD-7 und weitere standardisierte Tests
+                {t('screenings:subtitle')}
               </p>
             </div>
           </div>
@@ -345,7 +345,7 @@ export default function PsychScreenings() {
           <div className="mb-8">
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
               <Clock className="text-orange-500" />
-              Ausstehende Fragebögen
+              {t('screenings:pending')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {pending.map((assignment) => (
@@ -357,14 +357,14 @@ export default function PsychScreenings() {
                     <div>
                       <p className="font-semibold">{assignment.screening_type}</p>
                       <p className="text-sm text-gray-600">
-                        Zugewiesen von Dr. {assignment.therapist_first}{' '}
+                        {t('screenings:assignedBy')} Dr. {assignment.therapist_first}{' '}
                         {assignment.therapist_last}
                       </p>
                       {assignment.due_date && (
                         <p className="text-sm text-orange-600">
-                          Fällig bis:{' '}
+                          {t('screenings:dueDate')}:{' '}
                           {format(parseISO(assignment.due_date), 'dd.MM.yyyy', {
-                            locale: de,
+                            locale: getDateLocale(),
                           })}
                         </p>
                       )}
@@ -373,7 +373,7 @@ export default function PsychScreenings() {
                       onClick={() => startScreening(assignment.screening_type)}
                       className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
                     >
-                      Starten
+                      {t('screenings:startTest')}
                     </button>
                   </div>
                   {assignment.message && (
@@ -389,7 +389,7 @@ export default function PsychScreenings() {
 
         {/* Available Templates */}
         <div className="mb-8">
-          <h2 className="text-lg font-bold mb-4">Verfügbare Fragebögen</h2>
+          <h2 className="text-lg font-bold mb-4">{t('screenings:available')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {templates.map((template) => (
               <div
@@ -407,10 +407,10 @@ export default function PsychScreenings() {
                       {template.description}
                     </p>
                     <p className="text-xs text-gray-400 mt-2">
-                      {template.questionCount} Fragen
+                      {template.questionCount} {t('screenings:questionOf', { current: '', total: '' }).trim()}
                     </p>
                   </div>
-                  <ChevronRight className="text-gray-400" />
+                  <ChevronRight className="text-gray-400 rtl:flip" />
                 </div>
               </div>
             ))}
@@ -419,16 +419,16 @@ export default function PsychScreenings() {
 
         {/* Previous Results */}
         <div>
-          <h2 className="text-lg font-bold mb-4">Meine Ergebnisse</h2>
+          <h2 className="text-lg font-bold mb-4">{t('screenings:myResults')}</h2>
           {results.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
               <ClipboardCheck className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Noch keine Fragebögen ausgefüllt</p>
+              <p className="text-gray-600">{t('screenings:noResults')}</p>
             </div>
           ) : (
             <div className="space-y-3">
               {results.map((result) => {
-                const data = result.result_data;
+                const data = result.result_data || { totalScore: 0, maxScore: 1, percentage: 0, severity: 'none', severityLabel: '–' };
                 return (
                   <div
                     key={result.id}
@@ -438,9 +438,11 @@ export default function PsychScreenings() {
                       <div>
                         <p className="font-semibold">{result.screening_type}</p>
                         <p className="text-sm text-gray-500">
-                          {format(parseISO(result.created_at), 'dd.MM.yyyy HH:mm', {
-                            locale: de,
-                          })}
+                          {result.created_at
+                            ? format(parseISO(result.created_at), 'dd.MM.yyyy HH:mm', {
+                                locale: getDateLocale(),
+                              })
+                            : '–'}
                         </p>
                       </div>
                       <div className="text-right">

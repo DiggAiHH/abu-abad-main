@@ -1,5 +1,6 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, Copy, RefreshCw } from 'lucide-react';
+import { Component, ErrorInfo, ReactNode } from 'react';
+import i18n from '../i18n';
 
 interface Props {
   children: ReactNode;
@@ -41,7 +42,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     };
 
     navigator.clipboard.writeText(JSON.stringify(report, null, 2));
-    alert('Fehlerbericht in die Zwischenablage kopiert!');
+    alert(i18n.t('errors:errorReportCopiedAlert'));
   };
 
   private handleReload = () => {
@@ -58,8 +59,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-red-800">Ein unerwarteter Fehler ist aufgetreten</h2>
-                <p className="text-sm text-red-600">Das System hat eine Ausnahme abgefangen.</p>
+                <h2 className="text-lg font-bold text-red-800">{i18n.t('errors:unexpectedError')}</h2>
+                <p className="text-sm text-red-600">{i18n.t('errors:systemCaughtException')}</p>
               </div>
             </div>
 
@@ -73,12 +74,12 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Was haben Sie gerade gemacht? (Optional)
+                  {i18n.t('errors:whatWereYouDoing')}
                 </label>
                 <textarea
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   rows={3}
-                  placeholder="Beschreiben Sie kurz die Schritte, die zum Fehler führten..."
+                  placeholder={i18n.t('errors:whatWereYouDoingPlaceholder')}
                   value={this.state.userNote}
                   onChange={(e) => this.setState({ userNote: e.target.value })}
                 />
@@ -90,14 +91,14 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 font-medium transition-colors"
                 >
                   <RefreshCw className="w-4 h-4" />
-                  Seite neu laden
+                  {i18n.t('errors:reloadPage')}
                 </button>
                 <button
                   onClick={this.handleCopyReport}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium shadow-sm transition-colors"
                 >
                   <Copy className="w-4 h-4" />
-                  Bericht kopieren (für Support)
+                  {i18n.t('errors:copyReportForSupport')}
                 </button>
               </div>
             </div>

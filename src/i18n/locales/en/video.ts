@@ -1,0 +1,123 @@
+const video = {
+  title: 'Video Session',
+  // ─── Connection ──────────────────────────────────
+  connectionEstablished: 'Connection established',
+  connectionErrorDuringCall: 'Connection error during call',
+  connectionLost: 'Connection lost',
+  connectionError: 'Connection error',
+  connectionInterrupted: 'Connection interrupted, attempting to reconnect...',
+  connectionEndedInfo: 'Connection ended',
+  connectionLostReconnect: 'Connection lost. Please reconnect.',
+  connecting: 'Connecting...',
+  connected: 'Connected',
+  waitingForConnection: 'Waiting for connection...',
+  live: 'Live',
+
+  // ─── Call ───────────────────────────────────────
+  callEnded: 'Call ended',
+  callEndedSuccess: 'Call ended',
+  callCouldNotStart: 'Call could not be started',
+  callAlreadyOpen: 'Call is already running in another tab',
+  endCall: 'End call',
+  errorAnsweringCall: 'Error answering call',
+  errorStartingCall: 'Error starting call',
+  errorInitializingCall: 'Error initializing call',
+  errorConnectingTherapist: 'Error connecting to therapist',
+  connectionToTherapistFailed: 'Connection to therapist failed',
+
+  // ─── Peer/Network ───────────────────────────────
+  peerUnavailable: 'Peer unavailable. Wait for the therapist to join.',
+  peerServerUnreachable: 'PeerJS server unreachable. Connection failed.',
+  peerNotInitialized: 'Peer connection not initialized',
+  serverError: 'Server error. Please try again later.',
+  timeoutTherapist: 'Therapist not responding. Please try again later.',
+  therapistNotOnline: 'Therapist is not online or unreachable',
+  slowNetwork: 'Slow network connection detected. Quality reduced.',
+
+  // ─── Media/Camera ───────────────────────────────
+  browserNoWebRTC: 'Browser does not support WebRTC.',
+  cameraAccessDenied: 'Camera/microphone access denied. Please check permissions.',
+  noDeviceFound: 'No camera or microphone found.',
+  cameraTimeout: 'Camera timeout – using audio-only mode',
+  audioOnlyMode: 'Audio-only mode active',
+  audioOnlyActive: 'Audio-only mode active (camera not available)',
+  videoOff: 'Turn camera off',
+  videoOn: 'Turn camera on',
+  micOff: 'Turn microphone off',
+  micOn: 'Turn microphone on',
+  cameraActiveAriaLabel: 'Camera active',
+  cameraMutedAriaLabel: 'Camera off',
+  micActiveAriaLabel: 'Microphone active',
+  micMutedAriaLabel: 'Microphone muted',
+
+  // ─── Screen Share ───────────────────────────────
+  screenShareStarted: 'Screen sharing started',
+  screenShareFailed: 'Screen sharing failed',
+  screenShareEnded: 'Screen sharing ended',
+  stopScreenShare: 'Stop screen sharing',
+  startScreenShare: 'Share screen',
+
+  // ─── Chat ───────────────────────────────────────
+  openChat: 'Open chat',
+
+  // ─── Miscellaneous ──────────────────────────────
+  participantConnectedNoVideo: 'Participant connected (no video available)',
+  waitingForOtherParticipant: 'Waiting for other participant...',
+  otherParticipantLeft: 'The other participant has left the call.',
+  backToDashboard: 'Back to dashboard',
+  noRoomId: 'No room ID available',
+
+  // ─── Waiting Room ───────────────────────────────
+  waitingRoom: 'Waiting Room',
+  waitingRoomPreparing: 'Preparing waiting room...',
+  waitingForTherapist: 'Waiting for therapist',
+  notifiedWhenReady: 'You will be notified when your therapist is ready',
+  therapistReady: 'Your therapist is ready!',
+  redirectingToSession: 'You are now being redirected to the video session...',
+  statusInWaitingRoom: 'In waiting room',
+  statusFillQuestionnaire: 'Fill out questionnaire',
+  statusTherapistCalling: 'Therapist is calling',
+  statusStartSession: 'Start video session',
+  questionnaireSaved: 'Questionnaire saved',
+
+  // ─── Pre-Session Questionnaire ──────────────────
+  currentMoodLabel: 'How is your current mood?',
+  anxietyLevelLabel: 'Anxiety/tension level',
+  sleepQualityLabel: 'Sleep quality last night',
+  noAnxiety: 'No anxiety',
+  veryStrong: 'Very strong',
+  medicationTakenToday: 'Medication taken today',
+  mainConcernsLabel: 'What would you like to discuss today?',
+  mainConcernsPlaceholder: 'Your main topics for today\'s session...',
+  questionsForTherapistLabel: 'Do you have questions for your therapist?',
+  questionsPlaceholder: 'Questions you would like to ask...',
+  significantEventsLabel: 'Significant events since the last session',
+  eventsPlaceholder: 'Important events, changes...',
+  submitQuestionnaire: 'Submit questionnaire',
+
+  // ─── Therapist Queue ────────────────────────────
+  queueTitle: 'Waiting Room Overview',
+  patientsWaiting: '{{count}} patient(s) waiting',
+  noPatientsWaiting: 'No patients waiting',
+  patientsAppearHere: 'New patients will appear here once they join the waiting room.',
+  appointment: 'Appointment:',
+  waitingTime: 'Waiting: {{min}} min.',
+  viewQuestionnaire: 'Questionnaire',
+  admitPatient: 'Admit',
+  questionnaireFilled: 'Questionnaire completed',
+  questionnairePending: 'Questionnaire pending',
+  preSessionData: 'Pre-session data',
+  selectPatientToView: "Select a patient to view their questionnaire.",
+  moodLabel: 'Mood',
+  anxietyLabel: 'Anxiety level',
+  sleepLabel: 'Sleep quality',
+  medicationTakenLabel: 'Medication taken',
+  mainConcerns: 'Main concerns:',
+  questionsForYou: 'Questions for you:',
+  significantEvents: 'Significant events:',
+  questionnaireNotFilled: 'Questionnaire has not been filled out yet.',
+  patientCalledUp: 'Patient {{name}} admitted',
+  errorLoadingQueueData: 'Error loading data',
+};
+
+export default video;

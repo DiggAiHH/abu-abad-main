@@ -1,15 +1,17 @@
 import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
 import { Calendar, Clock, LogOut, MessageSquare, Plus, User, Video } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { appointmentAPI, messageAPI } from '../api/client';
 import { useAuthStore } from '../store/authStore';
 import { Appointment, Message } from '../types';
+import { getDateLocale } from '../utils/dateLocale';
 import { logger } from '../utils/logger';
 
 export default function TherapistDashboard() {
+  const { t } = useTranslation(['dashboard', 'nav', 'common', 'appointments', 'auth']);
   const { user, logout } = useAuthStore();
   const isDemo = useAuthStore((state) => state.isDemo);
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ export default function TherapistDashboard() {
     try {
       // Guard clause: User muss existieren
       if (!user?.id) {
-        throw new Error('Benutzer nicht authentifiziert');
+        throw new Error(t('common:userNotAuthenticated'));
       }
       
       const [apptRes, msgRes] = await Promise.all([
@@ -80,13 +82,13 @@ export default function TherapistDashboard() {
       logger.error('TherapistDashboard: Fehler beim Laden', error);
       
       if (error.response?.status === 401) {
-        toast.error('Sitzung abgelaufen. Bitte neu anmelden.');
+        toast.error(t('common:sessionExpired'));
         void logout();
         navigate('/login');
       } else if (!error.response) {
-        toast.error('Keine Verbindung zum Server. Daten werden nicht aktualisiert.');
+        toast.error(t('common:noConnectionServerUpdate'));
       } else {
-        toast.error('Fehler beim Laden der Daten');
+        toast.error(t('common:errorLoadingData'));
       }
     } finally {
       setLoading(false);
@@ -96,7 +98,7 @@ export default function TherapistDashboard() {
   const handleLogout = () => {
     void logout();
     navigate('/login');
-    toast.success('Erfolgreich abgemeldet');
+    toast.success(t('auth:logoutSuccess'));
   };
 
   const startVideoCall = (roomId: string) => {
@@ -119,25 +121,26 @@ export default function TherapistDashboard() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Therapeuten-Dashboard
+                {t('dashboard:therapistDashboard')}
               </h1>
               <p className="text-sm text-gray-600">
-                Willkommen, Dr. {user?.firstName} {user?.lastName}
+                {t('dashboard:welcomeDoctor', { name: `${user?.firstName} ${user?.lastName}` })}
               </p>
             </div>
             <button
               onClick={handleLogout}
+              aria-label={t('auth:logout')}
               className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
             >
               <LogOut size={20} />
-              Abmelden
+              {t('auth:logout')}
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -146,7 +149,7 @@ export default function TherapistDashboard() {
                 <Calendar className="text-blue-600" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Termine heute</p>
+                <p className="text-sm text-gray-600">{t('dashboard:appointmentsToday')}</p>
                 <p className="text-2xl font-bold">
                   {appointments.filter(a => {
                     try {
@@ -172,7 +175,7 @@ export default function TherapistDashboard() {
                 <Video className="text-green-600" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Offene Slots</p>
+                <p className="text-sm text-gray-600">{t('dashboard:openSlots')}</p>
                 <p className="text-2xl font-bold">
                   {appointments.filter(a => a?.status === 'available').length}
                 </p>
@@ -180,29 +183,29 @@ export default function TherapistDashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition" onClick={() => navigate('/questionnaires')}>
+          <button type="button" onClick={() => navigate('/questionnaires')} aria-label={t('dashboard:questionnairesManage')} className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition text-left w-full border-0">
             <div className="flex items-center gap-4">
               <div className="bg-purple-100 p-3 rounded-lg">
                 <MessageSquare className="text-purple-600" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Fragebögen</p>
-                <p className="text-lg font-bold">Verwalten</p>
+                <p className="text-sm text-gray-600">{t('nav:questionnaires')}</p>
+                <p className="text-lg font-bold">{t('dashboard:questionnairesManage')}</p>
               </div>
             </div>
-          </div>
+          </button>
 
-          <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition" onClick={() => navigate('/documents')}>
+          <button type="button" onClick={() => navigate('/documents')} aria-label={t('dashboard:documentsRequests')} className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition text-left w-full border-0">
             <div className="flex items-center gap-4">
               <div className="bg-orange-100 p-3 rounded-lg">
                 <User className="text-orange-600" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Dokumente</p>
-                <p className="text-lg font-bold">Anfragen</p>
+                <p className="text-sm text-gray-600">{t('nav:documents')}</p>
+                <p className="text-lg font-bold">{t('dashboard:documentsRequests')}</p>
               </div>
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Quick Actions */}
@@ -211,84 +214,90 @@ export default function TherapistDashboard() {
             onClick={() => navigate('/therapy-notes')}
             className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-xl font-bold mb-2">📔 Therapie-Notizen</h3>
-            <p className="text-indigo-100">SOAP-Dokumentation und Sitzungsprotokolle</p>
+            <h3 className="text-xl font-bold mb-2">📔 {t('nav:therapyNotes')}</h3>
+            <p className="text-indigo-100">{t('nav:therapyNotesSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/reports')}
             className="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-xl font-bold mb-2">📄 Berichte</h3>
-            <p className="text-cyan-100">Behandlungsberichte erstellen und exportieren</p>
+            <h3 className="text-xl font-bold mb-2">📄 {t('nav:reports')}</h3>
+            <p className="text-cyan-100">{t('nav:reportsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/queue')}
             className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-xl font-bold mb-2">👥 Wartezimmer</h3>
-            <p className="text-teal-100">Wartende Patienten einsehen und aufrufen</p>
+            <h3 className="text-xl font-bold mb-2">👥 {t('nav:waitingRoom')}</h3>
+            <p className="text-teal-100">{t('nav:waitingRoomSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/questionnaires')}
             className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-xl font-bold mb-2">📋 Fragebogen erstellen</h3>
-            <p className="text-blue-100">Anamnese, Symptom-Check oder individuelle Fragebögen</p>
+            <h3 className="text-xl font-bold mb-2">📋 {t('nav:createQuestionnaire')}</h3>
+            <p className="text-blue-100">{t('nav:createQuestionnaireSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/documents')}
             className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-xl font-bold mb-2">📄 Dokumente anfordern</h3>
-            <p className="text-green-100">Scans, Befunde oder spezifische Unterlagen von Patienten anfordern</p>
+            <h3 className="text-xl font-bold mb-2">📄 {t('nav:requestDocuments')}</h3>
+            <p className="text-green-100">{t('nav:requestDocumentsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/materials')}
             className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-xl font-bold mb-2">📝 Patientenmaterialien</h3>
-            <p className="text-purple-100">Notizen und Vorbereitungen der Patienten einsehen</p>
+            <h3 className="text-xl font-bold mb-2">📝 {t('nav:patientMaterials')}</h3>
+            <p className="text-purple-100">{t('nav:patientMaterialsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/billing')}
             className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
           >
-            <h3 className="text-xl font-bold mb-2">💶 Abrechnung</h3>
-            <p className="text-emerald-100">Rechnungen erstellen und verwalten</p>
+            <h3 className="text-xl font-bold mb-2">💶 {t('nav:billing')}</h3>
+            <p className="text-emerald-100">{t('nav:billingSubtitle')}</p>
           </button>
         </div>
 
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow">
           <div className="border-b border-gray-200">
-            <nav className="flex -mb-px">
+            <nav className="flex -mb-px" role="tablist" aria-label={t('common:mainNavigation')}>
               <button
                 onClick={() => setActiveTab('appointments')}
+                aria-label={t('appointments:title')}
+                aria-selected={activeTab === 'appointments'}
+                role="tab"
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === 'appointments'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Termine
+                {t('appointments:title')}
               </button>
               <button
                 onClick={() => setActiveTab('messages')}
+                aria-label={t('dashboard:messagesTab')}
+                aria-selected={activeTab === 'messages'}
+                role="tab"
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === 'messages'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Nachrichten
+                {t('dashboard:messagesTab')}
                 {messages.filter(m => !m.read).length > 0 && (
-                  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  <span className="ms-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {messages.filter(m => !m.read).length}
                   </span>
                 )}
@@ -300,20 +309,20 @@ export default function TherapistDashboard() {
             {activeTab === 'appointments' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">Meine Termine</h2>
+                  <h2 className="text-xl font-semibold">{t('dashboard:myAppointments')}</h2>
                   <button
                     onClick={() => setShowCreateModal(true)}
                     className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                   >
                     <Plus size={20} />
-                    Slot erstellen
+                    {t('appointments:createSlot')}
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   {appointments.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">
-                      Keine Termine vorhanden
+                      {t('appointments:noAppointments')}
                     </p>
                   ) : (
                     appointments.map((apt) => (
@@ -326,13 +335,13 @@ export default function TherapistDashboard() {
                             <div className="flex items-center gap-2 mb-2">
                               <Clock size={16} className="text-gray-400" />
                               <span className="font-medium">
-                                {format(new Date(apt.startTime), 'dd.MM.yyyy HH:mm', { locale: de })} - 
+                                {format(new Date(apt.startTime), 'dd.MM.yyyy HH:mm', { locale: getDateLocale() })} - 
                                 {format(new Date(apt.endTime), 'HH:mm')}
                               </span>
                             </div>
                             {apt.patient && (
                               <p className="text-sm text-gray-600">
-                                Patient: {apt.patient.firstName} {apt.patient.lastName}
+                                {t('common:patient')}: {apt.patient.firstName} {apt.patient.lastName}
                               </p>
                             )}
                             <div className="mt-2">
@@ -347,10 +356,10 @@ export default function TherapistDashboard() {
                                     : 'bg-red-100 text-red-800'
                                 }`}
                               >
-                                {apt.status === 'available' && 'Verfügbar'}
-                                {apt.status === 'booked' && 'Gebucht'}
-                                {apt.status === 'completed' && 'Abgeschlossen'}
-                                {apt.status === 'cancelled' && 'Abgesagt'}
+                                {apt.status === 'available' && t('appointments:statusAvailable')}
+                                {apt.status === 'booked' && t('appointments:statusBooked')}
+                                {apt.status === 'completed' && t('appointments:statusCompleted')}
+                                {apt.status === 'cancelled' && t('appointments:statusCancelled')}
                               </span>
                             </div>
                           </div>
@@ -361,7 +370,7 @@ export default function TherapistDashboard() {
                                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
                               >
                                 <Video size={16} />
-                                Sitzung starten
+                                {t('appointments:startSession')}
                               </button>
                             )}
                           </div>
@@ -375,11 +384,11 @@ export default function TherapistDashboard() {
 
             {activeTab === 'messages' && (
               <div>
-                <h2 className="text-xl font-semibold mb-6">Nachrichten</h2>
+                <h2 className="text-xl font-semibold mb-6">{t('dashboard:messagesTab')}</h2>
                 <div className="space-y-3">
                   {messages.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">
-                      Keine Nachrichten
+                      {t('dashboard:noMessages')}
                     </p>
                   ) : (
                     messages.map((msg) => (
@@ -401,7 +410,7 @@ export default function TherapistDashboard() {
                           </div>
                           {!msg.read && (
                             <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                              Neu
+                              {t('dashboard:newBadge')}
                             </span>
                           )}
                         </div>
@@ -430,6 +439,7 @@ export default function TherapistDashboard() {
 }
 
 function CreateAppointmentModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const { t } = useTranslation(['appointments', 'common']);
   const [formData, setFormData] = useState({
     startTime: '',
     endTime: '',
@@ -444,7 +454,7 @@ function CreateAppointmentModal({ onClose, onSuccess }: { onClose: () => void; o
 
     try {
       await appointmentAPI.create(formData);
-      toast.success('Termin-Slot erstellt!');
+      toast.success(t('appointments:slotCreated'));
       onSuccess();
     } catch (error) {
       // Error via interceptor
@@ -454,13 +464,13 @@ function CreateAppointmentModal({ onClose, onSuccess }: { onClose: () => void; o
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="create-appointment-title">
       <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <h2 className="text-2xl font-bold mb-4">Neuer Termin-Slot</h2>
+        <h2 id="create-appointment-title" className="text-2xl font-bold mb-4">{t('appointments:newSlot')}</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Startzeit</label>
+            <label className="block text-sm font-medium mb-2">{t('appointments:startTime')}</label>
             <input
               type="datetime-local"
               value={formData.startTime}
@@ -471,7 +481,7 @@ function CreateAppointmentModal({ onClose, onSuccess }: { onClose: () => void; o
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Endzeit</label>
+            <label className="block text-sm font-medium mb-2">{t('appointments:endTime')}</label>
             <input
               type="datetime-local"
               value={formData.endTime}
@@ -482,7 +492,7 @@ function CreateAppointmentModal({ onClose, onSuccess }: { onClose: () => void; o
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Preis (€)</label>
+            <label className="block text-sm font-medium mb-2">{t('appointments:priceEur')}</label>
             <input
               type="number"
               value={formData.price}
@@ -499,14 +509,14 @@ function CreateAppointmentModal({ onClose, onSuccess }: { onClose: () => void; o
               onClick={onClose}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
-              Abbrechen
+              {t('common:cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? 'Erstelle...' : 'Erstellen'}
+              {loading ? t('common:creating') : t('common:create')}
             </button>
           </div>
         </form>

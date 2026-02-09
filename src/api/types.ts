@@ -62,7 +62,7 @@ export function parseApiResponse<T>(
   try {
     return schema.parse(response);
   } catch (error) {
-    console.warn('API Response parsing failed:', error);
+    if (import.meta.env.DEV) console.warn('API Response parsing failed:', error);
     return null;
   }
 }

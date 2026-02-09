@@ -1,0 +1,47 @@
+const exercises = {
+  title: 'Exercices thérapeutiques',
+  subtitle: 'Vos exercices assignés et vos progrès',
+  myExercises: 'Mes exercices',
+  completionLog: 'Journal de réalisation',
+  stats: 'Statistiques',
+  markComplete: 'Marquer comme terminé',
+  completeExercise: "Terminer l'exercice",
+  exerciseCompleted: 'Exercice marqué comme terminé ! 🎉',
+  duration: 'Durée (minutes)',
+  difficulty: 'Difficulté',
+  moodBefore: 'Humeur avant',
+  moodAfter: 'Humeur après',
+  barriers: 'Obstacles',
+  notesPlaceholder: "Comment cela s'est-il passé ?",
+  noExercises: 'Aucun exercice assigné',
+  noCompletions: 'Aucune réalisation enregistrée',
+  activeExercises: 'exercices actifs',
+  completedToday: "terminés aujourd'hui",
+  totalExercises: 'Exercices',
+  totalCompletions: 'Réalisations',
+  avgMoodChange: "Variation d'humeur moy.",
+  byCategory: 'Par catégorie',
+  weeklyActivity: 'Activité hebdomadaire',
+  completionRate: 'Taux de réalisation',
+  dueDate: 'Date limite',
+  assignedBy: 'Assigné par',
+  statusPending: 'En attente',
+  statusInProgress: 'En cours',
+  statusCompleted: 'Terminé',
+
+  // Fréquence
+  frequencyDaily: 'Quotidien',
+  frequencyWeekly: 'Hebdomadaire',
+  frequencyBiweekly: 'Toutes les 2 semaines',
+  frequencyAsNeeded: 'Selon les besoins',
+
+  // Catégories
+  categoryRelaxation: 'Relaxation',
+  categoryCognitive: 'Cognitif',
+  categoryMindfulness: 'Pleine conscience',
+  categoryBehavioral: 'Activation comportementale',
+  categoryExposure: 'Exposition',
+  categorySocial: 'Compétences sociales',
+};
+
+export default exercises;

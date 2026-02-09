@@ -1,0 +1,123 @@
+const video = {
+  title: 'جلسة الفيديو',
+  // ─── الاتصال ──────────────────────────────────
+  connectionEstablished: 'تم إنشاء الاتصال',
+  connectionErrorDuringCall: 'خطأ في الاتصال أثناء المكالمة',
+  connectionLost: 'انقطع الاتصال',
+  connectionError: 'خطأ في الاتصال',
+  connectionInterrupted: 'انقطع الاتصال، جارٍ محاولة الاستعادة...',
+  connectionEndedInfo: 'تم إنهاء الاتصال',
+  connectionLostReconnect: 'فُقد الاتصال. يرجى إعادة الاتصال.',
+  connecting: 'جارٍ الاتصال...',
+  connected: 'متصل',
+  waitingForConnection: 'في انتظار الاتصال...',
+  live: 'مباشر',
+
+  // ─── المكالمة ──────────────────────────────────
+  callEnded: 'انتهت المكالمة',
+  callEndedSuccess: 'تم إنهاء المكالمة',
+  callCouldNotStart: 'تعذر بدء المكالمة',
+  callAlreadyOpen: 'المكالمة مفتوحة بالفعل في علامة تبويب أخرى',
+  endCall: 'إنهاء المكالمة',
+  errorAnsweringCall: 'خطأ في الرد على المكالمة',
+  errorStartingCall: 'خطأ في بدء المكالمة',
+  errorInitializingCall: 'خطأ في تهيئة المكالمة',
+  errorConnectingTherapist: 'خطأ في الاتصال بالمعالج',
+  connectionToTherapistFailed: 'فشل الاتصال بالمعالج',
+
+  // ─── الند/الشبكة ──────────────────────────────
+  peerUnavailable: 'الطرف الآخر غير متاح. انتظر حتى ينضم المعالج.',
+  peerServerUnreachable: 'خادم PeerJS غير قابل للوصول. فشل الاتصال.',
+  peerNotInitialized: 'اتصال الند غير مهيأ',
+  serverError: 'خطأ في الخادم. يرجى المحاولة لاحقاً.',
+  timeoutTherapist: 'المعالج لا يستجيب. يرجى المحاولة لاحقاً.',
+  therapistNotOnline: 'المعالج غير متصل أو غير متاح',
+  slowNetwork: 'تم اكتشاف اتصال شبكة بطيء. تم تقليل الجودة.',
+
+  // ─── الوسائط/الكاميرا ───────────────────────────
+  browserNoWebRTC: 'المتصفح لا يدعم WebRTC.',
+  cameraAccessDenied: 'تم رفض الوصول إلى الكاميرا/الميكروفون. يرجى التحقق من الأذونات.',
+  noDeviceFound: 'لم يتم العثور على كاميرا أو ميكروفون.',
+  cameraTimeout: 'انتهت مهلة الكاميرا – يُستخدم وضع الصوت فقط',
+  audioOnlyMode: 'وضع الصوت فقط نشط',
+  audioOnlyActive: 'وضع الصوت فقط نشط (الكاميرا غير متاحة)',
+  videoOff: 'إيقاف الكاميرا',
+  videoOn: 'تشغيل الكاميرا',
+  micOff: 'إيقاف الميكروفون',
+  micOn: 'تشغيل الميكروفون',
+  cameraActiveAriaLabel: 'الكاميرا نشطة',
+  cameraMutedAriaLabel: 'الكاميرا متوقفة',
+  micActiveAriaLabel: 'الميكروفون نشط',
+  micMutedAriaLabel: 'الميكروفون مكتوم',
+
+  // ─── مشاركة الشاشة ─────────────────────────────
+  screenShareStarted: 'بدأت مشاركة الشاشة',
+  screenShareFailed: 'فشلت مشاركة الشاشة',
+  screenShareEnded: 'انتهت مشاركة الشاشة',
+  stopScreenShare: 'إيقاف مشاركة الشاشة',
+  startScreenShare: 'مشاركة الشاشة',
+
+  // ─── المحادثة ───────────────────────────────────
+  openChat: 'فتح المحادثة',
+
+  // ─── متنوع ──────────────────────────────────────
+  participantConnectedNoVideo: 'المشارك متصل (لا يوجد فيديو متاح)',
+  waitingForOtherParticipant: 'في انتظار المشارك الآخر...',
+  otherParticipantLeft: 'المشارك الآخر غادر المكالمة.',
+  backToDashboard: 'العودة إلى لوحة التحكم',
+  noRoomId: 'لا يوجد معرّف للغرفة',
+
+  // ─── غرفة الانتظار ────────────────────────────
+  waitingRoom: 'غرفة الانتظار',
+  waitingRoomPreparing: 'جارٍ تحضير غرفة الانتظار...',
+  waitingForTherapist: 'في انتظار المعالج',
+  notifiedWhenReady: 'سيتم إشعارك عندما يكون معالجك جاهزاً',
+  therapistReady: 'معالجك جاهز!',
+  redirectingToSession: 'سيتم توجيهك الآن إلى جلسة الفيديو...',
+  statusInWaitingRoom: 'في غرفة الانتظار',
+  statusFillQuestionnaire: 'ملء الاستبيان',
+  statusTherapistCalling: 'المعالج يستدعيك',
+  statusStartSession: 'بدء جلسة الفيديو',
+  questionnaireSaved: 'تم حفظ الاستبيان',
+
+  // ─── استبيان ما قبل الجلسة ────────────────────
+  currentMoodLabel: 'كيف هو مزاجك الحالي؟',
+  anxietyLevelLabel: 'مستوى القلق/التوتر',
+  sleepQualityLabel: 'جودة النوم الليلة الماضية',
+  noAnxiety: 'لا قلق',
+  veryStrong: 'شديد جداً',
+  medicationTakenToday: 'هل تناولت أدويتك اليوم',
+  mainConcernsLabel: 'ما الذي تريد مناقشته اليوم؟',
+  mainConcernsPlaceholder: 'مواضيعك الرئيسية لجلسة اليوم...',
+  questionsForTherapistLabel: 'هل لديك أسئلة لمعالجك؟',
+  questionsPlaceholder: 'أسئلة تريد طرحها...',
+  significantEventsLabel: 'أحداث مهمة منذ الجلسة الأخيرة',
+  eventsPlaceholder: 'أحداث مهمة، تغييرات...',
+  submitQuestionnaire: 'إرسال الاستبيان',
+
+  // ─── قائمة انتظار المعالج ──────────────────────
+  queueTitle: 'نظرة عامة على غرفة الانتظار',
+  patientsWaiting: '{{count}} مريض(مرضى) في الانتظار',
+  noPatientsWaiting: 'لا يوجد مرضى في الانتظار',
+  patientsAppearHere: 'سيظهر المرضى الجدد هنا بمجرد انضمامهم إلى غرفة الانتظار.',
+  appointment: 'الموعد:',
+  waitingTime: 'في الانتظار: {{min}} دقيقة',
+  viewQuestionnaire: 'الاستبيان',
+  admitPatient: 'استدعاء',
+  questionnaireFilled: 'تم ملء الاستبيان',
+  questionnairePending: 'الاستبيان معلق',
+  preSessionData: 'بيانات ما قبل الجلسة',
+  selectPatientToView: 'اختر مريضاً لعرض استبيانه.',
+  moodLabel: 'المزاج',
+  anxietyLabel: 'مستوى القلق',
+  sleepLabel: 'جودة النوم',
+  medicationTakenLabel: 'تناول الأدوية',
+  mainConcerns: 'الاهتمامات الرئيسية:',
+  questionsForYou: 'أسئلة لك:',
+  significantEvents: 'أحداث مهمة:',
+  questionnaireNotFilled: 'لم يتم ملء الاستبيان بعد.',
+  patientCalledUp: 'تم استدعاء المريض {{name}}',
+  errorLoadingQueueData: 'خطأ في تحميل البيانات',
+};
+
+export default video;

@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import DemoBadge from './components/DemoBadge';
 import ErrorBoundary from './components/ErrorBoundary';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import Billing from './pages/Billing';
 import CrisisPlan from './pages/CrisisPlan';
 import DocumentRequests from './pages/DocumentRequests';
@@ -30,13 +32,14 @@ import { useAuthStore } from './store/authStore';
 
 function App() {
   const { user, loading, checkAuth } = useAuthStore();
+  const { t } = useTranslation(['common']);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
   const spinner = (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen" role="status" aria-label={t('common:loading')}>
       <div className="spinner"></div>
     </div>
   );
@@ -44,8 +47,17 @@ function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <Toaster position="top-right" />
+        {/* A11y: Skip-to-Content Link */}
+        <a href="#main-content" className="skip-to-content">
+          {t('common:skipToContent')}
+        </a>
+        <div aria-live="polite" aria-atomic="true">
+          <Toaster position="top-right" toastOptions={{ ariaProps: { role: 'status', 'aria-live': 'polite' } }} />
+        </div>
         <DemoBadge />
+        <div className="fixed top-2 end-2 z-50">
+          <LanguageSwitcher />
+        </div>
         <Routes>
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />

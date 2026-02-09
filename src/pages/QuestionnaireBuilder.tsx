@@ -4,14 +4,15 @@
  * Feldtypen: Text, Textarea, Radio, Checkbox, Select, Number, Date, Email, Tel
  */
 
-import { useMemo, useRef, useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, GripVertical, Save, Eye, Copy, Upload } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Copy, Eye, GripVertical, Plus, Save, Trash2, Upload } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { apiClient } from '../api/client';
-import { logger } from '../utils/logger';
 import { InfoTip } from '../components/InfoTip';
 import { QuestionnaireFormFields } from '../components/QuestionnaireFormFields';
+import { logger } from '../utils/logger';
 
 interface FormField {
   id: string;
@@ -32,6 +33,7 @@ interface QuestionnaireTemplate {
 }
 
 export default function QuestionnaireBuilder() {
+  const { t } = useTranslation(['questionnaires', 'common', 'errors']);
   const [templates, setTemplates] = useState<QuestionnaireTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -65,7 +67,8 @@ export default function QuestionnaireBuilder() {
   const loadTemplates = async () => {
     try {
       const response = await apiClient.get('/questionnaires/templates');
-      const mapped: QuestionnaireTemplate[] = (response.data.templates || []).map((t: any) => ({
+      const rawTemplates = Array.isArray(response.data?.templates) ? response.data.templates : Array.isArray(response.data) ? response.data : [];
+      const mapped: QuestionnaireTemplate[] = rawTemplates.map((t: any) => ({
         id: t.id,
         title: t.title,
         description: t.description || '',
@@ -76,7 +79,7 @@ export default function QuestionnaireBuilder() {
       setTemplates(mapped);
     } catch (error: any) {
       logger.error('QuestionnaireBuilder: Error loading templates', error);
-      toast.error('Fehler beim Laden der Vorlagen');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -97,12 +100,12 @@ export default function QuestionnaireBuilder() {
 
   const handleSaveField = () => {
     if (!editingField || !editingField.label.trim()) {
-      toast.error('Bitte geben Sie ein Label ein');
+      toast.error(t('common:fillAllFields'));
       return;
     }
 
     if (editingField.options && editingField.options.some(opt => !opt.trim())) {
-      toast.error('Alle Optionen müssen ausgefüllt sein');
+      toast.error(t('common:fillAllRequiredFields'));
       return;
     }
 
@@ -125,12 +128,12 @@ export default function QuestionnaireBuilder() {
 
   const handleSaveTemplate = async () => {
     if (!title.trim()) {
-      toast.error('Bitte geben Sie einen Titel ein');
+      toast.error(t('common:fillAllFields'));
       return;
     }
 
     if (fields.length === 0) {
-      toast.error('Fügen Sie mindestens ein Feld hinzu');
+      toast.error(t('questionnaires:addFieldsPrompt'));
       return;
     }
 
@@ -143,14 +146,14 @@ export default function QuestionnaireBuilder() {
           description,
           formSchema
         });
-        toast.success('Vorlage aktualisiert');
+        toast.success(t('questionnaires:templateSaved'));
       } else {
         await apiClient.post('/questionnaires/templates', {
           title,
           description,
           formSchema
         });
-        toast.success('Vorlage erstellt');
+        toast.success(t('questionnaires:templateSaved'));
       }
 
       setShowBuilder(false);
@@ -158,7 +161,7 @@ export default function QuestionnaireBuilder() {
       await loadTemplates();
     } catch (error: any) {
       logger.error('QuestionnaireBuilder: Error saving template', error);
-      toast.error('Fehler beim Speichern');
+      toast.error(t('common:errorSaving'));
     }
   };
 
@@ -171,24 +174,24 @@ export default function QuestionnaireBuilder() {
   };
 
   const handleDuplicateTemplate = async (template: QuestionnaireTemplate) => {
-    setTitle(`${template.title} (Kopie)`);
+    setTitle(`${template.title} (${t('common:copy')})`);
     setDescription(template.description);
     setFields(template.fields.map(f => ({ ...f, id: `field-${Date.now()}-${f.id}` })));
     setShowBuilder(true);
   };
 
   const handleDeleteTemplate = async (templateId: string) => {
-    if (!confirm('Möchten Sie diese Vorlage wirklich löschen?')) {
+    if (!confirm(t('common:confirmDelete'))) {
       return;
     }
 
     try {
       await apiClient.delete(`/questionnaires/templates/${templateId}`);
-      toast.success('Vorlage gelöscht');
+      toast.success(t('questionnaires:templateDeleted'));
       await loadTemplates();
     } catch (error: any) {
       logger.error('QuestionnaireBuilder: Error deleting template', error);
-      toast.error('Fehler beim Löschen');
+      toast.error(t('common:errorDeleting'));
     }
   };
 
@@ -209,9 +212,9 @@ export default function QuestionnaireBuilder() {
     if (!file) return;
     if (importing) return;
     setImporting(true);
-    setImportStatus('Analyse läuft…');
+    setImportStatus(t('questionnaires:importing'));
 
-    const toastId = toast.loading('PDF wird analysiert…');
+    const toastId = toast.loading(t('questionnaires:importing'));
 
     try {
       const form = new FormData();
@@ -226,20 +229,20 @@ export default function QuestionnaireBuilder() {
       const suggestedFields = suggested?.formSchema?.fields;
 
       if (!Array.isArray(suggestedFields) || suggestedFields.length === 0) {
-        toast.error('Keine Felder aus PDF erkannt. Bitte manuell erstellen.', { id: toastId });
+        toast.error(t('questionnaires:importFailed'), { id: toastId });
         resetBuilder();
         setShowBuilder(true);
 
         if (typeof res.data?.warning === 'string' && res.data.warning.trim()) {
           toast(res.data.warning);
         }
-        setImportStatus('Keine Felder erkannt');
+        setImportStatus(t('questionnaires:importFailed'));
         return;
       }
 
       resetBuilder();
       setTitle(suggested?.title || file.name.replace(/\.[^.]+$/, ''));
-      setDescription(suggested?.description || 'Import aus PDF (bitte prüfen/korregieren)');
+      setDescription(suggested?.description || t('questionnaires:importSuccess'));
       setFields(suggestedFields);
       setShowBuilder(true);
 
@@ -247,25 +250,25 @@ export default function QuestionnaireBuilder() {
 
       if (typeof res.data?.warning === 'string' && res.data.warning.trim()) {
         if (usedOcr) {
-          toast.success('PDF importiert (OCR genutzt). Bitte Felder prüfen.', { id: toastId });
-          setImportStatus('OCR abgeschlossen');
+          toast.success(t('questionnaires:importSuccess'), { id: toastId });
+          setImportStatus(t('questionnaires:importSuccess'));
         } else {
-          toast.success('PDF importiert. Bitte Felder prüfen.', { id: toastId });
-          setImportStatus('Import abgeschlossen');
+          toast.success(t('questionnaires:importSuccess'), { id: toastId });
+          setImportStatus(t('questionnaires:importSuccess'));
         }
         toast(res.data.warning);
       } else {
-        toast.success(usedOcr ? 'PDF importiert (OCR genutzt). Bitte Felder prüfen.' : 'PDF importiert. Bitte Felder prüfen.', {
+        toast.success(t('questionnaires:importSuccess'), {
           id: toastId,
         });
-        setImportStatus(usedOcr ? 'OCR abgeschlossen' : 'Import abgeschlossen');
+        setImportStatus(t('questionnaires:importSuccess'));
       }
     } catch (error: any) {
       logger.error('QuestionnaireBuilder: PDF import failed', error);
       const msg =
         error?.response?.data?.error ||
         error?.response?.data?.message ||
-        'PDF-Import fehlgeschlagen';
+        t('questionnaires:importFailed');
       toast.error(String(msg), { id: toastId });
       setImportStatus(String(msg));
     } finally {
@@ -275,17 +278,17 @@ export default function QuestionnaireBuilder() {
     }
   };
 
-  const getFieldTypeLabel = (type: string) => {
+  const getFieldTypeLabel = (type: string): string => {
     const labels: Record<string, string> = {
-      text: 'Textfeld',
-      textarea: 'Textbereich',
-      radio: 'Radiobuttons',
-      checkbox: 'Checkboxen',
-      select: 'Dropdown',
-      number: 'Zahl',
-      date: 'Datum',
-      email: 'E-Mail',
-      tel: 'Telefon'
+      text: t('questionnaires:fieldTypeText'),
+      textarea: t('questionnaires:fieldTypeTextarea'),
+      radio: t('questionnaires:fieldTypeRadio'),
+      checkbox: t('questionnaires:fieldTypeCheckbox'),
+      select: t('questionnaires:fieldTypeSelect'),
+      number: t('questionnaires:fieldTypeNumber'),
+      date: t('questionnaires:fieldTypeDate'),
+      email: t('common:email'),
+      tel: t('common:phone')
     };
     return labels[type] || type;
   };
@@ -306,15 +309,15 @@ export default function QuestionnaireBuilder() {
             <button
               onClick={() => navigate('/dashboard')}
               className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
-              title="Zurück zum Dashboard"
+              title={t('errors:backToDashboard')}
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 rtl:flip" />
               Dashboard
             </button>
 
-            <h1 className="text-2xl font-bold text-gray-900">Fragebogen-Vorlagen</h1>
-            <InfoTip label="Hilfe zu Vorlagen" title="So funktioniert’s">
-              Erstellen Sie Vorlagen als Baukasten (Felder). In der Vorschau sehen Sie, wie es beim Patienten aussieht.
+            <h1 className="text-2xl font-bold text-gray-900">{t('questionnaires:builder')}</h1>
+            <InfoTip label={t('questionnaires:builder')} title={t('questionnaires:builder')}>
+              {t('questionnaires:builderSubtitle')}
             </InfoTip>
           </div>
           
@@ -330,10 +333,10 @@ export default function QuestionnaireBuilder() {
               onClick={handleImportPdfClick}
               disabled={importing}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-800 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="PDF importieren"
+              title={t('questionnaires:importFromPdf')}
             >
               <Upload className="w-4 h-4" />
-              {importing ? 'Analysiere…' : 'PDF importieren'}
+              {importing ? t('questionnaires:importing') : t('questionnaires:importFromPdf')}
             </button>
             {importStatus && <span className="text-xs text-gray-500">{importStatus}</span>}
             <button
@@ -344,7 +347,7 @@ export default function QuestionnaireBuilder() {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-4 h-4" />
-              Neue Vorlage
+              {t('questionnaires:createTemplate')}
             </button>
           </div>
         </div>
@@ -352,8 +355,8 @@ export default function QuestionnaireBuilder() {
         {/* Templates Grid */}
         {templates.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
-            <p>Noch keine Vorlagen vorhanden</p>
-            <p className="text-sm">Erstellen Sie Ihre erste Fragebogen-Vorlage</p>
+            <p>{t('questionnaires:noTemplates')}</p>
+            <p className="text-sm">{t('questionnaires:createFirst')}</p>
           </div>
         ) : (
           <div className="grid gap-4">
@@ -367,7 +370,7 @@ export default function QuestionnaireBuilder() {
                     <h3 className="text-lg font-semibold text-gray-900">{template.title}</h3>
                     <p className="text-sm text-gray-600 mt-1">{template.description}</p>
                     <p className="text-xs text-gray-500 mt-2">
-                      {template.fields.length} Felder • {template.timesUsed} mal verwendet
+                      {template.fields.length} {t('questionnaires:addField')} • {t('questionnaires:timesUsed', { count: template.timesUsed })}
                     </p>
                   </div>
 
@@ -375,21 +378,21 @@ export default function QuestionnaireBuilder() {
                     <button
                       onClick={() => handleDuplicateTemplate(template)}
                       className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
-                      title="Duplizieren"
+                      title={t('common:copy')}
                     >
                       <Copy className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleEditTemplate(template)}
                       className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg"
-                      title="Bearbeiten"
+                      title={t('common:edit')}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteTemplate(template.id)}
                       className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                      title="Löschen"
+                      title={t('common:delete')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -408,15 +411,15 @@ export default function QuestionnaireBuilder() {
             <div className="p-6 border-b border-gray-200 sticky top-0 bg-white">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-xl font-bold">
-                  {editingTemplate ? 'Vorlage bearbeiten' : 'Neue Vorlage erstellen'}
+                  {editingTemplate ? t('questionnaires:editTemplate') : t('questionnaires:createTemplate')}
                 </h2>
                 <button
                   onClick={() => setShowPreview((v) => !v)}
                   className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
-                  title="Vorschau umschalten"
+                  title={t('common:preview')}
                 >
                   <Eye className="w-4 h-4" />
-                  Vorschau
+                  {t('common:preview')}
                 </button>
               </div>
             </div>
@@ -425,27 +428,27 @@ export default function QuestionnaireBuilder() {
               {/* Template Info */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Titel *
+                  {t('questionnaires:templateTitle')} *
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="z.B. Anamnesebogen Depression"
+                  placeholder={t('questionnaires:templateTitlePlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Beschreibung
+                  {t('questionnaires:templateDescription')}
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   rows={2}
-                  placeholder="Kurze Beschreibung des Fragebogens"
+                  placeholder={t('questionnaires:templateDescriptionPlaceholder')}
                 />
               </div>
 
@@ -453,10 +456,10 @@ export default function QuestionnaireBuilder() {
               <div>
                 <div className="flex justify-between items-center mb-4">
                   <label className="block text-sm font-medium text-gray-700">
-                    Felder ({fields.length})
+                    {t('questionnaires:addField')} ({fields.length})
                   </label>
-                  <InfoTip label="Hilfe zu Feldern" title="Tipp">
-                    Erstellen Sie Felder, wie sie der Patient später ausfüllt. Nutzen Sie die Vorschau, um das Ergebnis direkt zu prüfen.
+                  <InfoTip label={t('questionnaires:addField')} title={t('questionnaires:addField')}>
+                    {t('questionnaires:addFieldsPrompt')}
                   </InfoTip>
                   
                   <div className="flex gap-2 flex-wrap">
@@ -474,7 +477,7 @@ export default function QuestionnaireBuilder() {
 
                 {fields.length === 0 ? (
                   <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                    <p className="text-gray-500">Fügen Sie Felder hinzu</p>
+                    <p className="text-gray-500">{t('questionnaires:noFields')}</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -491,7 +494,7 @@ export default function QuestionnaireBuilder() {
                             <span className="font-medium text-gray-900">{field.label}</span>
                             {field.required && (
                               <span className="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded">
-                                Pflichtfeld
+                                {t('questionnaires:fieldRequired')}
                               </span>
                             )}
                           </div>
@@ -523,14 +526,14 @@ export default function QuestionnaireBuilder() {
               {showPreview && (
                 <div className="border-t border-gray-200 pt-6">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">Vorschau</h3>
-                    <InfoTip label="Hinweis zur Vorschau" title="Hinweis">
-                      Vorschau ist nur lokal (keine Speicherung). Sie zeigt die Patientenansicht.
+                    <h3 className="text-lg font-semibold text-gray-900">{t('common:preview')}</h3>
+                    <InfoTip label={t('common:preview')} title={t('common:preview')}>
+                      {t('questionnaires:builderSubtitle')}
                     </InfoTip>
                   </div>
                   <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
                     {fields.length === 0 ? (
-                      <div className="text-sm text-gray-600">Fügen Sie zuerst Felder hinzu.</div>
+                      <div className="text-sm text-gray-600">{t('questionnaires:noFields')}</div>
                     ) : (
                       <QuestionnaireFormFields
                         formSchema={previewSchema}
@@ -551,14 +554,14 @@ export default function QuestionnaireBuilder() {
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
               >
-                Abbrechen
+                {t('common:cancel')}
               </button>
               <button
                 onClick={handleSaveTemplate}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 <Save className="w-4 h-4" />
-                Speichern
+                {t('common:save')}
               </button>
             </div>
           </div>
@@ -570,20 +573,20 @@ export default function QuestionnaireBuilder() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg w-full max-w-2xl">
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-bold">Feld bearbeiten</h3>
+              <h3 className="text-lg font-bold">{t('questionnaires:editField')}</h3>
             </div>
 
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Label *
+                  {t('questionnaires:fieldLabel')} *
                 </label>
                 <input
                   type="text"
                   value={editingField.label}
                   onChange={(e) => setEditingField({ ...editingField, label: e.target.value })}
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="z.B. Wie oft treten die Symptome auf?"
+                  placeholder={t('questionnaires:fieldLabelPlaceholder')}
                 />
               </div>
 
@@ -595,7 +598,7 @@ export default function QuestionnaireBuilder() {
                     onChange={(e) => setEditingField({ ...editingField, required: e.target.checked })}
                     className="rounded"
                   />
-                  <span className="text-sm font-medium text-gray-700">Pflichtfeld</span>
+                  <span className="text-sm font-medium text-gray-700">{t('questionnaires:fieldRequired')}</span>
                 </label>
               </div>
 
@@ -603,7 +606,7 @@ export default function QuestionnaireBuilder() {
               {(editingField.type === 'radio' || editingField.type === 'checkbox' || editingField.type === 'select') && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Optionen
+                    {t('questionnaires:fieldOptions')}
                   </label>
                   {editingField.options?.map((option, index) => (
                     <div key={index} className="flex gap-2 mb-2">
@@ -638,7 +641,7 @@ export default function QuestionnaireBuilder() {
                     }}
                     className="text-sm text-blue-600 hover:text-blue-800"
                   >
-                    + Option hinzufügen
+                    + {t('questionnaires:addOption')}
                   </button>
                 </div>
               )}
@@ -652,13 +655,13 @@ export default function QuestionnaireBuilder() {
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
               >
-                Abbrechen
+                {t('common:cancel')}
               </button>
               <button
                 onClick={handleSaveField}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Speichern
+                {t('common:save')}
               </button>
             </div>
           </div>

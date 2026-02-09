@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import { Shield, Copy, Check, QrCode } from 'lucide-react';
+import { Check, Copy, QrCode, Shield } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../api/client';
+import { useAuthStore } from '../store/authStore';
 
 export default function TwoFASetup() {
+  const { t } = useTranslation(['auth', 'common']);
   const [secret, setSecret] = useState('');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
@@ -32,7 +34,7 @@ export default function TwoFASetup() {
       setQrCodeUrl(response.data.qrCodeUrl);
       setStep('setup');
     } catch (error: any) {
-      toast.error('Fehler beim Laden der 2FA-Daten');
+      toast.error(t('auth:twoFAErrorLoading'));
     } finally {
       setLoading(false);
     }
@@ -43,9 +45,9 @@ export default function TwoFASetup() {
       await navigator.clipboard.writeText(secret);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      toast.success('Secret kopiert');
+      toast.success(t('auth:twoFASecretCopied'));
     } catch {
-      toast.error('Kopieren fehlgeschlagen');
+      toast.error(t('auth:twoFACopyFailed'));
     }
   };
 
@@ -53,17 +55,17 @@ export default function TwoFASetup() {
     e.preventDefault();
     
     if (!/^\d{6}$/.test(verificationCode)) {
-      toast.error('Bitte geben Sie einen gültigen 6-stelligen Code ein');
+      toast.error(t('auth:twoFAInvalidCode'));
       return;
     }
 
     try {
       setLoading(true);
       await authAPI.verify2FA(verificationCode);
-      toast.success('2FA erfolgreich aktiviert!');
+      toast.success(t('auth:twoFAActivated'));
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error?.response?.data?.error || 'Ungültiger Code');
+      toast.error(error?.response?.data?.error || t('auth:twoFAInvalidCodeGeneric'));
     } finally {
       setLoading(false);
     }
@@ -84,11 +86,11 @@ export default function TwoFASetup() {
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-blue-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Zwei-Faktor-Authentifizierung</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('auth:twoFATitle')}</h1>
           <p className="text-gray-600 mt-2">
             {step === 'setup' 
-              ? 'Scannen Sie den QR-Code mit Ihrer Authenticator-App' 
-              : 'Geben Sie den Code aus Ihrer App ein'}
+              ? t('auth:twoFAScanQR') 
+              : t('auth:twoFAEnterCode')}
           </p>
         </div>
 
@@ -107,14 +109,14 @@ export default function TwoFASetup() {
                 </div>
                 <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
                   <QrCode className="w-4 h-4" />
-                  Mit Google Authenticator oder Authy scannen
+                  {t('auth:twoFAScanWithApp')}
                 </p>
               </div>
             )}
 
             {/* Manual Secret */}
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-600 mb-2">Manuelle Eingabe (Backup):</p>
+              <p className="text-sm text-gray-600 mb-2">{t('auth:twoFAManualEntry')}</p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 bg-white px-3 py-2 rounded border text-sm font-mono break-all">
                   {secret}
@@ -122,7 +124,7 @@ export default function TwoFASetup() {
                 <button
                   onClick={copySecret}
                   className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                  title="Secret kopieren"
+                  title={t('auth:twoFACopySecret')}
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
@@ -133,7 +135,7 @@ export default function TwoFASetup() {
               onClick={() => setStep('verify')}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition font-medium"
             >
-              Weiter zur Verifizierung
+              {t('auth:twoFAContinueVerification')}
             </button>
           </div>
         )}
@@ -142,7 +144,7 @@ export default function TwoFASetup() {
           <form onSubmit={verifyAndEnable} className="space-y-6">
             <div>
               <label htmlFor="2fa-code" className="block text-sm font-medium text-gray-700 mb-2">
-                6-stelliger Code
+                {t('auth:twoFACodeLabel')}
               </label>
               <input
                 id="2fa-code"
@@ -158,7 +160,7 @@ export default function TwoFASetup() {
                 autoFocus
               />
               <p className="text-sm text-gray-500 mt-2">
-                Öffnen Sie Ihre Authenticator-App und geben Sie den aktuellen Code ein.
+                {t('auth:twoFAOpenApp')}
               </p>
             </div>
 
@@ -168,14 +170,14 @@ export default function TwoFASetup() {
                 onClick={() => setStep('setup')}
                 className="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-300 transition font-medium"
               >
-                Zurück
+                {t('common:back')}
               </button>
               <button
                 type="submit"
                 disabled={loading || verificationCode.length !== 6}
                 className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Wird aktiviert...' : 'Aktivieren'}
+                {loading ? t('auth:twoFAActivating') : t('auth:twoFAActivate')}
               </button>
             </div>
           </form>
@@ -183,8 +185,7 @@ export default function TwoFASetup() {
 
         <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-sm text-yellow-800">
-            <strong>⚠️ Wichtig:</strong> Speichern Sie das Secret an einem sicheren Ort. 
-            Bei Verlust des Authenticators können Sie Ihr Konto nur mit diesem Secret wiederherstellen.
+            {t('auth:twoFAImportantNotice')}
           </p>
         </div>
       </div>

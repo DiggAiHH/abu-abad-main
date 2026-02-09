@@ -1,0 +1,123 @@
+const video = {
+  title: 'Sesión de vídeo',
+  // ─── Conexión ────────────────────────────────────
+  connectionEstablished: 'Conexión establecida',
+  connectionErrorDuringCall: 'Error de conexión durante la llamada',
+  connectionLost: 'Conexión perdida',
+  connectionError: 'Error de conexión',
+  connectionInterrupted: 'Conexión interrumpida, intentando restablecer...',
+  connectionEndedInfo: 'Conexión finalizada',
+  connectionLostReconnect: 'Conexión perdida. Por favor, vuelva a conectarse.',
+  connecting: 'Conectando...',
+  connected: 'Conectado',
+  waitingForConnection: 'Esperando conexión...',
+  live: 'En directo',
+
+  // ─── Llamada ─────────────────────────────────────
+  callEnded: 'Llamada finalizada',
+  callEndedSuccess: 'Llamada finalizada',
+  callCouldNotStart: 'No se pudo iniciar la llamada',
+  callAlreadyOpen: 'La llamada ya está en curso en otra pestaña',
+  endCall: 'Finalizar llamada',
+  errorAnsweringCall: 'Error al responder la llamada',
+  errorStartingCall: 'Error al iniciar la llamada',
+  errorInitializingCall: 'Error al inicializar la llamada',
+  errorConnectingTherapist: 'Error al conectar con el terapeuta',
+  connectionToTherapistFailed: 'Error en la conexión con el terapeuta',
+
+  // ─── Peer/Red ────────────────────────────────────
+  peerUnavailable: 'Interlocutor no disponible. Espere a que el terapeuta se una.',
+  peerServerUnreachable: 'Servidor PeerJS no accesible. Error de conexión.',
+  peerNotInitialized: 'Conexión peer no inicializada',
+  serverError: 'Error del servidor. Por favor, inténtelo más tarde.',
+  timeoutTherapist: 'El terapeuta no responde. Por favor, inténtelo más tarde.',
+  therapistNotOnline: 'El terapeuta no está en línea o no se encuentra disponible',
+  slowNetwork: 'Red lenta detectada. Calidad reducida.',
+
+  // ─── Medios/Cámara ──────────────────────────────
+  browserNoWebRTC: 'El navegador no es compatible con WebRTC.',
+  cameraAccessDenied: 'Acceso a cámara/micrófono denegado. Por favor, compruebe los permisos.',
+  noDeviceFound: 'No se encontró cámara ni micrófono.',
+  cameraTimeout: 'Tiempo de espera de cámara agotado: se usará modo solo audio',
+  audioOnlyMode: 'Modo solo audio activo',
+  audioOnlyActive: 'Modo solo audio activo (cámara no disponible)',
+  videoOff: 'Desactivar cámara',
+  videoOn: 'Activar cámara',
+  micOff: 'Desactivar micrófono',
+  micOn: 'Activar micrófono',
+  cameraActiveAriaLabel: 'Cámara activa',
+  cameraMutedAriaLabel: 'Cámara desactivada',
+  micActiveAriaLabel: 'Micrófono activo',
+  micMutedAriaLabel: 'Micrófono silenciado',
+
+  // ─── Compartir pantalla ──────────────────────────
+  screenShareStarted: 'Pantalla compartida iniciada',
+  screenShareFailed: 'Error al compartir pantalla',
+  screenShareEnded: 'Pantalla compartida finalizada',
+  stopScreenShare: 'Dejar de compartir pantalla',
+  startScreenShare: 'Compartir pantalla',
+
+  // ─── Chat ────────────────────────────────────────
+  openChat: 'Abrir chat',
+
+  // ─── Otros ───────────────────────────────────────
+  participantConnectedNoVideo: 'Participante conectado (vídeo no disponible)',
+  waitingForOtherParticipant: 'Esperando a otro participante...',
+  otherParticipantLeft: 'El otro participante ha abandonado la llamada.',
+  backToDashboard: 'Volver al panel',
+  noRoomId: 'No hay ID de sala',
+
+  // ─── Sala de espera ──────────────────────────────
+  waitingRoom: 'Sala de espera',
+  waitingRoomPreparing: 'Preparando sala de espera...',
+  waitingForTherapist: 'Esperando al terapeuta',
+  notifiedWhenReady: 'Se le notificará cuando su terapeuta esté listo',
+  therapistReady: '¡Su terapeuta está listo!',
+  redirectingToSession: 'Será redirigido a la videosesión...',
+  statusInWaitingRoom: 'En la sala de espera',
+  statusFillQuestionnaire: 'Completar cuestionario',
+  statusTherapistCalling: 'El terapeuta le está llamando',
+  statusStartSession: 'Iniciar videosesión',
+  questionnaireSaved: 'Cuestionario guardado',
+
+  // ─── Cuestionario previo a la sesión ─────────────
+  currentMoodLabel: '¿Cuál es su estado de ánimo actual?',
+  anxietyLevelLabel: 'Nivel de ansiedad/tensión',
+  sleepQualityLabel: 'Calidad del sueño anoche',
+  noAnxiety: 'Sin ansiedad',
+  veryStrong: 'Muy intensa',
+  medicationTakenToday: 'Medicamentos tomados hoy',
+  mainConcernsLabel: '¿Qué le gustaría tratar hoy?',
+  mainConcernsPlaceholder: 'Sus temas principales para la sesión de hoy...',
+  questionsForTherapistLabel: '¿Tiene preguntas para su terapeuta?',
+  questionsPlaceholder: 'Preguntas que desea plantear...',
+  significantEventsLabel: 'Eventos importantes desde la última sesión',
+  eventsPlaceholder: 'Eventos significativos, cambios...',
+  submitQuestionnaire: 'Enviar cuestionario',
+
+  // ─── Cola del terapeuta ──────────────────────────
+  queueTitle: 'Vista general de la sala de espera',
+  patientsWaiting: '{{count}} paciente(s) en espera',
+  noPatientsWaiting: 'No hay pacientes en espera',
+  patientsAppearHere: 'Los nuevos pacientes aparecerán aquí cuando se unan a la sala de espera.',
+  appointment: 'Cita:',
+  waitingTime: 'Espera: {{min}} min.',
+  viewQuestionnaire: 'Cuestionario',
+  admitPatient: 'Llamar',
+  questionnaireFilled: 'Cuestionario completado',
+  questionnairePending: 'Cuestionario pendiente',
+  preSessionData: 'Datos previos a la sesión',
+  selectPatientToView: 'Seleccione un paciente para ver su cuestionario.',
+  moodLabel: 'Estado de ánimo',
+  anxietyLabel: 'Nivel de ansiedad',
+  sleepLabel: 'Calidad del sueño',
+  medicationTakenLabel: 'Medicamentos tomados',
+  mainConcerns: 'Motivos principales:',
+  questionsForYou: 'Preguntas para usted:',
+  significantEvents: 'Eventos importantes:',
+  questionnaireNotFilled: 'El cuestionario aún no ha sido completado.',
+  patientCalledUp: 'Paciente {{name}} llamado',
+  errorLoadingQueueData: 'Error al cargar los datos',
+};
+
+export default video;

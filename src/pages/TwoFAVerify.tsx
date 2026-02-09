@@ -1,10 +1,12 @@
+import { Lock, Shield } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import { Shield, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 export default function TwoFAVerify() {
+  const { t } = useTranslation(['auth', 'common']);
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -19,12 +21,12 @@ export default function TwoFAVerify() {
     e.preventDefault();
 
     if (!/^\d{6}$/.test(code)) {
-      toast.error('Bitte geben Sie einen gültigen 6-stelligen Code ein');
+      toast.error(t('auth:twoFAInvalidCode'));
       return;
     }
 
     if (!tempToken) {
-      toast.error('Sitzung abgelaufen. Bitte erneut anmelden.');
+      toast.error(t('common:sessionExpiredLogin'));
       navigate('/login');
       return;
     }
@@ -33,10 +35,10 @@ export default function TwoFAVerify() {
       setLoading(true);
       await complete2FALogin(tempToken, code);
       
-      toast.success('Erfolgreich angemeldet!');
+      toast.success(t('auth:loginSuccess'));
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error?.response?.data?.error || 'Ungültiger Code');
+      toast.error(error?.response?.data?.error || t('auth:twoFAInvalidCodeGeneric'));
     } finally {
       setLoading(false);
     }
@@ -49,16 +51,16 @@ export default function TwoFAVerify() {
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-blue-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Zwei-Faktor-Authentifizierung</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('auth:twoFATitle')}</h1>
           <p className="text-gray-600 mt-2">
-            Geben Sie den Code aus Ihrer Authenticator-App ein
+            {t('auth:twoFAEnterCodeFromApp')}
           </p>
         </div>
 
         <form onSubmit={verify} className="space-y-6">
           <div>
             <label htmlFor="2fa-code" className="block text-sm font-medium text-gray-700 mb-2">
-              6-stelliger Code
+              {t('auth:twoFACodeLabel')}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -77,7 +79,7 @@ export default function TwoFAVerify() {
               />
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              Der Code ändert sich alle 30 Sekunden.
+              {t('auth:twoFACodeChanges')}
             </p>
           </div>
 
@@ -86,7 +88,7 @@ export default function TwoFAVerify() {
             disabled={loading || code.length !== 6}
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Wird verifiziert...' : 'Verifizieren'}
+            {loading ? t('auth:twoFAVerifying') : t('auth:twoFAVerify')}
           </button>
         </form>
 
@@ -95,7 +97,7 @@ export default function TwoFAVerify() {
             onClick={() => navigate('/login')}
             className="text-sm text-blue-600 hover:text-blue-700"
           >
-            ← Zurück zum Login
+            ← {t('auth:twoFABackToLogin')}
           </button>
         </div>
       </div>

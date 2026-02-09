@@ -1,22 +1,23 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import { logger } from '../utils/logger';
 import {
-  ArrowLeft,
-  AlertTriangle,
-  Phone,
-  Users,
-  Heart,
-  Shield,
-  Plus,
-  Save,
-  Trash2,
-  Star,
-  ChevronDown,
-  ChevronUp,
+    AlertTriangle,
+    ArrowLeft,
+    ChevronDown,
+    ChevronUp,
+    Heart,
+    Phone,
+    Plus,
+    Save,
+    Shield,
+    Star,
+    Trash2,
+    Users,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
+import { logger } from '../utils/logger';
 
 // ===== TYPES =====
 interface CopingStrategy {
@@ -80,6 +81,7 @@ const EMPTY_PLAN: CrisisPlan = {
 // ===== MAIN COMPONENT =====
 export default function CrisisPlan() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['crisis', 'common']);
 
   const [plan, setPlan] = useState<CrisisPlan>(EMPTY_PLAN);
   const [defaults, setDefaults] = useState<any>(null);
@@ -101,20 +103,25 @@ export default function CrisisPlan() {
         api.get('/crisis-plan/defaults'),
       ]);
 
-      setDefaults(defaultsRes.data);
+      const dRes = defaultsRes.data ?? {};
+      setDefaults(dRes);
 
-      if (planRes.data.exists && planRes.data.plan) {
-        setPlan({ ...EMPTY_PLAN, ...planRes.data.plan });
+      const planData = planRes.data ?? {};
+      if (planData.exists && planData.plan) {
+        setPlan({ ...EMPTY_PLAN, ...planData.plan });
+      } else if (planData.warningSignals || planData.copingStrategies || planData.emergencyContacts) {
+        // Demo-Modus: Daten kommen direkt ohne Wrapper
+        setPlan({ ...EMPTY_PLAN, ...planData });
       } else {
         // Pre-fill with default hotlines
         setPlan({
           ...EMPTY_PLAN,
-          crisisHotlines: defaultsRes.data.crisisHotlines || [],
+          crisisHotlines: dRes.crisisHotlines || [],
         });
       }
     } catch (error) {
       logger.error('CrisisPlan: Fehler beim Laden', error);
-      toast.error('Fehler beim Laden des Krisenplans');
+      toast.error(t('crisis:errorLoading'));
     } finally {
       setLoading(false);
     }
@@ -124,9 +131,9 @@ export default function CrisisPlan() {
     setSaving(true);
     try {
       await api.post('/crisis-plan', plan);
-      toast.success('Krisenplan gespeichert');
+      toast.success(t('crisis:saved'));
     } catch (error) {
-      toast.error('Fehler beim Speichern');
+      toast.error(t('crisis:errorSaving'));
     } finally {
       setSaving(false);
     }
@@ -251,12 +258,12 @@ export default function CrisisPlan() {
         </div>
         {examples && items.length === 0 && (
           <div className="text-sm text-gray-500 mb-2">
-            Beispiele:{' '}
+            {t('common:more')}:{' '}
             {examples.map((ex, i) => (
               <button
                 key={i}
                 onClick={() => addToArray(field, ex)}
-                className="text-blue-600 hover:underline mr-2"
+                className="text-blue-600 hover:underline me-2"
               >
                 {ex}
               </button>
@@ -299,10 +306,10 @@ export default function CrisisPlan() {
               <div>
                 <h1 className="text-2xl font-bold flex items-center gap-2">
                   <Shield size={28} />
-                  Mein Krisenplan
+                  {t('crisis:title')}
                 </h1>
                 <p className="text-red-100">
-                  Sicherheitsnetz für schwierige Momente
+                  {t('crisis:subtitle')}
                 </p>
               </div>
             </div>
@@ -312,7 +319,7 @@ export default function CrisisPlan() {
               className="flex items-center gap-2 px-4 py-2 bg-white text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50"
             >
               <Save size={20} />
-              {saving ? 'Speichert...' : 'Speichern'}
+              {saving ? t('common:saving') : t('common:save')}
             </button>
           </div>
         </div>
@@ -323,7 +330,7 @@ export default function CrisisPlan() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h3 className="font-bold text-red-700 flex items-center gap-2 mb-3">
             <AlertTriangle />
-            Notfall-Hotlines
+            {t('crisis:crisisHotlines')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {(plan.crisisHotlines.length > 0
@@ -351,52 +358,52 @@ export default function CrisisPlan() {
         {/* Warning Signs */}
         <Section
           id="warning"
-          title="Meine Warnsignale"
+          title={t('crisis:warningSignsTitle')}
           icon={<AlertTriangle className="text-orange-500" />}
           color="border-orange-500"
         >
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">
-                Gedanken
+                {t('crisis:warningSignsThoughts')}
               </label>
               <StringList
                 items={plan.warningSignsThoughts}
                 field="warningSignsThoughts"
-                placeholder="z.B. 'Alles ist hoffnungslos'"
+                placeholder={t('crisis:warningSignsThoughts')}
                 examples={defaults?.warningSignExamples?.thoughts}
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">
-                Verhaltensweisen
+                {t('crisis:warningSignsBehaviors')}
               </label>
               <StringList
                 items={plan.warningSignsBehaviors}
                 field="warningSignsBehaviors"
-                placeholder="z.B. 'Sozialer Rückzug'"
+                placeholder={t('crisis:warningSignsBehaviors')}
                 examples={defaults?.warningSignExamples?.behaviors}
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">
-                Körperliche Anzeichen
+                {t('crisis:warningSignsPhysical')}
               </label>
               <StringList
                 items={plan.warningSignsPhysical}
                 field="warningSignsPhysical"
-                placeholder="z.B. 'Schlafstörungen'"
+                placeholder={t('crisis:warningSignsPhysical')}
                 examples={defaults?.warningSignExamples?.physical}
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">
-                Gefühle
+                {t('crisis:warningSignsEmotional')}
               </label>
               <StringList
                 items={plan.warningSignsEmotional}
                 field="warningSignsEmotional"
-                placeholder="z.B. 'Überwältigende Traurigkeit'"
+                placeholder={t('crisis:warningSignsEmotional')}
                 examples={defaults?.warningSignExamples?.emotional}
               />
             </div>
@@ -406,7 +413,7 @@ export default function CrisisPlan() {
         {/* Coping Strategies */}
         <Section
           id="coping"
-          title="Meine Bewältigungsstrategien"
+          title={t('crisis:copingStrategies')}
           icon={<Star className="text-yellow-500" />}
           color="border-yellow-500"
         >
@@ -466,7 +473,7 @@ export default function CrisisPlan() {
               }
               className="text-blue-600 hover:underline flex items-center gap-1"
             >
-              <Plus size={16} /> Strategie hinzufügen
+              <Plus size={16} /> {t('crisis:addStrategy')}
             </button>
           </div>
         </Section>
@@ -474,12 +481,12 @@ export default function CrisisPlan() {
         {/* Emergency Contacts */}
         <Section
           id="contacts"
-          title="Meine Notfallkontakte"
+          title={t('crisis:emergencyContacts')}
           icon={<Users className="text-blue-500" />}
           color="border-blue-500"
         >
           <div className="space-y-4">
-            <h4 className="font-medium">Persönliche Kontakte</h4>
+            <h4 className="font-medium">{t('crisis:emergencyContacts')}</h4>
             {plan.emergencyContacts.map((contact, i) => (
               <div key={i} className="grid grid-cols-4 gap-2 items-center">
                 <input
@@ -488,7 +495,7 @@ export default function CrisisPlan() {
                   onChange={(e) =>
                     updateArrayItem('emergencyContacts', i, 'name', e.target.value)
                   }
-                  placeholder="Name"
+                  placeholder={t('crisis:contactName')}
                   className="border rounded px-2 py-1"
                 />
                 <input
@@ -497,7 +504,7 @@ export default function CrisisPlan() {
                   onChange={(e) =>
                     updateArrayItem('emergencyContacts', i, 'relationship', e.target.value)
                   }
-                  placeholder="Beziehung"
+                  placeholder={t('crisis:contactRelation')}
                   className="border rounded px-2 py-1"
                 />
                 <input
@@ -506,7 +513,7 @@ export default function CrisisPlan() {
                   onChange={(e) =>
                     updateArrayItem('emergencyContacts', i, 'phone', e.target.value)
                   }
-                  placeholder="Telefon"
+                  placeholder={t('crisis:contactPhone')}
                   className="border rounded px-2 py-1"
                 />
                 <button
@@ -527,12 +534,12 @@ export default function CrisisPlan() {
               }
               className="text-blue-600 hover:underline flex items-center gap-1"
             >
-              <Plus size={16} /> Kontakt hinzufügen
+              <Plus size={16} /> {t('crisis:addContact')}
             </button>
 
             <hr />
 
-            <h4 className="font-medium">Professionelle Kontakte</h4>
+            <h4 className="font-medium">{t('crisis:professionalContacts')}</h4>
             {plan.professionalContacts.map((contact, i) => (
               <div key={i} className="grid grid-cols-4 gap-2 items-center">
                 <input
@@ -541,7 +548,7 @@ export default function CrisisPlan() {
                   onChange={(e) =>
                     updateArrayItem('professionalContacts', i, 'name', e.target.value)
                   }
-                  placeholder="Name"
+                  placeholder={t('crisis:contactName')}
                   className="border rounded px-2 py-1"
                 />
                 <input
@@ -550,7 +557,7 @@ export default function CrisisPlan() {
                   onChange={(e) =>
                     updateArrayItem('professionalContacts', i, 'role', e.target.value)
                   }
-                  placeholder="Rolle (z.B. Therapeut)"
+                  placeholder={t('common:therapist')}
                   className="border rounded px-2 py-1"
                 />
                 <input
@@ -559,7 +566,7 @@ export default function CrisisPlan() {
                   onChange={(e) =>
                     updateArrayItem('professionalContacts', i, 'phone', e.target.value)
                   }
-                  placeholder="Telefon"
+                  placeholder={t('crisis:contactPhone')}
                   className="border rounded px-2 py-1"
                 />
                 <button
@@ -580,7 +587,7 @@ export default function CrisisPlan() {
               }
               className="text-blue-600 hover:underline flex items-center gap-1"
             >
-              <Plus size={16} /> Professionellen Kontakt hinzufügen
+              <Plus size={16} /> {t('crisis:addContact')}
             </button>
           </div>
         </Section>
@@ -588,48 +595,48 @@ export default function CrisisPlan() {
         {/* Reasons to Live */}
         <Section
           id="reasons"
-          title="Meine Gründe zu leben"
+          title={t('crisis:reasonsToLive')}
           icon={<Heart className="text-pink-500" />}
           color="border-pink-500"
         >
           <p className="text-gray-600 text-sm mb-4">
-            Was ist Ihnen wichtig? Wofür lohnt es sich weiterzumachen?
+            {t('crisis:addReason')}
           </p>
           <StringList
             items={plan.reasonsToLive}
             field="reasonsToLive"
-            placeholder="z.B. 'Meine Familie', 'Mein Haustier', 'Zukunftspläne'"
+            placeholder={t('crisis:addReason')}
           />
         </Section>
 
         {/* Safe Environment */}
         <Section
           id="safe"
-          title="Sichere Umgebung"
+          title={t('crisis:safeEnvironment')}
           icon={<Shield className="text-green-500" />}
           color="border-green-500"
         >
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">
-                Mein sicherer Ort
+                {t('crisis:safePlace')}
               </label>
               <input
                 type="text"
                 value={plan.safePlace}
                 onChange={(e) => setPlan({ ...plan, safePlace: e.target.value })}
-                placeholder="Wo fühlen Sie sich sicher?"
+                placeholder={t('crisis:safePlacePlaceholder')}
                 className="w-full border rounded px-3 py-2"
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">
-                Schritte zur sicheren Umgebung
+                {t('crisis:safeEnvironmentSteps')}
               </label>
               <StringList
                 items={plan.safeEnvironmentSteps}
                 field="safeEnvironmentSteps"
-                placeholder="z.B. 'Medikamente wegschließen'"
+                placeholder={t('crisis:safeEnvironmentSteps')}
               />
             </div>
           </div>
@@ -637,14 +644,14 @@ export default function CrisisPlan() {
 
         {/* Additional Notes */}
         <div className="bg-white rounded-lg shadow p-4">
-          <h3 className="font-bold mb-3">Zusätzliche Notizen</h3>
+          <h3 className="font-bold mb-3">{t('crisis:additionalNotes')}</h3>
           <textarea
             value={plan.additionalNotes}
             onChange={(e) =>
               setPlan({ ...plan, additionalNotes: e.target.value })
             }
             rows={4}
-            placeholder="Weitere wichtige Informationen für Krisensituationen..."
+            placeholder={t('crisis:additionalNotes')}
             className="w-full border rounded px-3 py-2"
           />
         </div>
@@ -656,7 +663,7 @@ export default function CrisisPlan() {
           className="w-full py-4 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           <Save size={24} />
-          {saving ? 'Speichert...' : 'Krisenplan speichern'}
+          {saving ? t('common:saving') : t('common:save')}
         </button>
       </main>
     </div>

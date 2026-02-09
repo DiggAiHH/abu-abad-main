@@ -1,21 +1,22 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import { logger } from '../utils/logger';
 import {
-  ArrowLeft,
-  Bell,
-  Mail,
-  MessageSquare,
-  Smartphone,
-  Clock,
-  Check,
-  X,
-  Settings,
-  Calendar,
-  Trash2,
+    ArrowLeft,
+    Bell,
+    Calendar,
+    Check,
+    Clock,
+    Mail,
+    MessageSquare,
+    Settings,
+    Smartphone,
+    Trash2,
+    X,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
+import { logger } from '../utils/logger';
 
 // ===== TYPES =====
 interface ReminderPreferences {
@@ -50,14 +51,15 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
   push: <Smartphone size={16} />,
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  email: 'E-Mail',
-  sms: 'SMS',
-  push: 'Push-Nachricht',
-};
-
 export default function ReminderSettings() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['settings', 'common']);
+
+  const TYPE_LABELS: Record<string, string> = {
+    email: t('settings:emailType'),
+    sms: t('settings:smsType'),
+    push: t('settings:pushType'),
+  };
 
   const [preferences, setPreferences] = useState<ReminderPreferences>({
     emailEnabled: true,
@@ -94,7 +96,7 @@ export default function ReminderSettings() {
       setAvailableTimes(timesRes.data.times);
     } catch (error) {
       logger.error('ReminderSettings: Fehler beim Laden', error);
-      toast.error('Fehler beim Laden der Einstellungen');
+      toast.error(t('common:errorLoadingSettings'));
     } finally {
       setLoading(false);
     }
@@ -104,9 +106,9 @@ export default function ReminderSettings() {
     setSaving(true);
     try {
       await api.put('/reminders/preferences', preferences);
-      toast.success('Einstellungen gespeichert');
+      toast.success(t('common:settingsSaved'));
     } catch (error) {
-      toast.error('Fehler beim Speichern');
+      toast.error(t('common:errorSaving'));
     } finally {
       setSaving(false);
     }
@@ -115,10 +117,10 @@ export default function ReminderSettings() {
   const cancelReminder = async (id: number) => {
     try {
       await api.delete(`/reminders/${id}`);
-      toast.success('Erinnerung storniert');
+      toast.success(t('settings:reminderCancelled'));
       loadData();
     } catch (error) {
-      toast.error('Fehler beim Stornieren');
+      toast.error(t('common:errorCancelling'));
     }
   };
 
@@ -155,15 +157,15 @@ export default function ReminderSettings() {
               onClick={() => navigate('/dashboard')}
               className="p-2 hover:bg-white/20 rounded-lg"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={24} className="rtl:flip" />
             </button>
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
                 <Bell size={28} />
-                Termin-Erinnerungen
+                {t('settings:reminderTitle')}
               </h1>
               <p className="text-amber-100">
-                {upcomingReminders.length} geplante Erinnerungen
+                {upcomingReminders.length} {t('settings:plannedReminders')}
               </p>
             </div>
           </div>
@@ -182,7 +184,7 @@ export default function ReminderSettings() {
             }`}
           >
             <Settings size={16} className="inline mr-1" />
-            Einstellungen
+            {t('settings:settingsTab')}
           </button>
           <button
             onClick={() => setActiveTab('upcoming')}
@@ -193,7 +195,7 @@ export default function ReminderSettings() {
             }`}
           >
             <Clock size={16} className="inline mr-1" />
-            Geplant ({upcomingReminders.length})
+            {t('settings:plannedTab')} ({upcomingReminders.length})
           </button>
           <button
             onClick={() => setActiveTab('history')}
@@ -204,7 +206,7 @@ export default function ReminderSettings() {
             }`}
           >
             <Calendar size={16} className="inline mr-1" />
-            Verlauf
+            {t('settings:historyTab')}
           </button>
         </div>
       </div>
@@ -215,15 +217,15 @@ export default function ReminderSettings() {
           <div className="space-y-6">
             {/* Notification Types */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">Benachrichtigungsarten</h2>
+              <h2 className="text-lg font-bold mb-4">{t('settings:notificationTypes')}</h2>
               <div className="space-y-4">
                 <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
                   <div className="flex items-center gap-3">
                     <Mail className="text-blue-500" />
                     <div>
-                      <p className="font-medium">E-Mail</p>
+                      <p className="font-medium">{t('settings:emailType')}</p>
                       <p className="text-sm text-gray-500">
-                        Erinnerungen per E-Mail erhalten
+                        {t('settings:emailDescription')}
                       </p>
                     </div>
                   </div>
@@ -241,9 +243,9 @@ export default function ReminderSettings() {
                   <div className="flex items-center gap-3">
                     <Smartphone className="text-green-500" />
                     <div>
-                      <p className="font-medium">Push-Nachricht</p>
+                      <p className="font-medium">{t('settings:pushType')}</p>
                       <p className="text-sm text-gray-500">
-                        In-App Benachrichtigungen
+                        {t('settings:pushDescription')}
                       </p>
                     </div>
                   </div>
@@ -261,9 +263,9 @@ export default function ReminderSettings() {
                   <div className="flex items-center gap-3">
                     <MessageSquare className="text-purple-500" />
                     <div>
-                      <p className="font-medium">SMS</p>
+                      <p className="font-medium">{t('settings:smsType')}</p>
                       <p className="text-sm text-gray-500">
-                        SMS-Erinnerungen (Premium)
+                        {t('settings:smsDescription')}
                       </p>
                     </div>
                   </div>
@@ -282,9 +284,9 @@ export default function ReminderSettings() {
 
             {/* Reminder Times */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">Erinnerungszeitpunkte</h2>
+              <h2 className="text-lg font-bold mb-4">{t('settings:reminderTimesTitle')}</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Wählen Sie, wann Sie vor einem Termin erinnert werden möchten
+                {t('settings:reminderTimesDescription')}
               </p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {availableTimes.map((time) => {
@@ -311,12 +313,12 @@ export default function ReminderSettings() {
 
             {/* Daily Summary */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">Tägliche Zusammenfassung</h2>
+              <h2 className="text-lg font-bold mb-4">{t('settings:dailySummaryTitle')}</h2>
               <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
                 <div>
-                  <p className="font-medium">Tagesübersicht aktivieren</p>
+                  <p className="font-medium">{t('settings:dailySummaryToggle')}</p>
                   <p className="text-sm text-gray-500">
-                    Morgendliche E-Mail mit allen Terminen des Tages
+                    {t('settings:dailySummaryDescription')}
                   </p>
                 </div>
                 <input
@@ -331,7 +333,7 @@ export default function ReminderSettings() {
 
               {preferences.dailySummaryEnabled && (
                 <div className="mt-4">
-                  <label className="block text-sm font-medium mb-1">Uhrzeit</label>
+                  <label className="block text-sm font-medium mb-1">{t('common:time')}</label>
                   <input
                     type="time"
                     value={preferences.dailySummaryTime}
@@ -350,7 +352,7 @@ export default function ReminderSettings() {
               disabled={saving}
               className="w-full py-4 bg-amber-500 text-white rounded-lg font-bold hover:bg-amber-600 disabled:opacity-50"
             >
-              {saving ? 'Speichert...' : 'Einstellungen speichern'}
+              {saving ? t('common:saving') : t('settings:saveSettings')}
             </button>
           </div>
         )}
@@ -361,9 +363,9 @@ export default function ReminderSettings() {
             {upcomingReminders.length === 0 ? (
               <div className="bg-white rounded-lg shadow p-8 text-center">
                 <Bell size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">Keine geplanten Erinnerungen</p>
+                <p className="text-gray-500">{t('settings:noPlannedReminders')}</p>
                 <p className="text-sm text-gray-400 mt-2">
-                  Erinnerungen werden automatisch für neue Termine erstellt
+                  {t('settings:remindersAutoCreated')}
                 </p>
               </div>
             ) : (
@@ -376,7 +378,7 @@ export default function ReminderSettings() {
                       </div>
                       <div>
                         <p className="font-medium">
-                          Termin am{' '}
+                          {t('settings:appointmentOn')}{' '}
                           {new Date(reminder.appointmentTime).toLocaleDateString('de-DE', {
                             weekday: 'short',
                             day: '2-digit',
@@ -387,11 +389,11 @@ export default function ReminderSettings() {
                         </p>
                         {reminder.otherPartyName && (
                           <p className="text-sm text-gray-600">
-                            mit {reminder.otherPartyName}
+                            – {reminder.otherPartyName}
                           </p>
                         )}
                         <p className="text-sm text-gray-500">
-                          {TYPE_LABELS[reminder.type]} um{' '}
+                          {TYPE_LABELS[reminder.type]} –{' '}
                           {new Date(reminder.scheduledFor).toLocaleString('de-DE', {
                             day: '2-digit',
                             month: '2-digit',
@@ -404,7 +406,7 @@ export default function ReminderSettings() {
                     <button
                       onClick={() => cancelReminder(reminder.id)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                      title="Stornieren"
+                      title={t('common:cancel')}
                     >
                       <Trash2 size={18} />
                     </button>
@@ -421,7 +423,7 @@ export default function ReminderSettings() {
             {reminderHistory.length === 0 ? (
               <div className="bg-white rounded-lg shadow p-8 text-center">
                 <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">Keine Erinnerungen gesendet</p>
+                <p className="text-gray-500">{t('settings:noRemindersSent')}</p>
               </div>
             ) : (
               reminderHistory.map((reminder) => (
@@ -443,10 +445,10 @@ export default function ReminderSettings() {
                     </div>
                     <div>
                       <p className="font-medium">
-                        {TYPE_LABELS[reminder.type]} {reminder.status === 'sent' ? 'gesendet' : 'fehlgeschlagen'}
+                        {TYPE_LABELS[reminder.type]} {reminder.status === 'sent' ? t('settings:sent') : t('settings:failed')}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Termin am{' '}
+                        {t('settings:appointmentOn')}{' '}
                         {new Date(reminder.appointmentTime).toLocaleDateString('de-DE', {
                           day: '2-digit',
                           month: '2-digit',
@@ -456,7 +458,7 @@ export default function ReminderSettings() {
                       </p>
                       {reminder.sentAt && (
                         <p className="text-xs text-gray-400">
-                          Gesendet: {new Date(reminder.sentAt).toLocaleString('de-DE')}
+                          {t('settings:sentAt')} {new Date(reminder.sentAt).toLocaleString('de-DE')}
                         </p>
                       )}
                     </div>

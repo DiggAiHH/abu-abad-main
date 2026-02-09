@@ -1,23 +1,24 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import { logger } from '../utils/logger';
 import {
-  ArrowLeft,
-  Pill,
-  Plus,
-  Check,
-  X,
-  Clock,
-  AlertTriangle,
-  TrendingUp,
-  Edit2,
-  Trash2,
-  ChevronDown,
-  ChevronUp,
-  Search,
+    AlertTriangle,
+    ArrowLeft,
+    Check,
+    ChevronDown,
+    ChevronUp,
+    Clock,
+    Edit2,
+    Pill,
+    Plus,
+    Search,
+    Trash2,
+    TrendingUp,
+    X,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
+import { logger } from '../utils/logger';
 
 // ===== TYPES =====
 interface Medication {
@@ -77,29 +78,30 @@ interface Adherence {
   sideEffects: Array<{ effect: string; count: number }>;
 }
 
-const FREQUENCY_LABELS: Record<string, string> = {
-  once_daily: '1x täglich',
-  twice_daily: '2x täglich',
-  three_times: '3x täglich',
-  four_times: '4x täglich',
-  as_needed: 'Bei Bedarf',
-  weekly: 'Wöchentlich',
-  other: 'Andere',
+const FREQUENCY_KEYS: Record<string, string> = {
+  once_daily: 'medications:frequencyOnce',
+  twice_daily: 'medications:frequencyTwice',
+  three_times: 'medications:frequencyThrice',
+  four_times: 'medications:frequencyFourTimes',
+  as_needed: 'medications:frequencyAsNeeded',
+  weekly: 'medications:frequencyWeekly',
+  other: 'common:more',
 };
 
-const CATEGORY_LABELS: Record<string, string> = {
-  antidepressant: 'Antidepressiva',
-  anxiolytic: 'Anxiolytika',
-  antipsychotic: 'Antipsychotika',
-  mood_stabilizer: 'Stimmungsstabilisierer',
-  stimulant: 'Stimulanzien',
-  sedative: 'Schlafmittel',
-  other_psychiatric: 'Sonstige Psychiatrische',
-  other_medical: 'Sonstige Medikamente',
+const CATEGORY_KEYS: Record<string, string> = {
+  antidepressant: 'medications:categoryAntidepressant',
+  anxiolytic: 'medications:categoryAnxiolytic',
+  antipsychotic: 'medications:categoryAntipsychotic',
+  mood_stabilizer: 'medications:categoryMoodStabilizer',
+  stimulant: 'medications:categoryStimulant',
+  sedative: 'medications:categorySedative',
+  other_psychiatric: 'medications:categoryOther',
+  other_medical: 'medications:categoryOther',
 };
 
 export default function MedicationTracker() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['medications', 'common']);
 
   const [medications, setMedications] = useState<Medication[]>([]);
   const [intakeLogs, setIntakeLogs] = useState<IntakeLog[]>([]);
@@ -153,14 +155,14 @@ export default function MedicationTracker() {
         api.get('/medications/adherence?days=30'),
       ]);
 
-      setMedications(medsRes.data);
-      setDbMedications(dbRes.data.medications);
-      setSideEffectOptions(dbRes.data.sideEffects);
-      setIntakeLogs(logsRes.data);
-      setAdherence(adherenceRes.data);
+      setMedications(Array.isArray(medsRes.data) ? medsRes.data : []);
+      setDbMedications(Array.isArray(dbRes.data?.medications) ? dbRes.data.medications : []);
+      setSideEffectOptions(Array.isArray(dbRes.data?.sideEffects) ? dbRes.data.sideEffects : []);
+      setIntakeLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
+      setAdherence(adherenceRes.data ?? null);
     } catch (error) {
       logger.error('MedicationTracker: Fehler beim Laden', error);
-      toast.error('Fehler beim Laden der Daten');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -169,12 +171,12 @@ export default function MedicationTracker() {
   const handleAddMedication = async () => {
     try {
       await api.post('/medications', formData);
-      toast.success('Medikament hinzugefügt');
+      toast.success(t('medications:medicationSaved'));
       setShowModal(false);
       resetForm();
       loadData();
     } catch (error) {
-      toast.error('Fehler beim Hinzufügen');
+      toast.error(t('common:errorSaving'));
     }
   };
 
@@ -182,37 +184,37 @@ export default function MedicationTracker() {
     if (!editingMed) return;
     try {
       await api.put(`/medications/${editingMed.id}`, formData);
-      toast.success('Medikament aktualisiert');
+      toast.success(t('medications:medicationSaved'));
       setShowModal(false);
       setEditingMed(null);
       resetForm();
       loadData();
     } catch (error) {
-      toast.error('Fehler beim Aktualisieren');
+      toast.error(t('common:errorSaving'));
     }
   };
 
   const handleDeactivateMedication = async (med: Medication) => {
-    if (!confirm(`Möchten Sie "${med.name}" als abgesetzt markieren?`)) return;
+    if (!confirm(t('medications:confirmDeleteMed'))) return;
     try {
       await api.post(`/medications/${med.id}/deactivate`, {
         endDate: new Date().toISOString().split('T')[0],
       });
-      toast.success('Medikament als abgesetzt markiert');
+      toast.success(t('medications:medicationDeleted'));
       loadData();
     } catch (error) {
-      toast.error('Fehler');
+      toast.error(t('common:error'));
     }
   };
 
   const handleDeleteMedication = async (med: Medication) => {
-    if (!confirm(`Möchten Sie "${med.name}" wirklich löschen? Dies entfernt auch alle Einnahme-Protokolle.`)) return;
+    if (!confirm(t('medications:confirmDeleteMed'))) return;
     try {
       await api.delete(`/medications/${med.id}`);
-      toast.success('Medikament gelöscht');
+      toast.success(t('medications:medicationDeleted'));
       loadData();
     } catch (error) {
-      toast.error('Fehler beim Löschen');
+      toast.error(t('common:errorDeleting'));
     }
   };
 
@@ -225,12 +227,12 @@ export default function MedicationTracker() {
         actualTime: new Date().toTimeString().slice(0, 5),
         ...intakeData,
       });
-      toast.success(intakeModal.taken ? '✓ Einnahme protokolliert' : 'Ausgelassen protokolliert');
+      toast.success(intakeModal.taken ? t('medications:intakeRecorded') : t('medications:skipped'));
       setIntakeModal(null);
       setIntakeData({ skippedReason: '', sideEffectsNoted: [], notes: '' });
       loadData();
     } catch (error) {
-      toast.error('Fehler beim Protokollieren');
+      toast.error(t('common:errorSaving'));
     }
   };
 
@@ -309,15 +311,15 @@ export default function MedicationTracker() {
                 onClick={() => navigate('/dashboard')}
                 className="p-2 hover:bg-white/20 rounded-lg"
               >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={24} className="rtl:flip" />
               </button>
               <div>
                 <h1 className="text-2xl font-bold flex items-center gap-2">
                   <Pill size={28} />
-                  Meine Medikamente
+                  {t('medications:myMedications')}
                 </h1>
                 <p className="text-green-100">
-                  {activeMeds.length} aktive Medikamente
+                  {activeMeds.length} {t('medications:myMedications')}
                 </p>
               </div>
             </div>
@@ -330,7 +332,7 @@ export default function MedicationTracker() {
               className="flex items-center gap-2 px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50"
             >
               <Plus size={20} />
-              Hinzufügen
+              {t('common:add')}
             </button>
           </div>
         </div>
@@ -348,7 +350,7 @@ export default function MedicationTracker() {
             }`}
           >
             <Clock size={16} className="inline mr-1" />
-            Heute
+            {t('common:today')}
           </button>
           <button
             onClick={() => setActiveTab('medications')}
@@ -359,7 +361,7 @@ export default function MedicationTracker() {
             }`}
           >
             <Pill size={16} className="inline mr-1" />
-            Übersicht
+            {t('medications:myMedications')}
           </button>
           <button
             onClick={() => setActiveTab('stats')}
@@ -370,7 +372,7 @@ export default function MedicationTracker() {
             }`}
           >
             <TrendingUp size={16} className="inline mr-1" />
-            Statistik
+            {t('medications:adherence')}
           </button>
         </div>
       </div>
@@ -382,12 +384,12 @@ export default function MedicationTracker() {
             {activeMeds.length === 0 ? (
               <div className="bg-white rounded-lg shadow p-8 text-center">
                 <Pill size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">Noch keine Medikamente eingetragen</p>
+                <p className="text-gray-500">{t('medications:noMedications')}</p>
                 <button
                   onClick={() => setShowModal(true)}
                   className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg"
                 >
-                  Erstes Medikament hinzufügen
+                  {t('medications:addFirst')}
                 </button>
               </div>
             ) : (
@@ -414,11 +416,11 @@ export default function MedicationTracker() {
                       <div>
                         <h3 className="font-bold text-lg">{med.name}</h3>
                         <p className="text-gray-600">
-                          {med.dosage} · {FREQUENCY_LABELS[med.frequency]}
+                          {med.dosage} · {t(FREQUENCY_KEYS[med.frequency] || 'common:more')}
                         </p>
                         {med.timing && med.timing.length > 0 && (
                           <p className="text-sm text-gray-500">
-                            Zeiten: {med.timing.join(', ')} Uhr
+                            {t('medications:timing')}: {med.timing.join(', ')}
                           </p>
                         )}
                       </div>
@@ -431,21 +433,21 @@ export default function MedicationTracker() {
                                 : 'bg-orange-100 text-orange-700'
                             }`}
                           >
-                            {todayLogs[0]?.taken ? '✓ Genommen' : 'Ausgelassen'}
+                            {todayLogs[0]?.taken ? `✓ ${t('medications:taken')}` : t('medications:skipped')}
                           </span>
                         ) : (
                           <>
                             <button
                               onClick={() => setIntakeModal({ medication: med, taken: true })}
                               className="p-3 bg-green-100 text-green-600 rounded-full hover:bg-green-200"
-                              title="Genommen"
+                              title={t('medications:taken')}
                             >
                               <Check size={24} />
                             </button>
                             <button
                               onClick={() => setIntakeModal({ medication: med, taken: false })}
                               className="p-3 bg-orange-100 text-orange-600 rounded-full hover:bg-orange-200"
-                              title="Ausgelassen"
+                              title={t('medications:skipped')}
                             >
                               <X size={24} />
                             </button>
@@ -466,10 +468,10 @@ export default function MedicationTracker() {
             {/* Active Medications */}
             <div>
               <h2 className="text-lg font-bold mb-3 text-gray-700">
-                Aktive Medikamente ({activeMeds.length})
+                {t('medications:myMedications')} ({activeMeds.length})
               </h2>
               {activeMeds.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">Keine aktiven Medikamente</p>
+                <p className="text-gray-500 text-center py-4">{t('medications:noMedications')}</p>
               ) : (
                 <div className="space-y-3">
                   {activeMeds.map((med) => (
@@ -489,7 +491,7 @@ export default function MedicationTracker() {
             {inactiveMeds.length > 0 && (
               <div>
                 <h2 className="text-lg font-bold mb-3 text-gray-400">
-                  Abgesetzte Medikamente ({inactiveMeds.length})
+                  {t('common:inactive')} ({inactiveMeds.length})
                 </h2>
                 <div className="space-y-3 opacity-60">
                   {inactiveMeds.map((med) => (
@@ -513,7 +515,7 @@ export default function MedicationTracker() {
           <div className="space-y-6">
             {/* Overall Adherence */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">Therapietreue (30 Tage)</h2>
+              <h2 className="text-lg font-bold mb-4">{t('medications:adherenceRate')} ({t('medications:last30Days')})</h2>
               <div className="flex items-center justify-center gap-4">
                 <div
                   className={`text-5xl font-bold ${
@@ -531,17 +533,16 @@ export default function MedicationTracker() {
                     : '—'}
                 </div>
                 <div className="text-sm text-gray-500">
-                  <p>{adherence.overall.taken} von {adherence.overall.total}</p>
-                  <p>protokollierten Einnahmen</p>
+                  <p>{t('medications:takenCount', { taken: adherence.overall.taken, total: adherence.overall.total })}</p>
                 </div>
               </div>
             </div>
 
             {/* Per Medication */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">Nach Medikament</h2>
+              <h2 className="text-lg font-bold mb-4">{t('medications:byMedication')}</h2>
               {adherence.byMedication.length === 0 ? (
-                <p className="text-gray-500 text-center">Keine Daten verfügbar</p>
+                <p className="text-gray-500 text-center">{t('common:noData')}</p>
               ) : (
                 <div className="space-y-3">
                   {adherence.byMedication.map((med) => (
@@ -577,7 +578,7 @@ export default function MedicationTracker() {
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                   <AlertTriangle className="text-orange-500" />
-                  Häufige Nebenwirkungen
+                  {t('medications:reportedSideEffects')}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {adherence.sideEffects.map((se) => (
@@ -601,7 +602,7 @@ export default function MedicationTracker() {
           <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 border-b flex justify-between items-center">
               <h2 className="text-xl font-bold">
-                {editingMed ? 'Medikament bearbeiten' : 'Neues Medikament'}
+                {editingMed ? t('medications:editMedication') : t('medications:addMedication')}
               </h2>
               <button onClick={() => setShowModal(false)} className="text-gray-500">
                 <X size={24} />
@@ -610,7 +611,7 @@ export default function MedicationTracker() {
             <div className="p-4 space-y-4">
               {/* Name with autocomplete */}
               <div className="relative">
-                <label className="block text-sm font-medium mb-1">Medikament</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:medicationName')}</label>
                 <div className="relative">
                   <Search size={16} className="absolute left-3 top-3 text-gray-400" />
                   <input
@@ -622,7 +623,7 @@ export default function MedicationTracker() {
                       setShowSuggestions(true);
                     }}
                     onFocus={() => setShowSuggestions(true)}
-                    placeholder="Name eingeben oder suchen..."
+                    placeholder={t('medications:searchDatabase')}
                     className="w-full border rounded pl-10 pr-3 py-2"
                   />
                 </div>
@@ -636,7 +637,7 @@ export default function MedicationTracker() {
                       >
                         <p className="font-medium">{med.name}</p>
                         <p className="text-xs text-gray-500">
-                          {med.genericName} · {CATEGORY_LABELS[med.category]}
+                          {med.genericName} · {t(CATEGORY_KEYS[med.category] || 'medications:categoryOther')}
                         </p>
                       </button>
                     ))}
@@ -646,7 +647,7 @@ export default function MedicationTracker() {
 
               {/* Dosage */}
               <div>
-                <label className="block text-sm font-medium mb-1">Dosierung *</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:dosage')} *</label>
                 <input
                   type="text"
                   value={formData.dosage}
@@ -658,15 +659,15 @@ export default function MedicationTracker() {
 
               {/* Frequency */}
               <div>
-                <label className="block text-sm font-medium mb-1">Häufigkeit</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:frequency')}</label>
                 <select
                   value={formData.frequency}
                   onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
                   className="w-full border rounded px-3 py-2"
                 >
-                  {Object.entries(FREQUENCY_LABELS).map(([key, label]) => (
+                  {Object.entries(FREQUENCY_KEYS).map(([key, tKey]) => (
                     <option key={key} value={key}>
-                      {label}
+                      {t(tKey)}
                     </option>
                   ))}
                 </select>
@@ -674,15 +675,15 @@ export default function MedicationTracker() {
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium mb-1">Kategorie</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:category')}</label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full border rounded px-3 py-2"
                 >
-                  {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+                  {Object.entries(CATEGORY_KEYS).map(([key, tKey]) => (
                     <option key={key} value={key}>
-                      {label}
+                      {t(tKey)}
                     </option>
                   ))}
                 </select>
@@ -690,7 +691,7 @@ export default function MedicationTracker() {
 
               {/* Prescribed By */}
               <div>
-                <label className="block text-sm font-medium mb-1">Verschrieben von</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:prescribedBy')}</label>
                 <input
                   type="text"
                   value={formData.prescribedBy}
@@ -702,7 +703,7 @@ export default function MedicationTracker() {
 
               {/* Reason */}
               <div>
-                <label className="block text-sm font-medium mb-1">Grund/Indikation</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:reason')}</label>
                 <input
                   type="text"
                   value={formData.reason}
@@ -714,7 +715,7 @@ export default function MedicationTracker() {
 
               {/* Start Date */}
               <div>
-                <label className="block text-sm font-medium mb-1">Startdatum</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:startDate')}</label>
                 <input
                   type="date"
                   value={formData.startDate}
@@ -725,12 +726,12 @@ export default function MedicationTracker() {
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-medium mb-1">Notizen</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:notes')}</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={2}
-                  placeholder="Besondere Hinweise..."
+                  placeholder={t('medications:notes')}
                   className="w-full border rounded px-3 py-2"
                 />
               </div>
@@ -740,14 +741,14 @@ export default function MedicationTracker() {
                 onClick={() => setShowModal(false)}
                 className="px-4 py-2 border rounded-lg hover:bg-gray-50"
               >
-                Abbrechen
+                {t('common:cancel')}
               </button>
               <button
                 onClick={editingMed ? handleUpdateMedication : handleAddMedication}
                 disabled={!formData.name || !formData.dosage}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
               >
-                {editingMed ? 'Speichern' : 'Hinzufügen'}
+                {editingMed ? t('common:save') : t('common:add')}
               </button>
             </div>
           </div>
@@ -764,7 +765,7 @@ export default function MedicationTracker() {
               } text-white rounded-t-lg`}
             >
               <h2 className="text-xl font-bold">
-                {intakeModal.taken ? '✓ Einnahme bestätigen' : 'Einnahme ausgelassen'}
+                {intakeModal.taken ? `✓ ${t('medications:logIntake')}` : t('medications:skipped')}
               </h2>
               <p>
                 {intakeModal.medication.name} · {intakeModal.medication.dosage}
@@ -774,7 +775,7 @@ export default function MedicationTracker() {
               {!intakeModal.taken && (
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Warum ausgelassen?
+                    {t('medications:skipped')}?
                   </label>
                   <input
                     type="text"
@@ -782,7 +783,7 @@ export default function MedicationTracker() {
                     onChange={(e) =>
                       setIntakeData({ ...intakeData, skippedReason: e.target.value })
                     }
-                    placeholder="z.B. Vergessen, Nebenwirkungen..."
+                    placeholder={t('medications:skipped')}
                     className="w-full border rounded px-3 py-2"
                   />
                 </div>
@@ -790,7 +791,7 @@ export default function MedicationTracker() {
 
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Nebenwirkungen bemerkt?
+                  {t('medications:sideEffects')}?
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {sideEffectOptions.slice(0, 12).map((se) => (
@@ -823,14 +824,14 @@ export default function MedicationTracker() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Notizen</label>
+                <label className="block text-sm font-medium mb-1">{t('medications:notes')}</label>
                 <input
                   type="text"
                   value={intakeData.notes}
                   onChange={(e) =>
                     setIntakeData({ ...intakeData, notes: e.target.value })
                   }
-                  placeholder="Optional..."
+                  placeholder={t('medications:notes')}
                   className="w-full border rounded px-3 py-2"
                 />
               </div>
@@ -840,7 +841,7 @@ export default function MedicationTracker() {
                 onClick={() => setIntakeModal(null)}
                 className="px-4 py-2 border rounded-lg hover:bg-gray-50"
               >
-                Abbrechen
+                {t('common:cancel')}
               </button>
               <button
                 onClick={handleLogIntake}
@@ -850,7 +851,7 @@ export default function MedicationTracker() {
                     : 'bg-orange-600 hover:bg-orange-700'
                 }`}
               >
-                Bestätigen
+                {t('common:confirm')}
               </button>
             </div>
           </div>
@@ -874,6 +875,7 @@ function MedicationCard({
   onDelete: () => void;
   inactive?: boolean;
 }) {
+  const { t } = useTranslation(['medications', 'common']);
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -885,12 +887,12 @@ function MedicationCard({
         <div>
           <h3 className="font-bold">{medication.name}</h3>
           <p className="text-gray-600 text-sm">
-            {medication.dosage} · {FREQUENCY_LABELS[medication.frequency]}
+            {medication.dosage} · {t(FREQUENCY_KEYS[medication.frequency] || 'common:more')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <span className="px-2 py-1 text-xs rounded bg-gray-100 text-gray-600">
-            {CATEGORY_LABELS[medication.category || 'other_psychiatric']}
+            {t(CATEGORY_KEYS[medication.category || 'other_psychiatric'])}
           </span>
           {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </div>
@@ -901,25 +903,25 @@ function MedicationCard({
           <div className="grid grid-cols-2 gap-3 text-sm mb-4">
             {medication.prescribedBy && (
               <div>
-                <span className="text-gray-500">Verschrieben von:</span>
+                <span className="text-gray-500">{t('medications:prescribedBy')}:</span>
                 <p>{medication.prescribedBy}</p>
               </div>
             )}
             {medication.reason && (
               <div>
-                <span className="text-gray-500">Indikation:</span>
+                <span className="text-gray-500">{t('medications:reason')}:</span>
                 <p>{medication.reason}</p>
               </div>
             )}
             {medication.startDate && (
               <div>
-                <span className="text-gray-500">Seit:</span>
+                <span className="text-gray-500">{t('medications:startDate')}:</span>
                 <p>{new Date(medication.startDate).toLocaleDateString('de-DE')}</p>
               </div>
             )}
             {medication.endDate && (
               <div>
-                <span className="text-gray-500">Bis:</span>
+                <span className="text-gray-500">{t('medications:endDate')}:</span>
                 <p>{new Date(medication.endDate).toLocaleDateString('de-DE')}</p>
               </div>
             )}
@@ -935,7 +937,7 @@ function MedicationCard({
               }}
               className="flex items-center gap-1 px-3 py-1 text-sm border rounded hover:bg-gray-50"
             >
-              <Edit2 size={14} /> Bearbeiten
+              <Edit2 size={14} /> {t('common:edit')}
             </button>
             {!inactive && (
               <button
@@ -945,7 +947,7 @@ function MedicationCard({
                 }}
                 className="flex items-center gap-1 px-3 py-1 text-sm border border-orange-500 text-orange-500 rounded hover:bg-orange-50"
               >
-                Absetzen
+                {t('common:inactive')}
               </button>
             )}
             <button
@@ -955,7 +957,7 @@ function MedicationCard({
               }}
               className="flex items-center gap-1 px-3 py-1 text-sm text-red-500 hover:bg-red-50 rounded"
             >
-              <Trash2 size={14} /> Löschen
+              <Trash2 size={14} /> {t('common:delete')}
             </button>
           </div>
         </div>

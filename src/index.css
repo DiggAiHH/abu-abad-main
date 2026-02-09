@@ -26,8 +26,38 @@
     @apply outline-none ring-2 ring-primary-600 ring-offset-2;
   }
 
+  /* A11y: Dark-Mode Fokusring */
+  @media (prefers-color-scheme: dark) {
+    :where(button, [role='button'], a, input, select, textarea):focus-visible {
+      --tw-ring-color: theme('colors.primary.400');
+    }
+  }
+
   /* A11y: deaktivierte Controls klar erkennbar */
   :where(button, input, select, textarea):disabled {
     @apply opacity-50 cursor-not-allowed;
+  }
+}
+
+@layer components {
+  /* A11y: Skip-to-Content Link – visuell versteckt, bei Fokus sichtbar */
+  .skip-to-content {
+    @apply absolute z-[9999] px-4 py-2 text-sm font-semibold
+      bg-primary-600 text-white rounded-b-md
+      -translate-y-full transition-transform duration-200
+      focus:translate-y-0;
+    inset-inline-start: 1rem;
+    top: 0;
+  }
+
+  .skip-to-content:focus {
+    @apply outline-none ring-2 ring-white ring-offset-2 ring-offset-primary-600;
+  }
+}
+
+@layer utilities {
+  /* RTL: Richtungsabhängige Pfeil-Icons spiegeln */
+  [dir='rtl'] .rtl\:flip {
+    transform: scaleX(-1);
   }
 }

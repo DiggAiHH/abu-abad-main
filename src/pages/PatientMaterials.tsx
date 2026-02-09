@@ -4,12 +4,13 @@
  * DSGVO-konform: Verschlüsselte Speicherung, explizite Freigabe an Therapeut
  */
 
-import { useState, useEffect, useRef } from 'react';
-import { Upload, FileText, Image, Mic, Video, Trash2, Share2, Check } from 'lucide-react';
+import { Check, FileText, Image, Mic, Share2, Trash2, Upload, Video } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { apiClient } from '../api/client';
-import { extractTextFromImageFile } from '../utils/ocr';
 import { logger } from '../utils/logger';
+import { extractTextFromImageFile } from '../utils/ocr';
 
 interface PatientMaterial {
   id: string;
@@ -22,6 +23,7 @@ interface PatientMaterial {
 }
 
 export default function PatientMaterials() {
+  const { t } = useTranslation(['materials', 'common']);
   const [materials, setMaterials] = useState<PatientMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -68,10 +70,11 @@ export default function PatientMaterials() {
   const loadMaterials = async () => {
     try {
       const response = await apiClient.get('/patient-materials');
-      setMaterials(response.data.materials);
+      const data = response.data;
+      setMaterials(Array.isArray(data?.materials) ? data.materials : Array.isArray(data) ? data : []);
     } catch (error: any) {
       logger.error('PatientMaterials: Error loading materials', error);
-      toast.error('Fehler beim Laden der Materialien');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -80,7 +83,7 @@ export default function PatientMaterials() {
   // DSGVO-SAFE: Notiz hochladen
   const handleUploadNote = async () => {
     if (!noteContent.trim()) {
-      toast.error('Bitte geben Sie eine Notiz ein');
+      toast.error(t('common:fillAllFields'));
       return;
     }
 
@@ -91,13 +94,13 @@ export default function PatientMaterials() {
         content: noteContent
       });
 
-      toast.success('Notiz erfolgreich gespeichert');
+      toast.success(t('materials:uploadSuccess'));
       setNoteContent('');
       setShowNoteModal(false);
       await loadMaterials();
     } catch (error: any) {
       logger.error('PatientMaterials: Error uploading note', error);
-      toast.error('Fehler beim Speichern der Notiz');
+      toast.error(t('common:errorSaving'));
     } finally {
       setUploading(false);
     }
@@ -106,13 +109,13 @@ export default function PatientMaterials() {
   // DSGVO-SAFE: Datei hochladen (verschlüsselt)
   const handleUploadFile = async () => {
     if (!selectedFile || !uploadType) {
-      toast.error('Bitte wählen Sie eine Datei aus');
+      toast.error(t('materials:selectFile'));
       return;
     }
 
     // File Size Validation (100MB limit)
     if (selectedFile.size > 100 * 1024 * 1024) {
-      toast.error('Datei zu groß (max. 100MB)');
+      toast.error(t('materials:maxFileSize', { size: 100 }));
       return;
     }
 
@@ -139,16 +142,16 @@ export default function PatientMaterials() {
         },
       });
 
-      toast.success('Datei erfolgreich hochgeladen');
+      toast.success(t('materials:uploadSuccess'));
       setSelectedFile(null);
       setUploadType(null);
       await loadMaterials();
     } catch (error: any) {
       logger.error('PatientMaterials: Error uploading file', error);
       if (error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED') {
-        toast('Upload abgebrochen', { icon: 'ℹ️' });
+        toast(t('common:cancel'), { icon: 'ℹ️' });
       } else {
-        toast.error(error.response?.data?.error || 'Fehler beim Hochladen');
+        toast.error(error.response?.data?.error || t('common:errorUploading'));
       }
     } finally {
       setUploading(false);
@@ -168,7 +171,7 @@ export default function PatientMaterials() {
       return;
     }
     if (!selectedFile.type.startsWith('image/')) {
-      toast.error('OCR ist nur für Bilder verfügbar');
+      toast.error(t('materials:ocrImagesOnly', 'OCR: Nur Bilder'));
       return;
     }
 
@@ -179,13 +182,13 @@ export default function PatientMaterials() {
       const text = await extractTextFromImageFile(selectedFile);
       setNoteContent(text || '');
       if (!text) {
-        toast('Kein Text erkannt (lokal)', { icon: 'ℹ️' });
+        toast(t('common:noResults'), { icon: 'ℹ️' });
       } else {
-        toast.success('Text lokal erkannt');
+        toast.success(t('materials:ocrSuccess', 'OCR erfolgreich'));
       }
     } catch (error: any) {
       logger.error('PatientMaterials: OCR error', error);
-      toast.error('OCR fehlgeschlagen');
+      toast.error(t('common:error'));
     } finally {
       setOcrLoading(false);
     }
@@ -195,27 +198,27 @@ export default function PatientMaterials() {
   const handleShareWithTherapist = async (materialId: string) => {
     try {
       await apiClient.patch(`/patient-materials/${materialId}/share`);
-      toast.success('Mit Therapeut geteilt');
+      toast.success(t('materials:sharedWithTherapist'));
       await loadMaterials();
     } catch (error: any) {
       logger.error('PatientMaterials: Error sharing material', error);
-      toast.error('Fehler beim Teilen');
+      toast.error(t('common:error'));
     }
   };
 
   // Lösche Material (DSGVO Art. 17 - Recht auf Löschung)
   const handleDeleteMaterial = async (materialId: string) => {
-    if (!confirm('Möchten Sie dieses Material wirklich löschen?')) {
+    if (!confirm(t('common:confirmDelete'))) {
       return;
     }
 
     try {
       await apiClient.delete(`/patient-materials/${materialId}`);
-      toast.success('Material gelöscht');
+      toast.success(t('materials:deleteSuccess'));
       await loadMaterials();
     } catch (error: any) {
       logger.error('PatientMaterials: Error deleting material', error);
-      toast.error('Fehler beim Löschen');
+      toast.error(t('common:errorDeleting'));
     }
   };
 
@@ -236,7 +239,7 @@ export default function PatientMaterials() {
       link.remove();
     } catch (error: any) {
       logger.error('PatientMaterials: Error downloading material', error);
-      toast.error('Fehler beim Herunterladen');
+      toast.error(t('common:error'));
     }
   };
 
@@ -270,7 +273,7 @@ export default function PatientMaterials() {
       <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">
-            Meine Vorbereitungsmaterialien
+            {t('materials:title')}
           </h1>
           
           <div className="flex gap-2">
@@ -279,7 +282,7 @@ export default function PatientMaterials() {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <FileText className="w-4 h-4" />
-              Notiz erstellen
+              {t('materials:typeNote')}
             </button>
             
             <div className="relative">
@@ -305,7 +308,7 @@ export default function PatientMaterials() {
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer"
               >
                 <Upload className="w-4 h-4" />
-                Datei hochladen
+                {t('materials:uploadFile')}
               </label>
             </div>
           </div>
@@ -314,8 +317,7 @@ export default function PatientMaterials() {
         {/* DSGVO-Hinweis */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
-            <strong>🔒 Datenschutz:</strong> Alle hochgeladenen Materialien werden verschlüsselt gespeichert.
-            Sie können jederzeit entscheiden, welche Materialien Sie mit Ihrem Therapeuten teilen möchten.
+            <strong>🔒</strong> {t('materials:subtitle')}
           </p>
         </div>
 
@@ -324,7 +326,7 @@ export default function PatientMaterials() {
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-900">Bereit zum Hochladen:</p>
+                <p className="font-medium text-gray-900">{t('materials:uploadFile')}:</p>
                 <p className="text-sm text-gray-600">
                   {selectedFile.name} ({formatFileSize(selectedFile.size)})
                 </p>
@@ -338,14 +340,14 @@ export default function PatientMaterials() {
                   disabled={uploading}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50"
                 >
-                  Abbrechen
+                  {t('common:cancel')}
                 </button>
                 <button
                   onClick={handleUploadFile}
                   disabled={uploading}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {uploading ? 'Lädt hoch...' : 'Hochladen'}
+                  {uploading ? t('common:uploading') : t('common:upload')}
                 </button>
                 {selectedFile.type.startsWith('image/') && (
                   <button
@@ -353,7 +355,7 @@ export default function PatientMaterials() {
                     disabled={uploading || ocrLoading}
                     className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
                   >
-                    {ocrLoading ? 'OCR läuft...' : 'Text erkennen (lokal)'}
+                    {ocrLoading ? t('common:loading') : t('materials:ocrButton', 'OCR')}
                   </button>
                 )}
                 {uploading && (
@@ -361,7 +363,7 @@ export default function PatientMaterials() {
                     onClick={handleCancelUpload}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                   >
-                    Upload stoppen
+                    {t('common:cancel')}
                   </button>
                 )}
               </div>
@@ -370,7 +372,7 @@ export default function PatientMaterials() {
             {uploading && (
               <div className="mt-3">
                 <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
-                  <span>Upload läuft</span>
+                  <span>{t('common:uploading')}</span>
                   <span>{uploadProgress}%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -388,8 +390,8 @@ export default function PatientMaterials() {
         {materials.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p>Noch keine Materialien vorhanden</p>
-            <p className="text-sm">Erstellen Sie eine Notiz oder laden Sie eine Datei hoch</p>
+            <p>{t('materials:noMaterials')}</p>
+            <p className="text-sm">{t('materials:startUploading')}</p>
           </div>
         ) : (
           <div className="grid gap-4">
@@ -405,10 +407,10 @@ export default function PatientMaterials() {
                   
                   <div>
                     <p className="font-medium text-gray-900 capitalize">
-                      {material.materialType === 'note' ? 'Notiz' : 
-                       material.materialType === 'sketch' ? 'Skizze' :
-                       material.materialType === 'audio' ? 'Audioaufnahme' :
-                       material.materialType === 'video' ? 'Videoaufnahme' : 'Dokument'}
+                      {material.materialType === 'note' ? t('materials:typeNote') : 
+                       material.materialType === 'sketch' ? t('materials:typeSketch') :
+                       material.materialType === 'audio' ? t('materials:typeAudio') :
+                       material.materialType === 'video' ? t('materials:typeVideo') : t('materials:typeDocument')}
                     </p>
                     <p className="text-sm text-gray-600">
                       {new Date(material.createdAt).toLocaleDateString('de-DE')}
@@ -421,20 +423,22 @@ export default function PatientMaterials() {
                   {material.sharedWithTherapist ? (
                     <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                       <Check className="w-4 h-4" />
-                      Geteilt
+                      {t('materials:sharedWithTherapist')}
                     </span>
                   ) : (
                     <button
                       onClick={() => handleShareWithTherapist(material.id)}
+                      aria-label={t('materials:shareToggle')}
                       className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm hover:bg-blue-200"
                     >
                       <Share2 className="w-4 h-4" />
-                      Teilen
+                      {t('materials:shareToggle')}
                     </button>
                   )}
                   
                   <button
                     onClick={() => handleDownloadMaterial(material.id)}
+                    aria-label={t('common:download')}
                     className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                   >
                     <Upload className="w-4 h-4 rotate-180" />
@@ -442,6 +446,7 @@ export default function PatientMaterials() {
                   
                   <button
                     onClick={() => handleDeleteMaterial(material.id)}
+                    aria-label={t('common:delete')}
                     className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -469,13 +474,13 @@ export default function PatientMaterials() {
           }}
         >
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
-            <h2 id="patient-materials-note-title" className="text-xl font-bold mb-4">Neue Notiz erstellen</h2>
+            <h2 id="patient-materials-note-title" className="text-xl font-bold mb-4">{t('materials:typeNote')}</h2>
             
             <textarea
               ref={noteTextareaRef}
               value={noteContent}
               onChange={(e) => setNoteContent(e.target.value)}
-              placeholder="Schreiben Sie hier Ihre Notizen zur Vorbereitung auf die Sitzung..."
+              placeholder={t('materials:contentPlaceholder')}
               className="w-full h-64 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
             
@@ -487,14 +492,14 @@ export default function PatientMaterials() {
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
               >
-                Abbrechen
+                {t('common:cancel')}
               </button>
               <button
                 onClick={handleUploadNote}
                 disabled={uploading}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {uploading ? 'Speichert...' : 'Speichern'}
+                {uploading ? t('common:saving') : t('common:save')}
               </button>
             </div>
           </div>

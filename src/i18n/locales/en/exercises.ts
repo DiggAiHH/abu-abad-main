@@ -1,0 +1,47 @@
+const exercises = {
+  title: 'Therapeutic Exercises',
+  subtitle: 'Your assigned exercises and progress',
+  myExercises: 'My Exercises',
+  completionLog: 'Completion Log',
+  stats: 'Statistics',
+  markComplete: 'Mark as complete',
+  completeExercise: 'Complete exercise',
+  exerciseCompleted: 'Exercise marked as complete! 🎉',
+  duration: 'Duration (minutes)',
+  difficulty: 'Difficulty',
+  moodBefore: 'Mood before',
+  moodAfter: 'Mood after',
+  barriers: 'Barriers',
+  notesPlaceholder: 'How did it go?',
+  noExercises: 'No exercises assigned',
+  noCompletions: 'No completions yet',
+  activeExercises: 'active exercises',
+  completedToday: 'completed today',
+  totalExercises: 'Exercises',
+  totalCompletions: 'Completions',
+  avgMoodChange: 'Avg. mood change',
+  byCategory: 'By category',
+  weeklyActivity: 'Weekly activity',
+  completionRate: 'Completion rate',
+  dueDate: 'Due date',
+  assignedBy: 'Assigned by',
+  statusPending: 'Pending',
+  statusInProgress: 'In progress',
+  statusCompleted: 'Completed',
+
+  // Frequency
+  frequencyDaily: 'Daily',
+  frequencyWeekly: 'Weekly',
+  frequencyBiweekly: 'Every 2 weeks',
+  frequencyAsNeeded: 'As needed',
+
+  // Categories
+  categoryRelaxation: 'Relaxation',
+  categoryCognitive: 'Cognitive',
+  categoryMindfulness: 'Mindfulness',
+  categoryBehavioral: 'Behavioral activation',
+  categoryExposure: 'Exposure',
+  categorySocial: 'Social skills',
+};
+
+export default exercises;

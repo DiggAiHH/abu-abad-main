@@ -28,19 +28,22 @@ function validateEnv(): EnvConfig {
     IS_PRODUCTION: raw.PROD === true,
   };
 
-  // Warnungen in Development
+  // Warnungen nur in Development (nicht in Production-Bundles)
   if (raw.DEV) {
     if (!config.VITE_API_URL) {
-      console.warn('[Env] VITE_API_URL nicht gesetzt – API-Calls gehen an /api (relative URL)');
+      // eslint-disable-next-line no-console
+      console.info('[Env] VITE_API_URL nicht gesetzt – API-Calls gehen an /api (relative URL)');
     }
     if (!config.VITE_STRIPE_PUBLISHABLE_KEY) {
-      console.warn('[Env] VITE_STRIPE_PUBLISHABLE_KEY nicht gesetzt – Zahlungen deaktiviert');
+      // eslint-disable-next-line no-console
+      console.info('[Env] VITE_STRIPE_PUBLISHABLE_KEY nicht gesetzt – Zahlungen deaktiviert');
     }
   }
 
   // Kritische Prüfung in Production
   if (config.IS_PRODUCTION) {
     if (config.VITE_STRIPE_PUBLISHABLE_KEY && config.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_test_')) {
+      // eslint-disable-next-line no-console
       console.error('[Env] ⚠️  Stripe Test-Key in Produktion erkannt!');
     }
   }

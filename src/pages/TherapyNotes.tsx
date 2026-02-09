@@ -1,22 +1,23 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import toast from 'react-hot-toast';
 import { format, parseISO } from 'date-fns';
-import { de } from 'date-fns/locale';
-import { useNavigate, useParams } from 'react-router-dom';
-import { logger } from '../utils/logger';
 import {
-  ArrowLeft,
-  Save,
-  AlertTriangle,
-  FileText,
-  User,
-  ChevronDown,
-  ChevronUp,
-  Plus,
-  Trash2,
-  Edit2,
+    AlertTriangle,
+    ArrowLeft,
+    ChevronDown,
+    ChevronUp,
+    Edit2,
+    FileText,
+    Plus,
+    Save,
+    Trash2,
+    User,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { api } from '../api/client';
+import { getDateLocale } from '../utils/dateLocale';
+import { logger } from '../utils/logger';
 
 // ===== TYPES =====
 interface TherapyNote {
@@ -25,6 +26,7 @@ interface TherapyNote {
   first_name: string;
   last_name: string;
   session_date: string;
+  sessionDate?: string; // Demo-Modus Kompatibilität
   session_number?: number;
   session_duration?: number;
   subjective?: string;
@@ -71,31 +73,32 @@ const RISK_COLORS = {
   acute: 'bg-red-100 text-red-700',
 };
 
-const RISK_LABELS = {
-  none: 'Kein Risiko',
-  low: 'Niedriges Risiko',
-  moderate: 'Moderates Risiko',
-  high: 'Hohes Risiko',
-  acute: 'Akutes Risiko',
+const RISK_LABEL_KEYS = {
+  none: 'notes:riskNone',
+  low: 'notes:riskLow',
+  moderate: 'notes:riskModerate',
+  high: 'notes:riskHigh',
+  acute: 'notes:riskAcute',
 };
 
-const COMMON_INTERVENTIONS = [
-  'Kognitive Umstrukturierung',
-  'Verhaltensexperimente',
-  'Exposition',
-  'Achtsamkeitsübungen',
-  'Entspannungstechniken',
-  'Psychoedukation',
-  'Aktivitätsaufbau',
-  'Problemlösetraining',
-  'Soziales Kompetenztraining',
-  'Stuhldialog',
-  'EMDR',
-  'Imaginative Verfahren',
+const COMMON_INTERVENTION_KEYS = [
+  'notes:interventionCognitiveRestructuring',
+  'notes:interventionBehavioralExperiments',
+  'notes:interventionExposure',
+  'notes:interventionMindfulness',
+  'notes:interventionRelaxation',
+  'notes:interventionPsychoEducation',
+  'notes:interventionBehavioralActivation',
+  'notes:interventionProblemSolving',
+  'notes:interventionSocialSkills',
+  'notes:interventionChairDialog',
+  'notes:interventionEMDR',
+  'notes:interventionImaginative',
 ];
 
 // ===== MAIN COMPONENT =====
 export default function TherapyNotes() {
+  const { t } = useTranslation(['notes', 'common']);
   const navigate = useNavigate();
   const { patientId } = useParams<{ patientId?: string }>();
 
@@ -186,10 +189,10 @@ export default function TherapyNotes() {
     setLoading(true);
     try {
       const res = await api.get(`/therapy-notes/patient/${patientId}`);
-      setNotes(res.data || []);
+      setNotes(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       logger.error('TherapyNotes: Fehler beim Laden der Notizen', error);
-      toast.error('Fehler beim Laden der Notizen');
+      toast.error(t('common:errorLoadingData'));
     } finally {
       setLoading(false);
     }
@@ -220,33 +223,33 @@ export default function TherapyNotes() {
     e.preventDefault();
     
     if (!selectedPatient) {
-      toast.error('Bitte wählen Sie einen Patienten');
+      toast.error(t('notes:selectPatient'));
       return;
     }
 
     try {
       if (editingNote) {
         await api.put(`/therapy-notes/${editingNote.id}`, formData);
-        toast.success('Notiz aktualisiert');
+        toast.success(t('notes:noteUpdated'));
       } else {
         await api.post('/therapy-notes', {
           ...formData,
           patientId: selectedPatient,
         });
-        toast.success('Notiz erstellt');
+        toast.success(t('notes:noteSaved'));
       }
       
       setShowForm(false);
       resetForm();
       loadNotes(selectedPatient);
     } catch (error) {
-      toast.error('Fehler beim Speichern');
+      toast.error(t('common:errorSaving'));
     }
   };
 
   const handleEdit = (note: TherapyNote) => {
     setFormData({
-      sessionDate: note.session_date.split('T')[0],
+      sessionDate: (note.session_date || note.sessionDate || '').split('T')[0] || format(new Date(), 'yyyy-MM-dd'),
       sessionDuration: note.session_duration || 50,
       subjective: note.subjective || '',
       objective: note.objective || '',
@@ -267,14 +270,14 @@ export default function TherapyNotes() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Möchten Sie diese Notiz wirklich löschen?')) return;
+    if (!confirm(t('common:confirmDelete'))) return;
     
     try {
       await api.delete(`/therapy-notes/${id}`);
-      toast.success('Notiz gelöscht');
+      toast.success(t('notes:noteDeleted'));
       loadNotes(selectedPatient);
     } catch (error) {
-      toast.error('Fehler beim Löschen');
+      toast.error(t('common:errorDeleting'));
     }
   };
 
@@ -306,14 +309,14 @@ export default function TherapyNotes() {
                 onClick={() => navigate('/dashboard')}
                 className="p-2 hover:bg-gray-100 rounded-lg"
               >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={24} className="rtl:flip" />
               </button>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Therapie-Notizen
+                  {t('notes:title')}
                 </h1>
                 <p className="text-sm text-gray-600">
-                  Sitzungsdokumentation im SOAP-Format
+                  {t('notes:subtitle')}
                 </p>
               </div>
             </div>
@@ -326,7 +329,7 @@ export default function TherapyNotes() {
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
                 <Plus size={20} />
-                Neue Notiz
+                {t('notes:newNote')}
               </button>
             )}
           </div>
@@ -337,15 +340,15 @@ export default function TherapyNotes() {
         {/* Patient Selection */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            <User className="inline mr-2" size={16} />
-            Patient auswählen
+            <User className="inline me-2" size={16} />
+            {t('common:patient')} {t('common:select').toLowerCase()}
           </label>
           <select
             value={selectedPatient}
             onChange={(e) => setSelectedPatient(e.target.value)}
             className="w-full md:w-1/2 border rounded-lg px-3 py-2"
           >
-            <option value="">-- Patient wählen --</option>
+            <option value="">{t('notes:selectPatient')}</option>
             {patients.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.first_name} {p.last_name}
@@ -360,7 +363,7 @@ export default function TherapyNotes() {
             <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold">
-                  {editingNote ? 'Notiz bearbeiten' : 'Neue Sitzungsnotiz'}
+                  {editingNote ? t('notes:editNote') : t('notes:newNote')}
                 </h2>
                 <button
                   onClick={() => {
@@ -378,7 +381,7 @@ export default function TherapyNotes() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Sitzungsdatum
+                      {t('notes:sessionDate')}
                     </label>
                     <input
                       type="date"
@@ -391,7 +394,7 @@ export default function TherapyNotes() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Dauer (Minuten)
+                      {t('notes:sessionDuration')}
                     </label>
                     <input
                       type="number"
@@ -412,13 +415,12 @@ export default function TherapyNotes() {
                 {/* SOAP Format */}
                 <div className="space-y-4">
                   <h3 className="font-bold text-lg border-b pb-2">
-                    📋 SOAP-Dokumentation
+                    📋 {t('notes:subtitle')}
                   </h3>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-blue-600 font-bold">S</span>ubjektiv
-                      - Patientenbericht
+                      <span className="text-blue-600 font-bold">S</span>{t('notes:soapSubjective').slice(1)}
                     </label>
                     <textarea
                       value={formData.subjective}
@@ -426,15 +428,14 @@ export default function TherapyNotes() {
                         setFormData({ ...formData, subjective: e.target.value })
                       }
                       rows={4}
-                      placeholder="Was berichtet der Patient? Beschwerden, Ereignisse, Gefühle..."
+                      placeholder={t('notes:soapSubjectivePlaceholder')}
                       className="w-full border rounded-lg px-3 py-2"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-green-600 font-bold">O</span>bjektiv
-                      - Beobachtungen
+                      <span className="text-green-600 font-bold">O</span>{t('notes:soapObjective').slice(1)}
                     </label>
                     <textarea
                       value={formData.objective}
@@ -442,7 +443,7 @@ export default function TherapyNotes() {
                         setFormData({ ...formData, objective: e.target.value })
                       }
                       rows={4}
-                      placeholder="Therapeutische Beobachtungen: Verhalten, Affekt, Interaktion..."
+                      placeholder={t('notes:soapObjectivePlaceholder')}
                       className="w-full border rounded-lg px-3 py-2"
                     />
                   </div>
@@ -450,7 +451,7 @@ export default function TherapyNotes() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       <span className="text-purple-600 font-bold">A</span>
-                      ssessment - Einschätzung
+                      {t('notes:soapAssessment').slice(1)}
                     </label>
                     <textarea
                       value={formData.assessment}
@@ -458,15 +459,14 @@ export default function TherapyNotes() {
                         setFormData({ ...formData, assessment: e.target.value })
                       }
                       rows={4}
-                      placeholder="Diagnostische Einschätzung, Hypothesen, Verlaufsbeurteilung..."
+                      placeholder={t('notes:soapAssessmentPlaceholder')}
                       className="w-full border rounded-lg px-3 py-2"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-orange-600 font-bold">P</span>lan -
-                      Weiteres Vorgehen
+                      <span className="text-orange-600 font-bold">P</span>{t('notes:soapPlan').slice(1)}
                     </label>
                     <textarea
                       value={formData.plan}
@@ -474,7 +474,7 @@ export default function TherapyNotes() {
                         setFormData({ ...formData, plan: e.target.value })
                       }
                       rows={4}
-                      placeholder="Behandlungsplan, nächste Schritte, Interventionen..."
+                      placeholder={t('notes:soapPlanPlaceholder')}
                       className="w-full border rounded-lg px-3 py-2"
                     />
                   </div>
@@ -483,21 +483,21 @@ export default function TherapyNotes() {
                 {/* Interventions */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Durchgeführte Interventionen
+                    {t('notes:interventions')}
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {COMMON_INTERVENTIONS.map((int) => (
+                    {COMMON_INTERVENTION_KEYS.map((key) => (
                       <button
-                        key={int}
+                        key={key}
                         type="button"
-                        onClick={() => toggleIntervention(int)}
+                        onClick={() => toggleIntervention(t(key))}
                         className={`px-3 py-1 rounded-full text-sm transition ${
-                          formData.interventions.includes(int)
+                          formData.interventions.includes(t(key))
                             ? 'bg-blue-100 text-blue-700 border-blue-300 border'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {int}
+                        {t(key)}
                       </button>
                     ))}
                   </div>
@@ -506,7 +506,7 @@ export default function TherapyNotes() {
                 {/* Homework */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Hausaufgaben für den Patienten
+                    {t('notes:homework')}
                   </label>
                   <textarea
                     value={formData.homework}
@@ -514,7 +514,7 @@ export default function TherapyNotes() {
                       setFormData({ ...formData, homework: e.target.value })
                     }
                     rows={2}
-                    placeholder="Übungen, Tagebuch führen, Verhaltensexperimente..."
+                    placeholder={t('notes:homework')}
                     className="w-full border rounded-lg px-3 py-2"
                   />
                 </div>
@@ -523,12 +523,12 @@ export default function TherapyNotes() {
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <h4 className="font-bold text-red-700 mb-3 flex items-center gap-2">
                     <AlertTriangle size={20} />
-                    Risikobewertung
+                    {t('notes:riskAssessment')}
                   </h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Risikostufe
+                        {t('notes:riskAssessment')}
                       </label>
                       <select
                         value={formData.riskAssessment}
@@ -540,11 +540,11 @@ export default function TherapyNotes() {
                         }
                         className="w-full border rounded-lg px-3 py-2"
                       >
-                        <option value="none">Kein Risiko</option>
-                        <option value="low">Niedriges Risiko</option>
-                        <option value="moderate">Moderates Risiko</option>
-                        <option value="high">Hohes Risiko</option>
-                        <option value="acute">Akutes Risiko</option>
+                        <option value="none">{t('notes:riskNone')}</option>
+                        <option value="low">{t('notes:riskLow')}</option>
+                        <option value="moderate">{t('notes:riskModerate')}</option>
+                        <option value="high">{t('notes:riskHigh')}</option>
+                        <option value="acute">{t('notes:riskAcute')}</option>
                       </select>
                     </div>
                     <div className="flex items-center">
@@ -561,7 +561,7 @@ export default function TherapyNotes() {
                           className="rounded"
                         />
                         <span className="text-sm font-medium text-red-700">
-                          Suizidale Gedanken berichtet
+                          {t('notes:suicidalIdeation')}
                         </span>
                       </label>
                     </div>
@@ -571,7 +571,7 @@ export default function TherapyNotes() {
                 {/* Progress */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Fortschrittsbewertung: {formData.progressRating}/5
+                    {t('notes:progressRating')}: {formData.progressRating}/5
                   </label>
                   <input
                     type="range"
@@ -587,9 +587,9 @@ export default function TherapyNotes() {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>Verschlechterung</span>
-                    <span>Keine Änderung</span>
-                    <span>Deutliche Besserung</span>
+                    <span>1</span>
+                    <span>3</span>
+                    <span>5</span>
                   </div>
                 </div>
 
@@ -608,7 +608,7 @@ export default function TherapyNotes() {
                       className="rounded"
                     />
                     <span className="text-sm font-medium">
-                      Dringender Follow-up erforderlich
+                      {t('notes:followUpRequired')}
                     </span>
                   </label>
                 </div>
@@ -623,14 +623,14 @@ export default function TherapyNotes() {
                     }}
                     className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
                   >
-                    Abbrechen
+                    {t('common:cancel')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     <Save size={20} />
-                    Speichern
+                    {t('common:save')}
                   </button>
                 </div>
               </form>
@@ -643,10 +643,10 @@ export default function TherapyNotes() {
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <User size={48} className="mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              Kein Patient ausgewählt
+              {t('notes:selectPatient')}
             </h3>
             <p className="text-gray-500">
-              Wählen Sie einen Patienten, um dessen Therapienotizen zu sehen.
+              {t('notes:selectPatient')}
             </p>
           </div>
         ) : loading ? (
@@ -657,16 +657,16 @@ export default function TherapyNotes() {
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <FileText size={48} className="mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              Keine Notizen vorhanden
+              {t('notes:noNotes')}
             </h3>
             <p className="text-gray-500 mb-4">
-              Erstellen Sie die erste Sitzungsnotiz für diesen Patienten.
+              {t('notes:noNotes')}
             </p>
             <button
               onClick={() => setShowForm(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              Erste Notiz erstellen
+              {t('notes:newNote')}
             </button>
           </div>
         ) : (
@@ -686,14 +686,14 @@ export default function TherapyNotes() {
                   <div className="flex items-center gap-4">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-blue-600">
-                        {format(parseISO(note.session_date), 'dd', {
-                          locale: de,
-                        })}
+                        {(note.session_date || note.sessionDate)
+                          ? format(parseISO(note.session_date || note.sessionDate!), 'dd', { locale: getDateLocale() })
+                          : '–'}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {format(parseISO(note.session_date), 'MMM yy', {
-                          locale: de,
-                        })}
+                        {(note.session_date || note.sessionDate)
+                          ? format(parseISO(note.session_date || note.sessionDate!), 'MMM yy', { locale: getDateLocale() })
+                          : '–'}
                       </p>
                     </div>
                     <div>
@@ -701,16 +701,16 @@ export default function TherapyNotes() {
                         {note.first_name} {note.last_name}
                       </p>
                       <p className="text-sm text-gray-600">
-                        {note.session_duration} Min | Fortschritt:{' '}
+                        {note.session_duration} {t('common:min')} | {t('notes:progressRating')}:{' '}
                         {note.progress_rating || '-'}/5
                       </p>
                     </div>
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium ${
-                        RISK_COLORS[note.risk_assessment]
+                        RISK_COLORS[note.risk_assessment] || 'bg-gray-100 text-gray-700'
                       }`}
                     >
-                      {RISK_LABELS[note.risk_assessment]}
+                      {t(RISK_LABEL_KEYS[note.risk_assessment] || 'notes:riskNone')}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -748,7 +748,7 @@ export default function TherapyNotes() {
                       {note.subjective && (
                         <div className="bg-blue-50 rounded p-3">
                           <h4 className="font-bold text-blue-700 text-sm mb-1">
-                            Subjektiv
+                            {t('notes:soapSubjective')}
                           </h4>
                           <p className="text-sm">{note.subjective}</p>
                         </div>
@@ -756,7 +756,7 @@ export default function TherapyNotes() {
                       {note.objective && (
                         <div className="bg-green-50 rounded p-3">
                           <h4 className="font-bold text-green-700 text-sm mb-1">
-                            Objektiv
+                            {t('notes:soapObjective')}
                           </h4>
                           <p className="text-sm">{note.objective}</p>
                         </div>
@@ -764,7 +764,7 @@ export default function TherapyNotes() {
                       {note.assessment && (
                         <div className="bg-purple-50 rounded p-3">
                           <h4 className="font-bold text-purple-700 text-sm mb-1">
-                            Assessment
+                            {t('notes:soapAssessment')}
                           </h4>
                           <p className="text-sm">{note.assessment}</p>
                         </div>
@@ -772,7 +772,7 @@ export default function TherapyNotes() {
                       {note.plan && (
                         <div className="bg-orange-50 rounded p-3">
                           <h4 className="font-bold text-orange-700 text-sm mb-1">
-                            Plan
+                            {t('notes:soapPlan')}
                           </h4>
                           <p className="text-sm">{note.plan}</p>
                         </div>
@@ -783,7 +783,7 @@ export default function TherapyNotes() {
                     {note.interventions?.length > 0 && (
                       <div>
                         <h4 className="font-medium text-sm text-gray-700 mb-1">
-                          Interventionen:
+                          {t('notes:interventions')}:
                         </h4>
                         <div className="flex flex-wrap gap-1">
                           {note.interventions.map((int, i) => (
@@ -802,7 +802,7 @@ export default function TherapyNotes() {
                     {note.homework && (
                       <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
                         <h4 className="font-bold text-yellow-700 text-sm mb-1">
-                          📝 Hausaufgaben
+                          📝 {t('notes:homework')}
                         </h4>
                         <p className="text-sm">{note.homework}</p>
                       </div>

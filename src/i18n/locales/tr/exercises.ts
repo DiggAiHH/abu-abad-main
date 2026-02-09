@@ -1,0 +1,47 @@
+const exercises = {
+  title: 'Terapötik Egzersizler',
+  subtitle: 'Size atanan egzersizler ve ilerlemeniz',
+  myExercises: 'Egzersizlerim',
+  completionLog: 'Tamamlama Kaydı',
+  stats: 'İstatistikler',
+  markComplete: 'Tamamlandı olarak işaretle',
+  completeExercise: 'Egzersizi tamamla',
+  exerciseCompleted: 'Egzersiz tamamlandı olarak işaretlendi! 🎉',
+  duration: 'Süre (dakika)',
+  difficulty: 'Zorluk',
+  moodBefore: 'Önceki ruh hali',
+  moodAfter: 'Sonraki ruh hali',
+  barriers: 'Engeller',
+  notesPlaceholder: 'Nasıl geçti?',
+  noExercises: 'Atanmış egzersiz bulunmamaktadır',
+  noCompletions: 'Henüz tamamlanan egzersiz yok',
+  activeExercises: 'aktif egzersiz',
+  completedToday: 'bugün tamamlandı',
+  totalExercises: 'Egzersizler',
+  totalCompletions: 'Tamamlamalar',
+  avgMoodChange: 'Ort. ruh hali değişimi',
+  byCategory: 'Kategoriye göre',
+  weeklyActivity: 'Haftalık aktivite',
+  completionRate: 'Tamamlama oranı',
+  dueDate: 'Son tarih',
+  assignedBy: 'Atayan',
+  statusPending: 'Beklemede',
+  statusInProgress: 'Devam ediyor',
+  statusCompleted: 'Tamamlandı',
+
+  // Sıklık
+  frequencyDaily: 'Günlük',
+  frequencyWeekly: 'Haftalık',
+  frequencyBiweekly: 'İki haftada bir',
+  frequencyAsNeeded: 'Gerektiğinde',
+
+  // Kategoriler
+  categoryRelaxation: 'Gevşeme',
+  categoryCognitive: 'Bilişsel',
+  categoryMindfulness: 'Farkındalık',
+  categoryBehavioral: 'Davranışsal aktivasyon',
+  categoryExposure: 'Maruz bırakma',
+  categorySocial: 'Sosyal beceri',
+};
+
+export default exercises;

@@ -1,23 +1,24 @@
-import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import Peer, { MediaConnection } from 'peerjs';
-import { 
-  Video, 
-  VideoOff, 
-  Mic, 
-  MicOff, 
-  PhoneOff, 
-  MessageSquare,
-  Monitor,
-  MonitorOff 
+import {
+    MessageSquare,
+    Mic,
+    MicOff,
+    Monitor,
+    MonitorOff,
+    PhoneOff,
+    Video,
+    VideoOff
 } from 'lucide-react';
+import Peer, { MediaConnection } from 'peerjs';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 import { logger } from '../utils/logger';
 
 const ACTIVE_ROOM_KEY_PREFIX = 'abu-abad-active-video-room';
 const ROOM_PARTICIPANTS_KEY = 'abu-abad-room-participants';
-const DUPLICATE_MESSAGE = 'Video-Call bereits geöffnet in einem anderen Tab.';
+const DUPLICATE_MESSAGE = 'video:callAlreadyOpen';
 
 const buildRoomLockKey = (userId?: string) => `${ACTIVE_ROOM_KEY_PREFIX}:${userId ?? 'guest'}`;
 
@@ -25,6 +26,7 @@ export default function VideoCall() {
   const { roomId } = useParams<{ roomId: string }>();
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { t } = useTranslation(['video', 'common']);
   
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
@@ -54,7 +56,7 @@ export default function VideoCall() {
     const pc = mediaConnection.peerConnection;
     const handleStateChange = () => {
       if (['failed', 'disconnected', 'closed'].includes(pc.connectionState)) {
-        setConnectionError('Verbindung verloren. Bitte erneut verbinden.');
+        setConnectionError(t('video:connectionLostReconnect'));
       }
     };
 
@@ -65,11 +67,13 @@ export default function VideoCall() {
     const originalClose = pc.close.bind(pc);
     pc.close = () => {
       originalClose();
-      setConnectionError('Verbindung verloren. Bitte erneut verbinden.');
+      setConnectionError(t('video:connectionLostReconnect'));
     };
 
     try {
-      (window as any).peerConnection = pc;
+      if (import.meta.env.DEV) {
+        (window as unknown as Record<string, unknown>).peerConnection = pc;
+      }
     } catch {
       // ignore assignment issues
     }
@@ -78,13 +82,13 @@ export default function VideoCall() {
   useEffect(() => {
     // Validation
     if (!user?.id) {
-      toast.error('Benutzer nicht authentifiziert');
+      toast.error(t('common:userNotAuthenticated'));
       navigate('/login');
       return;
     }
     
     if (!roomId) {
-      toast.error('Keine Raum-ID vorhanden');
+      toast.error(t('video:noRoomId'));
       navigate('/dashboard');
       return;
     }
@@ -109,7 +113,7 @@ export default function VideoCall() {
         }
         setIsConnected(false);
         setRemoteStream(null);
-        setConnectionError(message || 'Verbindung verloren (Test)');
+        setConnectionError(message || t('video:connectionLost'));
       },
       forceAudioOnlyMode: () => setIsAudioOnlyMode(true),
       setConnectedState: (state: boolean) => setIsConnected(state),
@@ -149,9 +153,9 @@ export default function VideoCall() {
       const duplicates = Object.values(store).filter((value) => value === roomId);
       const hasDuplicate = duplicates.length > 1;
       if (hasDuplicate) {
-        setConnectionError(DUPLICATE_MESSAGE);
+        setConnectionError(t(DUPLICATE_MESSAGE));
       } else {
-        setConnectionError((prev) => (prev === DUPLICATE_MESSAGE ? null : prev));
+        setConnectionError((prev) => (prev === t(DUPLICATE_MESSAGE) ? null : prev));
       }
     };
 
@@ -180,7 +184,7 @@ export default function VideoCall() {
       } else {
         sessionStorage.setItem(userRoomKey, JSON.stringify(store));
         if (!Object.values(store).some((value) => value === roomId)) {
-          setConnectionError((prev) => (prev === DUPLICATE_MESSAGE ? null : prev));
+          setConnectionError((prev) => (prev === t(DUPLICATE_MESSAGE) ? null : prev));
         }
       }
       window.removeEventListener('storage', handleStorage);
@@ -193,11 +197,11 @@ export default function VideoCall() {
     }
 
     if (roomId.includes('expired')) {
-      setConnectionError(prev => prev ?? 'Termin ist abgelaufen. Bitte neuen Termin vereinbaren.');
+      setConnectionError(prev => prev ?? t('video:connectionEndedInfo'));
     }
 
     if (roomId.includes('patient1') && user.role === 'patient' && !user.email.includes('patient1')) {
-      setConnectionError(prev => prev ?? 'Nicht berechtigt, dieser Termin gehört einem anderen Patienten.');
+      setConnectionError(prev => prev ?? t('video:connectionError'));
     }
   }, [roomId, user?.email, user?.role]);
 
@@ -235,11 +239,11 @@ export default function VideoCall() {
 
       if (hasRemote) {
         setIsConnected(true);
-        setConnectionError((prev) => (prev === 'Der andere Teilnehmer hat den Call verlassen.' ? null : prev));
+        setConnectionError((prev) => (prev === t('video:otherParticipantLeft') ? null : prev));
       } else if (previouslyHadRemote && !hasRemote) {
         setIsConnected(false);
         setRemoteStream(null);
-        setConnectionError('Der andere Teilnehmer hat den Call verlassen.');
+        setConnectionError(t('video:otherParticipantLeft'));
       }
     };
 
@@ -305,7 +309,7 @@ export default function VideoCall() {
       const downlink = connection.downlink ?? 0;
       const rtt = connection.rtt ?? 0;
       if (!isConnected && ((downlink && downlink < 0.8) || (rtt && rtt > 400))) {
-        setConnectionError('Langsame Netzwerkverbindung erkannt. Qualität reduziert.');
+        setConnectionError(t('video:slowNetwork'));
       }
     };
 
@@ -335,14 +339,14 @@ export default function VideoCall() {
         typeof window === 'undefined' ||
         !(window as any).RTCPeerConnection
       ) {
-        throw new Error('Browser unterstützt WebRTC nicht.');
+        throw new Error(t('video:browserNoWebRTC'));
       }
       
       // Helper for getUserMedia with timeout
       const getMedia = async (constraints: MediaStreamConstraints) => {
         const streamPromise = navigator.mediaDevices.getUserMedia(constraints);
         const timeoutPromise = new Promise<never>((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout beim Zugriff auf Kamera/Mikrofon')), 10000)
+          setTimeout(() => reject(new Error(t('video:cameraTimeout'))), 10000)
         );
         return Promise.race([streamPromise, timeoutPromise]) as Promise<MediaStream>;
       };
@@ -375,7 +379,7 @@ export default function VideoCall() {
                 autoGainControl: true,
               },
             });
-            toast('Nur Audio-Modus aktiv (Kamera nicht verfügbar)', { icon: 'ℹ️' });
+            toast(t('video:audioOnlyActive'), { icon: 'ℹ️' });
             setIsAudioOnlyMode(true);
             // Wir setzen KEINEN connectionError, damit der Call weitergeht
           } catch (audioErr) {
@@ -419,7 +423,7 @@ export default function VideoCall() {
 
       newPeer.on('open', (id) => {
         logger.debug('VideoCall: Peer connected', { id: String(id).slice(0, 8) });
-        toast.success('Verbindung hergestellt');
+        toast.success(t('video:connectionEstablished'));
         setConnectionError(null);
       });
 
@@ -438,18 +442,18 @@ export default function VideoCall() {
               remoteVideoRef.current.srcObject = remoteStream;
             }
             
-            toast.success('Verbindung hergestellt');
+            toast.success(t('video:connectionEstablished'));
           });
           
           incomingCall.on('error', (err) => {
             logger.error('VideoCall: Call error', err);
-            toast.error('Verbindungsfehler während des Anrufs');
-            setConnectionError('Verbindung unterbrochen');
+            toast.error(t('video:connectionErrorDuringCall'));
+            setConnectionError(t('video:connectionLost'));
           });
           
           incomingCall.on('close', () => {
             logger.debug('VideoCall: Call closed by remote peer');
-            toast('Anruf beendet', { icon: 'ℹ️' });
+            toast(t('video:callEnded'), { icon: 'ℹ️' });
             setIsConnected(false);
             setRemoteStream(null);
           });
@@ -458,21 +462,21 @@ export default function VideoCall() {
           attachPeerConnection(incomingCall);
         } catch (err) {
           logger.error('VideoCall: Error answering call', err);
-          toast.error('Fehler beim Annehmen des Anrufs');
+          toast.error(t('video:errorAnsweringCall'));
         }
       });
 
       newPeer.on('error', (error) => {
         logger.error('VideoCall: Peer error', error);
         
-        let errorMessage = 'Verbindungsfehler';
+        let errorMessage = t('video:connectionError');
         
         if (error.type === 'peer-unavailable') {
-          errorMessage = 'Gegenstelle nicht erreichbar. Warten Sie, bis der Therapeut beitritt.';
+          errorMessage = t('video:peerUnavailable');
         } else if (error.type === 'network') {
-          errorMessage = 'PeerJS Server nicht erreichbar. Verbindung fehlgeschlagen.';
+          errorMessage = t('video:peerServerUnreachable');
         } else if (error.type === 'server-error') {
-          errorMessage = 'Server-Fehler. Bitte später erneut versuchen.';
+          errorMessage = t('video:serverError');
         }
         
         toast.error(errorMessage);
@@ -481,7 +485,7 @@ export default function VideoCall() {
       
       newPeer.on('disconnected', () => {
         logger.warn('VideoCall: Peer disconnected, attempting to reconnect');
-        toast('Verbindung unterbrochen, versuche Wiederherstellung...', { icon: '⚠️' });
+        toast(t('video:connectionInterrupted'), { icon: '⚠️' });
         
         // Automatischer Reconnect-Versuch
         setTimeout(() => {
@@ -498,21 +502,21 @@ export default function VideoCall() {
         // Connection Timeout: Wenn nach 30s keine Verbindung
         connectionTimeoutRef.current = setTimeout(() => {
           if (!isConnected) {
-            toast.error('Timeout: Therapeut nicht erreichbar');
-            setConnectionError('Therapeut ist nicht online oder nicht erreichbar');
+            toast.error(t('video:timeoutTherapist'));
+            setConnectionError(t('video:therapistNotOnline'));
           }
         }, 30000);
         
         setTimeout(() => {
           try {
             if (!newPeer || newPeer.destroyed) {
-              throw new Error('Peer nicht initialisiert');
+              throw new Error(t('video:peerNotInitialized'));
             }
             
             const outgoingCall = newPeer.call(roomId, stream);
             
             if (!outgoingCall) {
-              throw new Error('Anruf konnte nicht gestartet werden');
+              throw new Error(t('video:callCouldNotStart'));
             }
             
             outgoingCall.on('stream', (remoteStream) => {
@@ -524,7 +528,7 @@ export default function VideoCall() {
                 remoteVideoRef.current.srcObject = remoteStream;
               }
               
-              toast.success('Verbindung hergestellt');
+              toast.success(t('video:connectionEstablished'));
               
               // Clear timeout bei erfolgreicher Verbindung
               if (connectionTimeoutRef.current) {
@@ -534,13 +538,13 @@ export default function VideoCall() {
             
             outgoingCall.on('error', (err) => {
               logger.error('VideoCall: Outgoing call error', err);
-              toast.error('Fehler beim Verbinden mit Therapeut');
-              setConnectionError('Verbindung zum Therapeuten fehlgeschlagen');
+              toast.error(t('video:errorConnectingTherapist'));
+              setConnectionError(t('video:connectionToTherapistFailed'));
             });
             
             outgoingCall.on('close', () => {
               logger.debug('VideoCall: Outgoing call closed');
-              toast('Verbindung beendet', { icon: 'ℹ️' });
+              toast(t('video:connectionEndedInfo'), { icon: 'ℹ️' });
               setIsConnected(false);
               setRemoteStream(null);
             });
@@ -549,7 +553,7 @@ export default function VideoCall() {
             attachPeerConnection(outgoingCall);
           } catch (err: any) {
             logger.error('VideoCall: Error initiating call', err);
-            toast.error(err.message || 'Fehler beim Starten des Anrufs');
+            toast.error(err.message || t('video:errorStartingCall'));
             setConnectionError(err.message);
           }
         }, 2000);
@@ -557,14 +561,14 @@ export default function VideoCall() {
     } catch (error: any) {
       logger.error('VideoCall: Error initializing call', error);
       
-      let errorMessage = 'Fehler beim Initialisieren des Anrufs';
+      let errorMessage = t('video:errorInitializingCall');
       
-      if (error.message === 'Browser unterstützt WebRTC nicht.') {
+      if (error.message === t('video:browserNoWebRTC')) {
         errorMessage = error.message;
       } else if (error.name === 'NotAllowedError') {
-        errorMessage = 'Kamera/Mikrofon-Zugriff verweigert. Bitte Berechtigungen prüfen.';
+        errorMessage = t('video:cameraAccessDenied');
       } else if (error.name === 'NotFoundError') {
-        errorMessage = 'Keine Kamera oder Mikrofon gefunden.';
+        errorMessage = t('video:noDeviceFound');
       } else if (error.message?.includes('Timeout')) {
         errorMessage = error.message;
       }
@@ -645,10 +649,10 @@ export default function VideoCall() {
         };
 
         setIsScreenSharing(true);
-        toast.success('Bildschirmfreigabe gestartet');
+        toast.success(t('video:screenShareStarted'));
       } catch (error) {
         logger.error('VideoCall: Screen share error', error);
-        toast.error('Bildschirmfreigabe fehlgeschlagen');
+        toast.error(t('video:screenShareFailed'));
       }
     } else {
       // Stop screen share, return to camera
@@ -669,14 +673,14 @@ export default function VideoCall() {
       }
 
       setIsScreenSharing(false);
-      toast.success('Bildschirmfreigabe beendet');
+      toast.success(t('video:screenShareEnded'));
     }
   };
 
   const endCall = () => {
     cleanup();
     navigate('/dashboard');
-    toast.success('Anruf beendet');
+    toast.success(t('video:callEndedSuccess'));
   };
 
   return (
@@ -694,7 +698,7 @@ export default function VideoCall() {
             onClick={endCall}
             className="mt-2 text-sm underline block mx-auto"
           >
-            Zurück zum Dashboard
+            {t('video:backToDashboard')}
           </button>
         </div>
       )}
@@ -703,23 +707,23 @@ export default function VideoCall() {
       <div className="bg-gray-800 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-white text-lg font-semibold">Video-Sitzung</h1>
+            <h1 className="text-white text-lg font-semibold">{t('video:title')}</h1>
             <p data-testid="connection-status" className="text-gray-400 text-sm">
-              {isConnected ? 'Verbunden' : 'Warten auf Verbindung...'}
+              {isConnected ? t('video:connected') : t('video:waitingForConnection')}
             </p>
             {isAudioOnlyMode && (
               <span
                 data-testid="audio-only-indicator"
                 className="mt-1 inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-200 border border-yellow-500/40"
               >
-                Audio-Only Modus aktiv
+                {t('video:audioOnlyMode')}
               </span>
             )}
           </div>
           <div className="flex items-center gap-2">
             <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`} />
             <span className="text-white text-sm">
-              {isConnected ? 'Live' : 'Verbinde...'}
+              {isConnected ? t('video:live') : t('video:connecting')}
             </span>
           </div>
         </div>
@@ -744,11 +748,11 @@ export default function VideoCall() {
                 </div>
                 <p className="text-lg">
                   {hasRemoteParticipant
-                    ? 'Teilnehmer verbunden (kein Video verfügbar)'
-                    : 'Warten auf anderen Teilnehmer...'}
+                    ? t('video:participantConnectedNoVideo')
+                    : t('video:waitingForOtherParticipant')}
                 </p>
                 {isAudioOnlyMode && (
-                  <p className="text-sm text-gray-300 mt-2">Audio-Only Modus aktiv</p>
+                  <p className="text-sm text-gray-300 mt-2">{t('video:audioOnlyMode')}</p>
                 )}
               </div>
             </div>
@@ -778,58 +782,58 @@ export default function VideoCall() {
           {/* Video Toggle */}
           <button
             onClick={toggleVideo}
-            aria-label={isVideoOn ? 'Kamera aktiv' : 'Kamera ausgeschaltet'}
+            aria-label={isVideoOn ? t('video:cameraActiveAriaLabel') : t('video:cameraMutedAriaLabel')}
             aria-pressed={isVideoOn}
             className={`p-4 rounded-full transition ${
               isVideoOn 
                 ? 'bg-gray-700 hover:bg-gray-600 text-white' 
                 : 'bg-red-600 hover:bg-red-700 text-white'
             }`}
-            title={isVideoOn ? 'Video ausschalten' : 'Video einschalten'}
+            title={isVideoOn ? t('video:videoOff') : t('video:videoOn')}
           >
             {isVideoOn ? <Video size={24} /> : <VideoOff size={24} />}
-            <span className="sr-only">{isVideoOn ? 'Kamera aktiv' : 'Kamera ausgeschaltet'}</span>
+            <span className="sr-only">{isVideoOn ? t('video:cameraActiveAriaLabel') : t('video:cameraMutedAriaLabel')}</span>
           </button>
 
           {/* Audio Toggle */}
           <button
             onClick={toggleAudio}
-            aria-label={isAudioOn ? 'Mikrofon aktiv' : 'Mikrofon stummgeschaltet'}
+            aria-label={isAudioOn ? t('video:micActiveAriaLabel') : t('video:micMutedAriaLabel')}
             aria-pressed={isAudioOn}
             className={`p-4 rounded-full transition ${
               isAudioOn 
                 ? 'bg-gray-700 hover:bg-gray-600 text-white' 
                 : 'bg-red-600 hover:bg-red-700 text-white'
             }`}
-            title={isAudioOn ? 'Mikrofon ausschalten' : 'Mikrofon einschalten'}
+            title={isAudioOn ? t('video:micOff') : t('video:micOn')}
           >
             {isAudioOn ? <Mic size={24} /> : <MicOff size={24} />}
-            <span className="sr-only">{isAudioOn ? 'Mikrofon aktiv' : 'Mikrofon stummgeschaltet'}</span>
+            <span className="sr-only">{isAudioOn ? t('video:micActiveAriaLabel') : t('video:micMutedAriaLabel')}</span>
           </button>
 
           {/* Screen Share (nur Therapeut) */}
           {user?.role === 'therapist' && (
             <button
               onClick={toggleScreenShare}
-              aria-label={isScreenSharing ? 'Bildschirmfreigabe beenden' : 'Bildschirm teilen'}
+              aria-label={isScreenSharing ? t('video:stopScreenShare') : t('video:startScreenShare')}
               aria-pressed={isScreenSharing}
               className={`p-4 rounded-full transition ${
                 isScreenSharing
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
                   : 'bg-gray-700 hover:bg-gray-600 text-white'
               }`}
-              title={isScreenSharing ? 'Bildschirmfreigabe beenden' : 'Bildschirm teilen'}
+              title={isScreenSharing ? t('video:stopScreenShare') : t('video:startScreenShare')}
             >
               {isScreenSharing ? <MonitorOff size={24} /> : <Monitor size={24} />}
-              <span className="sr-only">{isScreenSharing ? 'Bildschirmfreigabe beenden' : 'Bildschirm teilen'}</span>
+              <span className="sr-only">{isScreenSharing ? t('video:stopScreenShare') : t('video:startScreenShare')}</span>
             </button>
           )}
 
           {/* Chat */}
           <button
             className="p-4 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition"
-            title="Chat öffnen"
-            aria-label="Chat öffnen"
+            title={t('video:openChat')}
+            aria-label={t('video:openChat')}
           >
             <MessageSquare size={24} />
           </button>
@@ -837,9 +841,9 @@ export default function VideoCall() {
           {/* End Call */}
           <button
             onClick={endCall}
-            className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition ml-4"
-            title="Anruf beenden"
-            aria-label="Anruf beenden"
+            className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition ms-4"
+            title={t('video:endCall')}
+            aria-label={t('video:endCall')}
           >
             <PhoneOff size={24} />
           </button>
