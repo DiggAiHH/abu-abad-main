@@ -7,16 +7,23 @@ import {
   type SupportedLanguage,
 } from '../i18n';
 
+type LanguageSwitcherProps = {
+  // Optional: Aktuelle Sprache als Prop überschreiben, standardmäßig aus i18n
+  currentLang?: SupportedLanguage;
+};
+
 /**
  * Language Switcher Dropdown – zeigt Flagge + Sprachname
  * Unterstützt alle 9 Sprachen inkl. RTL (ar, fa)
  */
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ currentLang: propCurrentLang }: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation(['common']);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const currentLang = (i18n.language?.substring(0, 2) || 'de') as SupportedLanguage;
+  const currentLang = (
+    propCurrentLang || i18n.language?.substring(0, 2) || 'de'
+  ) as SupportedLanguage;
 
   // Schließe Dropdown bei Klick außerhalb
   useEffect(() => {
