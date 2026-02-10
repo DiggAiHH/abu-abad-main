@@ -1,15 +1,15 @@
 import { format, parseISO } from 'date-fns';
 import {
-    AlertTriangle,
-    ArrowLeft,
-    ChevronDown,
-    ChevronUp,
-    Edit2,
-    FileText,
-    Plus,
-    Save,
-    Trash2,
-    User,
+  AlertTriangle,
+  ArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  Edit2,
+  FileText,
+  Plus,
+  Save,
+  Trash2,
+  User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -164,7 +164,7 @@ export default function TherapyNotes() {
         : Array.isArray((res.data as any)?.appointments)
           ? (res.data as any).appointments
           : [];
-      
+
       // Unique Patienten extrahieren
       const patientMap = new Map<string, Patient>();
       appointments.forEach((apt: any) => {
@@ -176,7 +176,7 @@ export default function TherapyNotes() {
           });
         }
       });
-      
+
       setPatients(Array.from(patientMap.values()));
     } catch (error) {
       logger.error('TherapyNotes: Fehler beim Laden der Patienten', error);
@@ -221,7 +221,7 @@ export default function TherapyNotes() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedPatient) {
       toast.error(t('notes:selectPatient'));
       return;
@@ -238,7 +238,7 @@ export default function TherapyNotes() {
         });
         toast.success(t('notes:noteSaved'));
       }
-      
+
       setShowForm(false);
       resetForm();
       loadNotes(selectedPatient);
@@ -249,7 +249,9 @@ export default function TherapyNotes() {
 
   const handleEdit = (note: TherapyNote) => {
     setFormData({
-      sessionDate: (note.session_date || note.sessionDate || '').split('T')[0] || format(new Date(), 'yyyy-MM-dd'),
+      sessionDate:
+        (note.session_date || note.sessionDate || '').split('T')[0] ||
+        format(new Date(), 'yyyy-MM-dd'),
       sessionDuration: note.session_duration || 50,
       subjective: note.subjective || '',
       objective: note.objective || '',
@@ -271,7 +273,7 @@ export default function TherapyNotes() {
 
   const handleDelete = async (id: string) => {
     if (!confirm(t('common:confirmDelete'))) return;
-    
+
     try {
       await api.delete(`/therapy-notes/${id}`);
       toast.success(t('notes:noteDeleted'));
@@ -282,42 +284,38 @@ export default function TherapyNotes() {
   };
 
   const toggleIntervention = (intervention: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       interventions: prev.interventions.includes(intervention)
-        ? prev.interventions.filter((i) => i !== intervention)
+        ? prev.interventions.filter(i => i !== intervention)
         : [...prev.interventions, intervention],
     }));
   };
 
   if (loading && !selectedPatient) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner" />
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='spinner' />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className='min-h-screen bg-gray-50'>
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
+      <header className='bg-white shadow-sm'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
+          <div className='flex justify-between items-center'>
+            <div className='flex items-center gap-4'>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className='p-2 hover:bg-gray-100 rounded-lg'
               >
-                <ArrowLeft size={24} className="rtl:flip" />
+                <ArrowLeft size={24} className='rtl:flip' />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {t('notes:title')}
-                </h1>
-                <p className="text-sm text-gray-600">
-                  {t('notes:subtitle')}
-                </p>
+                <h1 className='text-2xl font-bold text-gray-900'>{t('notes:title')}</h1>
+                <p className='text-sm text-gray-600'>{t('notes:subtitle')}</p>
               </div>
             </div>
             {selectedPatient && (
@@ -326,7 +324,7 @@ export default function TherapyNotes() {
                   resetForm();
                   setShowForm(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className='flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition'
               >
                 <Plus size={20} />
                 {t('notes:newNote')}
@@ -336,20 +334,20 @@ export default function TherapyNotes() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Patient Selection */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            <User className="inline me-2" size={16} />
+        <div className='bg-white rounded-lg shadow p-4 mb-6'>
+          <label className='block text-sm font-medium text-gray-700 mb-2'>
+            <User className='inline me-2' size={16} />
             {t('common:patient')} {t('common:select').toLowerCase()}
           </label>
           <select
             value={selectedPatient}
-            onChange={(e) => setSelectedPatient(e.target.value)}
-            className="w-full md:w-1/2 border rounded-lg px-3 py-2"
+            onChange={e => setSelectedPatient(e.target.value)}
+            className='w-full md:w-1/2 border rounded-lg px-3 py-2'
           >
-            <option value="">{t('notes:selectPatient')}</option>
-            {patients.map((p) => (
+            <option value=''>{t('notes:selectPatient')}</option>
+            {patients.map(p => (
               <option key={p.id} value={p.id}>
                 {p.first_name} {p.last_name}
               </option>
@@ -359,10 +357,10 @@ export default function TherapyNotes() {
 
         {/* Notes Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-                <h2 className="text-xl font-bold">
+          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
+            <div className='bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto'>
+              <div className='sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center'>
+                <h2 className='text-xl font-bold'>
                   {editingNote ? t('notes:editNote') : t('notes:newNote')}
                 </h2>
                 <button
@@ -370,126 +368,117 @@ export default function TherapyNotes() {
                     setShowForm(false);
                     resetForm();
                   }}
-                  className="text-gray-500 hover:text-gray-700"
+                  className='text-gray-500 hover:text-gray-700'
                 >
                   ✕
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <form onSubmit={handleSubmit} className='p-6 space-y-6'>
                 {/* Session Metadata */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>
                       {t('notes:sessionDate')}
                     </label>
                     <input
-                      type="date"
+                      type='date'
                       value={formData.sessionDate}
-                      onChange={(e) =>
-                        setFormData({ ...formData, sessionDate: e.target.value })
-                      }
-                      className="w-full border rounded-lg px-3 py-2"
+                      onChange={e => setFormData({ ...formData, sessionDate: e.target.value })}
+                      className='w-full border rounded-lg px-3 py-2'
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>
                       {t('notes:sessionDuration')}
                     </label>
                     <input
-                      type="number"
-                      min="5"
-                      max="180"
+                      type='number'
+                      min='5'
+                      max='180'
                       value={formData.sessionDuration}
-                      onChange={(e) =>
+                      onChange={e =>
                         setFormData({
                           ...formData,
                           sessionDuration: parseInt(e.target.value),
                         })
                       }
-                      className="w-full border rounded-lg px-3 py-2"
+                      className='w-full border rounded-lg px-3 py-2'
                     />
                   </div>
                 </div>
 
                 {/* SOAP Format */}
-                <div className="space-y-4">
-                  <h3 className="font-bold text-lg border-b pb-2">
-                    📋 {t('notes:subtitle')}
-                  </h3>
+                <div className='space-y-4'>
+                  <h3 className='font-bold text-lg border-b pb-2'>📋 {t('notes:subtitle')}</h3>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-blue-600 font-bold">S</span>{t('notes:soapSubjective').slice(1)}
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <span className='text-blue-600 font-bold'>S</span>
+                      {t('notes:soapSubjective').slice(1)}
                     </label>
                     <textarea
                       value={formData.subjective}
-                      onChange={(e) =>
-                        setFormData({ ...formData, subjective: e.target.value })
-                      }
+                      onChange={e => setFormData({ ...formData, subjective: e.target.value })}
                       rows={4}
                       placeholder={t('notes:soapSubjectivePlaceholder')}
-                      className="w-full border rounded-lg px-3 py-2"
+                      className='w-full border rounded-lg px-3 py-2'
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-green-600 font-bold">O</span>{t('notes:soapObjective').slice(1)}
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <span className='text-green-600 font-bold'>O</span>
+                      {t('notes:soapObjective').slice(1)}
                     </label>
                     <textarea
                       value={formData.objective}
-                      onChange={(e) =>
-                        setFormData({ ...formData, objective: e.target.value })
-                      }
+                      onChange={e => setFormData({ ...formData, objective: e.target.value })}
                       rows={4}
                       placeholder={t('notes:soapObjectivePlaceholder')}
-                      className="w-full border rounded-lg px-3 py-2"
+                      className='w-full border rounded-lg px-3 py-2'
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-purple-600 font-bold">A</span>
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <span className='text-purple-600 font-bold'>A</span>
                       {t('notes:soapAssessment').slice(1)}
                     </label>
                     <textarea
                       value={formData.assessment}
-                      onChange={(e) =>
-                        setFormData({ ...formData, assessment: e.target.value })
-                      }
+                      onChange={e => setFormData({ ...formData, assessment: e.target.value })}
                       rows={4}
                       placeholder={t('notes:soapAssessmentPlaceholder')}
-                      className="w-full border rounded-lg px-3 py-2"
+                      className='w-full border rounded-lg px-3 py-2'
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-orange-600 font-bold">P</span>{t('notes:soapPlan').slice(1)}
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <span className='text-orange-600 font-bold'>P</span>
+                      {t('notes:soapPlan').slice(1)}
                     </label>
                     <textarea
                       value={formData.plan}
-                      onChange={(e) =>
-                        setFormData({ ...formData, plan: e.target.value })
-                      }
+                      onChange={e => setFormData({ ...formData, plan: e.target.value })}
                       rows={4}
                       placeholder={t('notes:soapPlanPlaceholder')}
-                      className="w-full border rounded-lg px-3 py-2"
+                      className='w-full border rounded-lg px-3 py-2'
                     />
                   </div>
                 </div>
 
                 {/* Interventions */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
                     {t('notes:interventions')}
                   </label>
-                  <div className="flex flex-wrap gap-2">
-                    {COMMON_INTERVENTION_KEYS.map((key) => (
+                  <div className='flex flex-wrap gap-2'>
+                    {COMMON_INTERVENTION_KEYS.map(key => (
                       <button
                         key={key}
-                        type="button"
+                        type='button'
                         onClick={() => toggleIntervention(t(key))}
                         className={`px-3 py-1 rounded-full text-sm transition ${
                           formData.interventions.includes(t(key))
@@ -505,62 +494,60 @@ export default function TherapyNotes() {
 
                 {/* Homework */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
                     {t('notes:homework')}
                   </label>
                   <textarea
                     value={formData.homework}
-                    onChange={(e) =>
-                      setFormData({ ...formData, homework: e.target.value })
-                    }
+                    onChange={e => setFormData({ ...formData, homework: e.target.value })}
                     rows={2}
                     placeholder={t('notes:homework')}
-                    className="w-full border rounded-lg px-3 py-2"
+                    className='w-full border rounded-lg px-3 py-2'
                   />
                 </div>
 
                 {/* Risk Assessment */}
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h4 className="font-bold text-red-700 mb-3 flex items-center gap-2">
+                <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+                  <h4 className='font-bold text-red-700 mb-3 flex items-center gap-2'>
                     <AlertTriangle size={20} />
                     {t('notes:riskAssessment')}
                   </h4>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
                         {t('notes:riskAssessment')}
                       </label>
                       <select
                         value={formData.riskAssessment}
-                        onChange={(e) =>
+                        onChange={e =>
                           setFormData({
                             ...formData,
                             riskAssessment: e.target.value as any,
                           })
                         }
-                        className="w-full border rounded-lg px-3 py-2"
+                        className='w-full border rounded-lg px-3 py-2'
                       >
-                        <option value="none">{t('notes:riskNone')}</option>
-                        <option value="low">{t('notes:riskLow')}</option>
-                        <option value="moderate">{t('notes:riskModerate')}</option>
-                        <option value="high">{t('notes:riskHigh')}</option>
-                        <option value="acute">{t('notes:riskAcute')}</option>
+                        <option value='none'>{t('notes:riskNone')}</option>
+                        <option value='low'>{t('notes:riskLow')}</option>
+                        <option value='moderate'>{t('notes:riskModerate')}</option>
+                        <option value='high'>{t('notes:riskHigh')}</option>
+                        <option value='acute'>{t('notes:riskAcute')}</option>
                       </select>
                     </div>
-                    <div className="flex items-center">
-                      <label className="flex items-center gap-2 cursor-pointer">
+                    <div className='flex items-center'>
+                      <label className='flex items-center gap-2 cursor-pointer'>
                         <input
-                          type="checkbox"
+                          type='checkbox'
                           checked={formData.suicidalIdeation}
-                          onChange={(e) =>
+                          onChange={e =>
                             setFormData({
                               ...formData,
                               suicidalIdeation: e.target.checked,
                             })
                           }
-                          className="rounded"
+                          className='rounded'
                         />
-                        <span className="text-sm font-medium text-red-700">
+                        <span className='text-sm font-medium text-red-700'>
                           {t('notes:suicidalIdeation')}
                         </span>
                       </label>
@@ -570,23 +557,23 @@ export default function TherapyNotes() {
 
                 {/* Progress */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
                     {t('notes:progressRating')}: {formData.progressRating}/5
                   </label>
                   <input
-                    type="range"
-                    min="1"
-                    max="5"
+                    type='range'
+                    min='1'
+                    max='5'
                     value={formData.progressRating}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({
                         ...formData,
                         progressRating: parseInt(e.target.value),
                       })
                     }
-                    className="w-full"
+                    className='w-full'
                   />
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className='flex justify-between text-xs text-gray-500'>
                     <span>1</span>
                     <span>3</span>
                     <span>5</span>
@@ -594,40 +581,38 @@ export default function TherapyNotes() {
                 </div>
 
                 {/* Follow Up */}
-                <div className="flex items-center">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                <div className='flex items-center'>
+                  <label className='flex items-center gap-2 cursor-pointer'>
                     <input
-                      type="checkbox"
+                      type='checkbox'
                       checked={formData.followUpRequired}
-                      onChange={(e) =>
+                      onChange={e =>
                         setFormData({
                           ...formData,
                           followUpRequired: e.target.checked,
                         })
                       }
-                      className="rounded"
+                      className='rounded'
                     />
-                    <span className="text-sm font-medium">
-                      {t('notes:followUpRequired')}
-                    </span>
+                    <span className='text-sm font-medium'>{t('notes:followUpRequired')}</span>
                   </label>
                 </div>
 
                 {/* Submit */}
-                <div className="flex gap-4 pt-4">
+                <div className='flex gap-4 pt-4'>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => {
                       setShowForm(false);
                       resetForm();
                     }}
-                    className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+                    className='flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50'
                   >
                     {t('common:cancel')}
                   </button>
                   <button
-                    type="submit"
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    type='submit'
+                    className='flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'
                   >
                     <Save size={20} />
                     {t('common:save')}
@@ -640,67 +625,58 @@ export default function TherapyNotes() {
 
         {/* Notes List */}
         {!selectedPatient ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <User size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              {t('notes:selectPatient')}
-            </h3>
-            <p className="text-gray-500">
-              {t('notes:selectPatient')}
-            </p>
+          <div className='bg-white rounded-lg shadow p-8 text-center'>
+            <User size={48} className='mx-auto text-gray-400 mb-4' />
+            <h3 className='text-lg font-semibold text-gray-700 mb-2'>{t('notes:selectPatient')}</h3>
+            <p className='text-gray-500'>{t('notes:selectPatient')}</p>
           </div>
         ) : loading ? (
-          <div className="flex justify-center py-12">
-            <div className="spinner" />
+          <div className='flex justify-center py-12'>
+            <div className='spinner' />
           </div>
         ) : notes.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <FileText size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              {t('notes:noNotes')}
-            </h3>
-            <p className="text-gray-500 mb-4">
-              {t('notes:noNotes')}
-            </p>
+          <div className='bg-white rounded-lg shadow p-8 text-center'>
+            <FileText size={48} className='mx-auto text-gray-400 mb-4' />
+            <h3 className='text-lg font-semibold text-gray-700 mb-2'>{t('notes:noNotes')}</h3>
+            <p className='text-gray-500 mb-4'>{t('notes:noNotes')}</p>
             <button
               onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'
             >
               {t('notes:newNote')}
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
-            {notes.map((note) => (
-              <div
-                key={note.id}
-                className="bg-white rounded-lg shadow overflow-hidden"
-              >
+          <div className='space-y-4'>
+            {notes.map(note => (
+              <div key={note.id} className='bg-white rounded-lg shadow overflow-hidden'>
                 {/* Note Header */}
                 <div
-                  className="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50"
-                  onClick={() =>
-                    setExpandedNote(expandedNote === note.id ? null : note.id)
-                  }
+                  className='p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50'
+                  onClick={() => setExpandedNote(expandedNote === note.id ? null : note.id)}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">
-                        {(note.session_date || note.sessionDate)
-                          ? format(parseISO(note.session_date || note.sessionDate!), 'dd', { locale: getDateLocale() })
+                  <div className='flex items-center gap-4'>
+                    <div className='text-center'>
+                      <p className='text-2xl font-bold text-blue-600'>
+                        {note.session_date || note.sessionDate
+                          ? format(parseISO(note.session_date || note.sessionDate!), 'dd', {
+                              locale: getDateLocale(),
+                            })
                           : '–'}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        {(note.session_date || note.sessionDate)
-                          ? format(parseISO(note.session_date || note.sessionDate!), 'MMM yy', { locale: getDateLocale() })
+                      <p className='text-xs text-gray-500'>
+                        {note.session_date || note.sessionDate
+                          ? format(parseISO(note.session_date || note.sessionDate!), 'MMM yy', {
+                              locale: getDateLocale(),
+                            })
                           : '–'}
                       </p>
                     </div>
                     <div>
-                      <p className="font-semibold">
+                      <p className='font-semibold'>
                         {note.first_name} {note.last_name}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className='text-sm text-gray-600'>
                         {note.session_duration} {t('common:min')} | {t('notes:progressRating')}:{' '}
                         {note.progress_rating || '-'}/5
                       </p>
@@ -713,68 +689,64 @@ export default function TherapyNotes() {
                       {t(RISK_LABEL_KEYS[note.risk_assessment] || 'notes:riskNone')}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className='flex items-center gap-2'>
                     <button
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleEdit(note);
                       }}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                      className='p-2 text-blue-600 hover:bg-blue-50 rounded'
                     >
                       <Edit2 size={16} />
                     </button>
                     <button
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleDelete(note.id);
                       }}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded"
+                      className='p-2 text-red-600 hover:bg-red-50 rounded'
                     >
                       <Trash2 size={16} />
                     </button>
-                    {expandedNote === note.id ? (
-                      <ChevronUp size={20} />
-                    ) : (
-                      <ChevronDown size={20} />
-                    )}
+                    {expandedNote === note.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </div>
                 </div>
 
                 {/* Expanded Content */}
                 {expandedNote === note.id && (
-                  <div className="border-t p-4 space-y-4">
+                  <div className='border-t p-4 space-y-4'>
                     {/* SOAP Sections */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       {note.subjective && (
-                        <div className="bg-blue-50 rounded p-3">
-                          <h4 className="font-bold text-blue-700 text-sm mb-1">
+                        <div className='bg-blue-50 rounded p-3'>
+                          <h4 className='font-bold text-blue-700 text-sm mb-1'>
                             {t('notes:soapSubjective')}
                           </h4>
-                          <p className="text-sm">{note.subjective}</p>
+                          <p className='text-sm'>{note.subjective}</p>
                         </div>
                       )}
                       {note.objective && (
-                        <div className="bg-green-50 rounded p-3">
-                          <h4 className="font-bold text-green-700 text-sm mb-1">
+                        <div className='bg-green-50 rounded p-3'>
+                          <h4 className='font-bold text-green-700 text-sm mb-1'>
                             {t('notes:soapObjective')}
                           </h4>
-                          <p className="text-sm">{note.objective}</p>
+                          <p className='text-sm'>{note.objective}</p>
                         </div>
                       )}
                       {note.assessment && (
-                        <div className="bg-purple-50 rounded p-3">
-                          <h4 className="font-bold text-purple-700 text-sm mb-1">
+                        <div className='bg-purple-50 rounded p-3'>
+                          <h4 className='font-bold text-purple-700 text-sm mb-1'>
                             {t('notes:soapAssessment')}
                           </h4>
-                          <p className="text-sm">{note.assessment}</p>
+                          <p className='text-sm'>{note.assessment}</p>
                         </div>
                       )}
                       {note.plan && (
-                        <div className="bg-orange-50 rounded p-3">
-                          <h4 className="font-bold text-orange-700 text-sm mb-1">
+                        <div className='bg-orange-50 rounded p-3'>
+                          <h4 className='font-bold text-orange-700 text-sm mb-1'>
                             {t('notes:soapPlan')}
                           </h4>
-                          <p className="text-sm">{note.plan}</p>
+                          <p className='text-sm'>{note.plan}</p>
                         </div>
                       )}
                     </div>
@@ -782,14 +754,14 @@ export default function TherapyNotes() {
                     {/* Interventions */}
                     {note.interventions?.length > 0 && (
                       <div>
-                        <h4 className="font-medium text-sm text-gray-700 mb-1">
+                        <h4 className='font-medium text-sm text-gray-700 mb-1'>
                           {t('notes:interventions')}:
                         </h4>
-                        <div className="flex flex-wrap gap-1">
+                        <div className='flex flex-wrap gap-1'>
                           {note.interventions.map((int, i) => (
                             <span
                               key={i}
-                              className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full"
+                              className='px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full'
                             >
                               {int}
                             </span>
@@ -800,11 +772,11 @@ export default function TherapyNotes() {
 
                     {/* Homework */}
                     {note.homework && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
-                        <h4 className="font-bold text-yellow-700 text-sm mb-1">
+                      <div className='bg-yellow-50 border border-yellow-200 rounded p-3'>
+                        <h4 className='font-bold text-yellow-700 text-sm mb-1'>
                           📝 {t('notes:homework')}
                         </h4>
-                        <p className="text-sm">{note.homework}</p>
+                        <p className='text-sm'>{note.homework}</p>
                       </div>
                     )}
                   </div>

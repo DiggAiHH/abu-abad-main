@@ -39,12 +39,14 @@ class ErrorBoundary extends Component<Props, State> {
     // HISTORY-AWARE: Use existing logging infrastructure
     // DSGVO-SAFE: No external error tracking, local-only
     if (import.meta.env.DEV && typeof window !== 'undefined') {
-      const win = window as Window & { logError?: (err: unknown, ctx: string, info?: unknown) => void };
+      const win = window as Window & {
+        logError?: (err: unknown, ctx: string, info?: unknown) => void;
+      };
       win.logError?.(error, 'ErrorBoundary', errorInfo);
     } else if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
-    
+
     this.setState({
       error,
       errorInfo,
@@ -92,7 +94,7 @@ class ErrorBoundary extends Component<Props, State> {
       userFeedback: '',
       copied: false,
     });
-    
+
     // Seite neu laden
     window.location.href = '/';
   };
@@ -141,52 +143,51 @@ class ErrorBoundary extends Component<Props, State> {
 
       // Standard Fallback UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-            <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
+        <div className='min-h-screen flex items-center justify-center bg-gray-50 px-4'>
+          <div className='max-w-md w-full bg-white rounded-lg shadow-xl p-8'>
+            <div className='flex items-center justify-center mb-6'>
+              <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center'>
+                <AlertTriangle className='w-8 h-8 text-red-600' />
               </div>
             </div>
-            
-            <h1 className="text-2xl font-bold text-gray-900 text-center mb-4">
+
+            <h1 className='text-2xl font-bold text-gray-900 text-center mb-4'>
               {i18n.t('errors:errorOccurred')}
             </h1>
-            
-            <p className="text-gray-600 text-center mb-6">
-              {i18n.t('errors:sorryTryAgain')}
-            </p>
+
+            <p className='text-gray-600 text-center mb-6'>{i18n.t('errors:sorryTryAgain')}</p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mb-6 p-4 bg-gray-100 rounded-lg">
-                <summary className="cursor-pointer font-medium text-sm text-gray-700 mb-2">
+              <details className='mb-6 p-4 bg-gray-100 rounded-lg'>
+                <summary className='cursor-pointer font-medium text-sm text-gray-700 mb-2'>
                   {i18n.t('errors:errorDetailsDevOnly')}
                 </summary>
-                <div className="text-xs text-gray-600 overflow-auto">
-                  <p className="font-bold mb-2">{this.state.error.toString()}</p>
-                  <pre className="whitespace-pre-wrap">
-                    {this.state.errorInfo?.componentStack}
-                  </pre>
+                <div className='text-xs text-gray-600 overflow-auto'>
+                  <p className='font-bold mb-2'>{this.state.error.toString()}</p>
+                  <pre className='whitespace-pre-wrap'>{this.state.errorInfo?.componentStack}</pre>
                 </div>
               </details>
             )}
 
             {/* PHASE 3: User Feedback for Error Report */}
-            <div className="mb-6">
-              <label htmlFor="user-feedback" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className='mb-6'>
+              <label
+                htmlFor='user-feedback'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
                 {i18n.t('errors:whatHappened')}
               </label>
               <textarea
-                id="user-feedback"
+                id='user-feedback'
                 rows={3}
                 value={this.state.userFeedback}
-                onChange={(e) => this.setState({ userFeedback: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={e => this.setState({ userFeedback: e.target.value })}
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                 placeholder={i18n.t('errors:whatHappenedPlaceholder')}
               />
             </div>
 
-            <div className="space-y-3">
+            <div className='space-y-3'>
               {/* PHASE 3: Copy Error Report Button */}
               <button
                 onClick={this.handleCopyErrorReport}
@@ -196,25 +197,27 @@ class ErrorBoundary extends Component<Props, State> {
                     : 'bg-orange-600 text-white hover:bg-orange-700'
                 }`}
               >
-                {this.state.copied ? i18n.t('errors:errorReportCopied') : i18n.t('errors:copyErrorReport')}
+                {this.state.copied
+                  ? i18n.t('errors:errorReportCopied')
+                  : i18n.t('errors:copyErrorReport')}
               </button>
-              
+
               <button
                 onClick={this.handleReset}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-medium"
+                className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-medium'
               >
                 {i18n.t('errors:goToHome')}
               </button>
-              
+
               <button
                 onClick={() => window.location.reload()}
-                className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition font-medium"
+                className='w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition font-medium'
               >
                 {i18n.t('errors:reloadPage')}
               </button>
             </div>
 
-            <p className="mt-6 text-xs text-gray-500 text-center">
+            <p className='mt-6 text-xs text-gray-500 text-center'>
               {i18n.t('errors:persistentErrorNotice')}
             </p>
           </div>

@@ -1,15 +1,15 @@
 import {
-    ArrowLeft,
-    Bell,
-    Calendar,
-    Check,
-    Clock,
-    Mail,
-    MessageSquare,
-    Settings,
-    Smartphone,
-    Trash2,
-    X,
+  ArrowLeft,
+  Bell,
+  Calendar,
+  Check,
+  Clock,
+  Mail,
+  MessageSquare,
+  Settings,
+  Smartphone,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -129,7 +129,7 @@ export default function ReminderSettings() {
     if (current.includes(minutes)) {
       setPreferences({
         ...preferences,
-        reminderTimes: current.filter((t) => t !== minutes),
+        reminderTimes: current.filter(t => t !== minutes),
       });
     } else {
       setPreferences({
@@ -141,30 +141,30 @@ export default function ReminderSettings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner" />
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='spinner' />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className='min-h-screen bg-gray-50'>
       {/* Header */}
-      <header className="bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
+      <header className='bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'>
+        <div className='max-w-4xl mx-auto px-4 py-4'>
+          <div className='flex items-center gap-4'>
             <button
               onClick={() => navigate('/dashboard')}
-              className="p-2 hover:bg-white/20 rounded-lg"
+              className='p-2 hover:bg-white/20 rounded-lg'
             >
-              <ArrowLeft size={24} className="rtl:flip" />
+              <ArrowLeft size={24} className='rtl:flip' />
             </button>
             <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
+              <h1 className='text-2xl font-bold flex items-center gap-2'>
                 <Bell size={28} />
                 {t('settings:reminderTitle')}
               </h1>
-              <p className="text-amber-100">
+              <p className='text-amber-100'>
                 {upcomingReminders.length} {t('settings:plannedReminders')}
               </p>
             </div>
@@ -173,8 +173,8 @@ export default function ReminderSettings() {
       </header>
 
       {/* Tabs */}
-      <div className="max-w-4xl mx-auto px-4 pt-4">
-        <div className="flex bg-white rounded-lg shadow overflow-hidden">
+      <div className='max-w-4xl mx-auto px-4 pt-4'>
+        <div className='flex bg-white rounded-lg shadow overflow-hidden'>
           <button
             onClick={() => setActiveTab('settings')}
             className={`flex-1 py-3 text-sm font-medium ${
@@ -183,7 +183,7 @@ export default function ReminderSettings() {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            <Settings size={16} className="inline mr-1" />
+            <Settings size={16} className='inline mr-1' />
             {t('settings:settingsTab')}
           </button>
           <button
@@ -194,102 +194,90 @@ export default function ReminderSettings() {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            <Clock size={16} className="inline mr-1" />
+            <Clock size={16} className='inline mr-1' />
             {t('settings:plannedTab')} ({upcomingReminders.length})
           </button>
           <button
             onClick={() => setActiveTab('history')}
             className={`flex-1 py-3 text-sm font-medium ${
-              activeTab === 'history'
-                ? 'bg-amber-500 text-white'
-                : 'text-gray-600 hover:bg-gray-50'
+              activeTab === 'history' ? 'bg-amber-500 text-white' : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            <Calendar size={16} className="inline mr-1" />
+            <Calendar size={16} className='inline mr-1' />
             {t('settings:historyTab')}
           </button>
         </div>
       </div>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
+      <main className='max-w-4xl mx-auto px-4 py-6'>
         {/* SETTINGS TAB */}
         {activeTab === 'settings' && (
-          <div className="space-y-6">
+          <div className='space-y-6'>
             {/* Notification Types */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">{t('settings:notificationTypes')}</h2>
-              <div className="space-y-4">
-                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                  <div className="flex items-center gap-3">
-                    <Mail className="text-blue-500" />
+            <div className='bg-white rounded-lg shadow p-6'>
+              <h2 className='text-lg font-bold mb-4'>{t('settings:notificationTypes')}</h2>
+              <div className='space-y-4'>
+                <label className='flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100'>
+                  <div className='flex items-center gap-3'>
+                    <Mail className='text-blue-500' />
                     <div>
-                      <p className="font-medium">{t('settings:emailType')}</p>
-                      <p className="text-sm text-gray-500">
-                        {t('settings:emailDescription')}
-                      </p>
+                      <p className='font-medium'>{t('settings:emailType')}</p>
+                      <p className='text-sm text-gray-500'>{t('settings:emailDescription')}</p>
                     </div>
                   </div>
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={preferences.emailEnabled}
-                    onChange={(e) =>
+                    onChange={e =>
                       setPreferences({ ...preferences, emailEnabled: e.target.checked })
                     }
-                    className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                    className='w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500'
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="text-green-500" />
+                <label className='flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100'>
+                  <div className='flex items-center gap-3'>
+                    <Smartphone className='text-green-500' />
                     <div>
-                      <p className="font-medium">{t('settings:pushType')}</p>
-                      <p className="text-sm text-gray-500">
-                        {t('settings:pushDescription')}
-                      </p>
+                      <p className='font-medium'>{t('settings:pushType')}</p>
+                      <p className='text-sm text-gray-500'>{t('settings:pushDescription')}</p>
                     </div>
                   </div>
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={preferences.pushEnabled}
-                    onChange={(e) =>
+                    onChange={e =>
                       setPreferences({ ...preferences, pushEnabled: e.target.checked })
                     }
-                    className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                    className='w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500'
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 opacity-60">
-                  <div className="flex items-center gap-3">
-                    <MessageSquare className="text-purple-500" />
+                <label className='flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 opacity-60'>
+                  <div className='flex items-center gap-3'>
+                    <MessageSquare className='text-purple-500' />
                     <div>
-                      <p className="font-medium">{t('settings:smsType')}</p>
-                      <p className="text-sm text-gray-500">
-                        {t('settings:smsDescription')}
-                      </p>
+                      <p className='font-medium'>{t('settings:smsType')}</p>
+                      <p className='text-sm text-gray-500'>{t('settings:smsDescription')}</p>
                     </div>
                   </div>
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={preferences.smsEnabled}
-                    onChange={(e) =>
-                      setPreferences({ ...preferences, smsEnabled: e.target.checked })
-                    }
+                    onChange={e => setPreferences({ ...preferences, smsEnabled: e.target.checked })}
                     disabled
-                    className="w-5 h-5 rounded border-gray-300"
+                    className='w-5 h-5 rounded border-gray-300'
                   />
                 </label>
               </div>
             </div>
 
             {/* Reminder Times */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">{t('settings:reminderTimesTitle')}</h2>
-              <p className="text-sm text-gray-500 mb-4">
-                {t('settings:reminderTimesDescription')}
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {availableTimes.map((time) => {
+            <div className='bg-white rounded-lg shadow p-6'>
+              <h2 className='text-lg font-bold mb-4'>{t('settings:reminderTimesTitle')}</h2>
+              <p className='text-sm text-gray-500 mb-4'>{t('settings:reminderTimesDescription')}</p>
+              <div className='grid grid-cols-2 md:grid-cols-3 gap-3'>
+                {availableTimes.map(time => {
                   const isSelected = preferences.reminderTimes.includes(time.minutes);
                   return (
                     <button
@@ -301,9 +289,9 @@ export default function ReminderSettings() {
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{time.label}</span>
-                        {isSelected && <Check size={18} className="text-amber-500" />}
+                      <div className='flex items-center justify-between'>
+                        <span className='font-medium'>{time.label}</span>
+                        {isSelected && <Check size={18} className='text-amber-500' />}
                       </div>
                     </button>
                   );
@@ -312,35 +300,33 @@ export default function ReminderSettings() {
             </div>
 
             {/* Daily Summary */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold mb-4">{t('settings:dailySummaryTitle')}</h2>
-              <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+            <div className='bg-white rounded-lg shadow p-6'>
+              <h2 className='text-lg font-bold mb-4'>{t('settings:dailySummaryTitle')}</h2>
+              <label className='flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100'>
                 <div>
-                  <p className="font-medium">{t('settings:dailySummaryToggle')}</p>
-                  <p className="text-sm text-gray-500">
-                    {t('settings:dailySummaryDescription')}
-                  </p>
+                  <p className='font-medium'>{t('settings:dailySummaryToggle')}</p>
+                  <p className='text-sm text-gray-500'>{t('settings:dailySummaryDescription')}</p>
                 </div>
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   checked={preferences.dailySummaryEnabled}
-                  onChange={(e) =>
+                  onChange={e =>
                     setPreferences({ ...preferences, dailySummaryEnabled: e.target.checked })
                   }
-                  className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                  className='w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500'
                 />
               </label>
 
               {preferences.dailySummaryEnabled && (
-                <div className="mt-4">
-                  <label className="block text-sm font-medium mb-1">{t('common:time')}</label>
+                <div className='mt-4'>
+                  <label className='block text-sm font-medium mb-1'>{t('common:time')}</label>
                   <input
-                    type="time"
+                    type='time'
                     value={preferences.dailySummaryTime}
-                    onChange={(e) =>
+                    onChange={e =>
                       setPreferences({ ...preferences, dailySummaryTime: e.target.value })
                     }
-                    className="border rounded px-3 py-2"
+                    className='border rounded px-3 py-2'
                   />
                 </div>
               )}
@@ -350,7 +336,7 @@ export default function ReminderSettings() {
             <button
               onClick={savePreferences}
               disabled={saving}
-              className="w-full py-4 bg-amber-500 text-white rounded-lg font-bold hover:bg-amber-600 disabled:opacity-50"
+              className='w-full py-4 bg-amber-500 text-white rounded-lg font-bold hover:bg-amber-600 disabled:opacity-50'
             >
               {saving ? t('common:saving') : t('settings:saveSettings')}
             </button>
@@ -359,25 +345,23 @@ export default function ReminderSettings() {
 
         {/* UPCOMING TAB */}
         {activeTab === 'upcoming' && (
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {upcomingReminders.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-8 text-center">
-                <Bell size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">{t('settings:noPlannedReminders')}</p>
-                <p className="text-sm text-gray-400 mt-2">
-                  {t('settings:remindersAutoCreated')}
-                </p>
+              <div className='bg-white rounded-lg shadow p-8 text-center'>
+                <Bell size={48} className='mx-auto text-gray-300 mb-4' />
+                <p className='text-gray-500'>{t('settings:noPlannedReminders')}</p>
+                <p className='text-sm text-gray-400 mt-2'>{t('settings:remindersAutoCreated')}</p>
               </div>
             ) : (
-              upcomingReminders.map((reminder) => (
-                <div key={reminder.id} className="bg-white rounded-lg shadow p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
+              upcomingReminders.map(reminder => (
+                <div key={reminder.id} className='bg-white rounded-lg shadow p-4'>
+                  <div className='flex items-start justify-between'>
+                    <div className='flex items-start gap-3'>
+                      <div className='p-2 bg-amber-100 rounded-lg text-amber-600'>
                         {TYPE_ICONS[reminder.type]}
                       </div>
                       <div>
-                        <p className="font-medium">
+                        <p className='font-medium'>
                           {t('settings:appointmentOn')}{' '}
                           {new Date(reminder.appointmentTime).toLocaleDateString('de-DE', {
                             weekday: 'short',
@@ -388,11 +372,9 @@ export default function ReminderSettings() {
                           })}
                         </p>
                         {reminder.otherPartyName && (
-                          <p className="text-sm text-gray-600">
-                            – {reminder.otherPartyName}
-                          </p>
+                          <p className='text-sm text-gray-600'>– {reminder.otherPartyName}</p>
                         )}
-                        <p className="text-sm text-gray-500">
+                        <p className='text-sm text-gray-500'>
                           {TYPE_LABELS[reminder.type]} –{' '}
                           {new Date(reminder.scheduledFor).toLocaleString('de-DE', {
                             day: '2-digit',
@@ -405,7 +387,7 @@ export default function ReminderSettings() {
                     </div>
                     <button
                       onClick={() => cancelReminder(reminder.id)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                      className='p-2 text-red-500 hover:bg-red-50 rounded-lg'
                       title={t('common:cancel')}
                     >
                       <Trash2 size={18} />
@@ -419,21 +401,21 @@ export default function ReminderSettings() {
 
         {/* HISTORY TAB */}
         {activeTab === 'history' && (
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {reminderHistory.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-8 text-center">
-                <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">{t('settings:noRemindersSent')}</p>
+              <div className='bg-white rounded-lg shadow p-8 text-center'>
+                <Calendar size={48} className='mx-auto text-gray-300 mb-4' />
+                <p className='text-gray-500'>{t('settings:noRemindersSent')}</p>
               </div>
             ) : (
-              reminderHistory.map((reminder) => (
+              reminderHistory.map(reminder => (
                 <div
                   key={reminder.id}
                   className={`bg-white rounded-lg shadow p-4 border-l-4 ${
                     reminder.status === 'sent' ? 'border-green-500' : 'border-red-500'
                   }`}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className='flex items-start gap-3'>
                     <div
                       className={`p-2 rounded-lg ${
                         reminder.status === 'sent'
@@ -444,10 +426,11 @@ export default function ReminderSettings() {
                       {reminder.status === 'sent' ? <Check size={16} /> : <X size={16} />}
                     </div>
                     <div>
-                      <p className="font-medium">
-                        {TYPE_LABELS[reminder.type]} {reminder.status === 'sent' ? t('settings:sent') : t('settings:failed')}
+                      <p className='font-medium'>
+                        {TYPE_LABELS[reminder.type]}{' '}
+                        {reminder.status === 'sent' ? t('settings:sent') : t('settings:failed')}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className='text-sm text-gray-500'>
                         {t('settings:appointmentOn')}{' '}
                         {new Date(reminder.appointmentTime).toLocaleDateString('de-DE', {
                           day: '2-digit',
@@ -457,7 +440,7 @@ export default function ReminderSettings() {
                         })}
                       </p>
                       {reminder.sentAt && (
-                        <p className="text-xs text-gray-400">
+                        <p className='text-xs text-gray-400'>
                           {t('settings:sentAt')} {new Date(reminder.sentAt).toLocaleString('de-DE')}
                         </p>
                       )}

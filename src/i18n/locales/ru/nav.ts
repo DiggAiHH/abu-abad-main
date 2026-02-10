@@ -33,7 +33,8 @@ const nav = {
   createQuestionnaire: 'Создать опросник',
   createQuestionnaireSubtitle: 'Анамнез, проверка симптомов или индивидуальные опросники',
   requestDocuments: 'Запросить документы',
-  requestDocumentsSubtitle: 'Запрос результатов обследований, заключений или других документов у пациентов',
+  requestDocumentsSubtitle:
+    'Запрос результатов обследований, заключений или других документов у пациентов',
   patientMaterials: 'Материалы пациентов',
   patientMaterialsSubtitle: 'Просмотр заметок и подготовительных материалов пациентов',
   billing: 'Счета',

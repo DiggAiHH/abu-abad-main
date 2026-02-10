@@ -13,7 +13,7 @@ import { logger } from '../utils/logger';
 export default function TherapistDashboard() {
   const { t } = useTranslation(['dashboard', 'nav', 'common', 'appointments', 'auth']);
   const { user, logout } = useAuthStore();
-  const isDemo = useAuthStore((state) => state.isDemo);
+  const isDemo = useAuthStore(state => state.isDemo);
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -39,35 +39,78 @@ export default function TherapistDashboard() {
       const today16 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 16, 0);
       const today17 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 0);
       setAppointments([
-        { id: 'demo-1', therapistId: user.id, patientId: 'p1', startTime: today10.toISOString(), endTime: today11.toISOString(), status: 'booked', price: 120, paymentStatus: 'completed', meetingRoomId: 'room-1', patient: { firstName: 'Max', lastName: 'Mustermann' } },
-        { id: 'demo-2', therapistId: user.id, startTime: today14.toISOString(), endTime: today15.toISOString(), status: 'available', price: 120, paymentStatus: 'pending' },
-        { id: 'demo-3', therapistId: user.id, patientId: 'p2', startTime: today16.toISOString(), endTime: today17.toISOString(), status: 'booked', price: 150, paymentStatus: 'pending', meetingRoomId: 'room-2', patient: { firstName: 'Anna', lastName: 'Schmidt' } },
+        {
+          id: 'demo-1',
+          therapistId: user.id,
+          patientId: 'p1',
+          startTime: today10.toISOString(),
+          endTime: today11.toISOString(),
+          status: 'booked',
+          price: 120,
+          paymentStatus: 'completed',
+          meetingRoomId: 'room-1',
+          patient: { firstName: 'Max', lastName: 'Mustermann' },
+        },
+        {
+          id: 'demo-2',
+          therapistId: user.id,
+          startTime: today14.toISOString(),
+          endTime: today15.toISOString(),
+          status: 'available',
+          price: 120,
+          paymentStatus: 'pending',
+        },
+        {
+          id: 'demo-3',
+          therapistId: user.id,
+          patientId: 'p2',
+          startTime: today16.toISOString(),
+          endTime: today17.toISOString(),
+          status: 'booked',
+          price: 150,
+          paymentStatus: 'pending',
+          meetingRoomId: 'room-2',
+          patient: { firstName: 'Anna', lastName: 'Schmidt' },
+        },
       ]);
       setMessages([
-        { id: 'msg-1', senderId: 'p1', receiverId: user.id, content: 'Guten Tag, ich möchte meinen nächsten Termin besprechen.', read: false, createdAt: new Date(Date.now() - 3600000).toISOString(), sender: { firstName: 'Max', lastName: 'Mustermann' } },
-        { id: 'msg-2', senderId: 'p2', receiverId: user.id, content: 'Vielen Dank für die letzte Sitzung!', read: true, createdAt: new Date(Date.now() - 86400000).toISOString(), sender: { firstName: 'Anna', lastName: 'Schmidt' } },
+        {
+          id: 'msg-1',
+          senderId: 'p1',
+          receiverId: user.id,
+          content: 'Guten Tag, ich möchte meinen nächsten Termin besprechen.',
+          read: false,
+          createdAt: new Date(Date.now() - 3600000).toISOString(),
+          sender: { firstName: 'Max', lastName: 'Mustermann' },
+        },
+        {
+          id: 'msg-2',
+          senderId: 'p2',
+          receiverId: user.id,
+          content: 'Vielen Dank für die letzte Sitzung!',
+          read: true,
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          sender: { firstName: 'Anna', lastName: 'Schmidt' },
+        },
       ]);
       setLoading(false);
       return;
     }
-    
+
     loadData();
   }, [user?.id, isDemo]);
 
   const loadData = async () => {
     setLoading(true);
-    
+
     try {
       // Guard clause: User muss existieren
       if (!user?.id) {
         throw new Error(t('common:userNotAuthenticated'));
       }
-      
-      const [apptRes, msgRes] = await Promise.all([
-        appointmentAPI.getAll(),
-        messageAPI.getAll(),
-      ]);
-      
+
+      const [apptRes, msgRes] = await Promise.all([appointmentAPI.getAll(), messageAPI.getAll()]);
+
       // Defensive checks - sicherstellen dass Arrays zurückkommen
       const allAppointments = Array.isArray(apptRes.data)
         ? apptRes.data
@@ -75,12 +118,12 @@ export default function TherapistDashboard() {
           ? (apptRes.data as any).appointments
           : [];
       const msgs = Array.isArray(msgRes.data) ? msgRes.data : [];
-      
+
       setAppointments(allAppointments);
       setMessages(msgs);
     } catch (error: any) {
       logger.error('TherapistDashboard: Fehler beim Laden', error);
-      
+
       if (error.response?.status === 401) {
         toast.error(t('common:sessionExpired'));
         void logout();
@@ -107,30 +150,30 @@ export default function TherapistDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner"></div>
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='spinner'></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className='min-h-screen bg-gray-50'>
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
+      <header className='bg-white shadow-sm'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
+          <div className='flex justify-between items-center'>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className='text-2xl font-bold text-gray-900'>
                 {t('dashboard:therapistDashboard')}
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className='text-sm text-gray-600'>
                 {t('dashboard:welcomeDoctor', { name: `${user?.firstName} ${user?.lastName}` })}
               </p>
             </div>
             <button
               onClick={handleLogout}
               aria-label={t('auth:logout')}
-              className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+              className='flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition'
             >
               <LogOut size={20} />
               {t('auth:logout')}
@@ -140,142 +183,162 @@ export default function TherapistDashboard() {
       </header>
 
       {/* Main Content */}
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id='main-content' className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center gap-4">
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <Calendar className="text-blue-600" size={24} />
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
+          <div className='bg-white rounded-lg shadow p-6'>
+            <div className='flex items-center gap-4'>
+              <div className='bg-blue-100 p-3 rounded-lg'>
+                <Calendar className='text-blue-600' size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">{t('dashboard:appointmentsToday')}</p>
-                <p className="text-2xl font-bold">
-                  {appointments.filter(a => {
-                    try {
-                      if (!a?.startTime) return false;
-                      const appointmentDate = new Date(a.startTime);
-                      const today = new Date();
-                      // Normalize to start of day in local timezone
-                      const aptDay = new Date(appointmentDate.getFullYear(), appointmentDate.getMonth(), appointmentDate.getDate());
-                      const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                      return aptDay.getTime() === todayDay.getTime();
-                    } catch {
-                      return false;
-                    }
-                  }).length}
+                <p className='text-sm text-gray-600'>{t('dashboard:appointmentsToday')}</p>
+                <p className='text-2xl font-bold'>
+                  {
+                    appointments.filter(a => {
+                      try {
+                        if (!a?.startTime) return false;
+                        const appointmentDate = new Date(a.startTime);
+                        const today = new Date();
+                        // Normalize to start of day in local timezone
+                        const aptDay = new Date(
+                          appointmentDate.getFullYear(),
+                          appointmentDate.getMonth(),
+                          appointmentDate.getDate()
+                        );
+                        const todayDay = new Date(
+                          today.getFullYear(),
+                          today.getMonth(),
+                          today.getDate()
+                        );
+                        return aptDay.getTime() === todayDay.getTime();
+                      } catch {
+                        return false;
+                      }
+                    }).length
+                  }
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center gap-4">
-              <div className="bg-green-100 p-3 rounded-lg">
-                <Video className="text-green-600" size={24} />
+          <div className='bg-white rounded-lg shadow p-6'>
+            <div className='flex items-center gap-4'>
+              <div className='bg-green-100 p-3 rounded-lg'>
+                <Video className='text-green-600' size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">{t('dashboard:openSlots')}</p>
-                <p className="text-2xl font-bold">
+                <p className='text-sm text-gray-600'>{t('dashboard:openSlots')}</p>
+                <p className='text-2xl font-bold'>
                   {appointments.filter(a => a?.status === 'available').length}
                 </p>
               </div>
             </div>
           </div>
 
-          <button type="button" onClick={() => navigate('/questionnaires')} aria-label={t('dashboard:questionnairesManage')} className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition text-left w-full border-0">
-            <div className="flex items-center gap-4">
-              <div className="bg-purple-100 p-3 rounded-lg">
-                <MessageSquare className="text-purple-600" size={24} />
+          <button
+            type='button'
+            onClick={() => navigate('/questionnaires')}
+            aria-label={t('dashboard:questionnairesManage')}
+            className='bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition text-left w-full border-0'
+          >
+            <div className='flex items-center gap-4'>
+              <div className='bg-purple-100 p-3 rounded-lg'>
+                <MessageSquare className='text-purple-600' size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">{t('nav:questionnaires')}</p>
-                <p className="text-lg font-bold">{t('dashboard:questionnairesManage')}</p>
+                <p className='text-sm text-gray-600'>{t('nav:questionnaires')}</p>
+                <p className='text-lg font-bold'>{t('dashboard:questionnairesManage')}</p>
               </div>
             </div>
           </button>
 
-          <button type="button" onClick={() => navigate('/documents')} aria-label={t('dashboard:documentsRequests')} className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition text-left w-full border-0">
-            <div className="flex items-center gap-4">
-              <div className="bg-orange-100 p-3 rounded-lg">
-                <User className="text-orange-600" size={24} />
+          <button
+            type='button'
+            onClick={() => navigate('/documents')}
+            aria-label={t('dashboard:documentsRequests')}
+            className='bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition text-left w-full border-0'
+          >
+            <div className='flex items-center gap-4'>
+              <div className='bg-orange-100 p-3 rounded-lg'>
+                <User className='text-orange-600' size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">{t('nav:documents')}</p>
-                <p className="text-lg font-bold">{t('dashboard:documentsRequests')}</p>
+                <p className='text-sm text-gray-600'>{t('nav:documents')}</p>
+                <p className='text-lg font-bold'>{t('dashboard:documentsRequests')}</p>
               </div>
             </div>
           </button>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
+        <div className='grid grid-cols-1 md:grid-cols-6 gap-6 mb-8'>
           <button
             onClick={() => navigate('/therapy-notes')}
-            className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
+            className='bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left'
           >
-            <h3 className="text-xl font-bold mb-2">📔 {t('nav:therapyNotes')}</h3>
-            <p className="text-indigo-100">{t('nav:therapyNotesSubtitle')}</p>
+            <h3 className='text-xl font-bold mb-2'>📔 {t('nav:therapyNotes')}</h3>
+            <p className='text-indigo-100'>{t('nav:therapyNotesSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/reports')}
-            className="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
+            className='bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left'
           >
-            <h3 className="text-xl font-bold mb-2">📄 {t('nav:reports')}</h3>
-            <p className="text-cyan-100">{t('nav:reportsSubtitle')}</p>
+            <h3 className='text-xl font-bold mb-2'>📄 {t('nav:reports')}</h3>
+            <p className='text-cyan-100'>{t('nav:reportsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/queue')}
-            className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
+            className='bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left'
           >
-            <h3 className="text-xl font-bold mb-2">👥 {t('nav:waitingRoom')}</h3>
-            <p className="text-teal-100">{t('nav:waitingRoomSubtitle')}</p>
+            <h3 className='text-xl font-bold mb-2'>👥 {t('nav:waitingRoom')}</h3>
+            <p className='text-teal-100'>{t('nav:waitingRoomSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/questionnaires')}
-            className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
+            className='bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left'
           >
-            <h3 className="text-xl font-bold mb-2">📋 {t('nav:createQuestionnaire')}</h3>
-            <p className="text-blue-100">{t('nav:createQuestionnaireSubtitle')}</p>
+            <h3 className='text-xl font-bold mb-2'>📋 {t('nav:createQuestionnaire')}</h3>
+            <p className='text-blue-100'>{t('nav:createQuestionnaireSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/documents')}
-            className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
+            className='bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left'
           >
-            <h3 className="text-xl font-bold mb-2">📄 {t('nav:requestDocuments')}</h3>
-            <p className="text-green-100">{t('nav:requestDocumentsSubtitle')}</p>
+            <h3 className='text-xl font-bold mb-2'>📄 {t('nav:requestDocuments')}</h3>
+            <p className='text-green-100'>{t('nav:requestDocumentsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/materials')}
-            className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
+            className='bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left'
           >
-            <h3 className="text-xl font-bold mb-2">📝 {t('nav:patientMaterials')}</h3>
-            <p className="text-purple-100">{t('nav:patientMaterialsSubtitle')}</p>
+            <h3 className='text-xl font-bold mb-2'>📝 {t('nav:patientMaterials')}</h3>
+            <p className='text-purple-100'>{t('nav:patientMaterialsSubtitle')}</p>
           </button>
 
           <button
             onClick={() => navigate('/billing')}
-            className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left"
+            className='bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition text-left'
           >
-            <h3 className="text-xl font-bold mb-2">💶 {t('nav:billing')}</h3>
-            <p className="text-emerald-100">{t('nav:billingSubtitle')}</p>
+            <h3 className='text-xl font-bold mb-2'>💶 {t('nav:billing')}</h3>
+            <p className='text-emerald-100'>{t('nav:billingSubtitle')}</p>
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="border-b border-gray-200">
-            <nav className="flex -mb-px" role="tablist" aria-label={t('common:mainNavigation')}>
+        <div className='bg-white rounded-lg shadow'>
+          <div className='border-b border-gray-200'>
+            <nav className='flex -mb-px' role='tablist' aria-label={t('common:mainNavigation')}>
               <button
                 onClick={() => setActiveTab('appointments')}
                 aria-label={t('appointments:title')}
                 aria-selected={activeTab === 'appointments'}
-                role="tab"
+                role='tab'
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === 'appointments'
                     ? 'border-blue-500 text-blue-600'
@@ -288,7 +351,7 @@ export default function TherapistDashboard() {
                 onClick={() => setActiveTab('messages')}
                 aria-label={t('dashboard:messagesTab')}
                 aria-selected={activeTab === 'messages'}
-                role="tab"
+                role='tab'
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === 'messages'
                     ? 'border-blue-500 text-blue-600'
@@ -297,7 +360,7 @@ export default function TherapistDashboard() {
               >
                 {t('dashboard:messagesTab')}
                 {messages.filter(m => !m.read).length > 0 && (
-                  <span className="ms-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  <span className='ms-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full'>
                     {messages.filter(m => !m.read).length}
                   </span>
                 )}
@@ -305,55 +368,58 @@ export default function TherapistDashboard() {
             </nav>
           </div>
 
-          <div className="p-6">
+          <div className='p-6'>
             {activeTab === 'appointments' && (
               <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">{t('dashboard:myAppointments')}</h2>
+                <div className='flex justify-between items-center mb-6'>
+                  <h2 className='text-xl font-semibold'>{t('dashboard:myAppointments')}</h2>
                   <button
                     onClick={() => setShowCreateModal(true)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700'
                   >
                     <Plus size={20} />
                     {t('appointments:createSlot')}
                   </button>
                 </div>
 
-                <div className="space-y-4">
+                <div className='space-y-4'>
                   {appointments.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">
+                    <p className='text-center text-gray-500 py-8'>
                       {t('appointments:noAppointments')}
                     </p>
                   ) : (
-                    appointments.map((apt) => (
+                    appointments.map(apt => (
                       <div
                         key={apt.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                        className='border border-gray-200 rounded-lg p-4 hover:shadow-md transition'
                       >
-                        <div className="flex justify-between items-start">
+                        <div className='flex justify-between items-start'>
                           <div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Clock size={16} className="text-gray-400" />
-                              <span className="font-medium">
-                                {format(new Date(apt.startTime), 'dd.MM.yyyy HH:mm', { locale: getDateLocale() })} - 
-                                {format(new Date(apt.endTime), 'HH:mm')}
+                            <div className='flex items-center gap-2 mb-2'>
+                              <Clock size={16} className='text-gray-400' />
+                              <span className='font-medium'>
+                                {format(new Date(apt.startTime), 'dd.MM.yyyy HH:mm', {
+                                  locale: getDateLocale(),
+                                })}{' '}
+                                -{format(new Date(apt.endTime), 'HH:mm')}
                               </span>
                             </div>
                             {apt.patient && (
-                              <p className="text-sm text-gray-600">
-                                {t('common:patient')}: {apt.patient.firstName} {apt.patient.lastName}
+                              <p className='text-sm text-gray-600'>
+                                {t('common:patient')}: {apt.patient.firstName}{' '}
+                                {apt.patient.lastName}
                               </p>
                             )}
-                            <div className="mt-2">
+                            <div className='mt-2'>
                               <span
                                 className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                                   apt.status === 'available'
                                     ? 'bg-green-100 text-green-800'
                                     : apt.status === 'booked'
-                                    ? 'bg-blue-100 text-blue-800'
-                                    : apt.status === 'completed'
-                                    ? 'bg-gray-100 text-gray-800'
-                                    : 'bg-red-100 text-red-800'
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : apt.status === 'completed'
+                                        ? 'bg-gray-100 text-gray-800'
+                                        : 'bg-red-100 text-red-800'
                                 }`}
                               >
                                 {apt.status === 'available' && t('appointments:statusAvailable')}
@@ -363,11 +429,11 @@ export default function TherapistDashboard() {
                               </span>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className='flex gap-2'>
                             {apt.status === 'booked' && apt.meetingRoomId && (
                               <button
                                 onClick={() => startVideoCall(apt.meetingRoomId!)}
-                                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+                                className='bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2'
                               >
                                 <Video size={16} />
                                 {t('appointments:startSession')}
@@ -384,32 +450,30 @@ export default function TherapistDashboard() {
 
             {activeTab === 'messages' && (
               <div>
-                <h2 className="text-xl font-semibold mb-6">{t('dashboard:messagesTab')}</h2>
-                <div className="space-y-3">
+                <h2 className='text-xl font-semibold mb-6'>{t('dashboard:messagesTab')}</h2>
+                <div className='space-y-3'>
                   {messages.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">
-                      {t('dashboard:noMessages')}
-                    </p>
+                    <p className='text-center text-gray-500 py-8'>{t('dashboard:noMessages')}</p>
                   ) : (
-                    messages.map((msg) => (
+                    messages.map(msg => (
                       <div
                         key={msg.id}
                         className={`border rounded-lg p-4 ${
                           !msg.read ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'
                         }`}
                       >
-                        <div className="flex justify-between items-start">
+                        <div className='flex justify-between items-start'>
                           <div>
-                            <p className="font-medium">
+                            <p className='font-medium'>
                               {msg.sender?.firstName} {msg.sender?.lastName}
                             </p>
-                            <p className="text-sm text-gray-600 mt-1">{msg.content}</p>
-                            <p className="text-xs text-gray-400 mt-2">
+                            <p className='text-sm text-gray-600 mt-1'>{msg.content}</p>
+                            <p className='text-xs text-gray-400 mt-2'>
                               {format(new Date(msg.createdAt), 'dd.MM.yyyy HH:mm')}
                             </p>
                           </div>
                           {!msg.read && (
-                            <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                            <span className='bg-blue-600 text-white text-xs px-2 py-1 rounded-full'>
                               {t('dashboard:newBadge')}
                             </span>
                           )}
@@ -438,7 +502,13 @@ export default function TherapistDashboard() {
   );
 }
 
-function CreateAppointmentModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+function CreateAppointmentModal({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
   const { t } = useTranslation(['appointments', 'common']);
   const [formData, setFormData] = useState({
     startTime: '',
@@ -464,57 +534,64 @@ function CreateAppointmentModal({ onClose, onSuccess }: { onClose: () => void; o
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="create-appointment-title">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <h2 id="create-appointment-title" className="text-2xl font-bold mb-4">{t('appointments:newSlot')}</h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div
+      className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='create-appointment-title'
+    >
+      <div className='bg-white rounded-lg max-w-md w-full p-6'>
+        <h2 id='create-appointment-title' className='text-2xl font-bold mb-4'>
+          {t('appointments:newSlot')}
+        </h2>
+
+        <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
-            <label className="block text-sm font-medium mb-2">{t('appointments:startTime')}</label>
+            <label className='block text-sm font-medium mb-2'>{t('appointments:startTime')}</label>
             <input
-              type="datetime-local"
+              type='datetime-local'
               value={formData.startTime}
-              onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+              onChange={e => setFormData({ ...formData, startTime: e.target.value })}
               required
-              className="w-full px-3 py-2 border rounded-lg"
+              className='w-full px-3 py-2 border rounded-lg'
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">{t('appointments:endTime')}</label>
+            <label className='block text-sm font-medium mb-2'>{t('appointments:endTime')}</label>
             <input
-              type="datetime-local"
+              type='datetime-local'
               value={formData.endTime}
-              onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+              onChange={e => setFormData({ ...formData, endTime: e.target.value })}
               required
-              className="w-full px-3 py-2 border rounded-lg"
+              className='w-full px-3 py-2 border rounded-lg'
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">{t('appointments:priceEur')}</label>
+            <label className='block text-sm font-medium mb-2'>{t('appointments:priceEur')}</label>
             <input
-              type="number"
+              type='number'
               value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+              onChange={e => setFormData({ ...formData, price: Number(e.target.value) })}
               required
               min={0}
-              className="w-full px-3 py-2 border rounded-lg"
+              className='w-full px-3 py-2 border rounded-lg'
             />
           </div>
 
-          <div className="flex gap-3 mt-6">
+          <div className='flex gap-3 mt-6'>
             <button
-              type="button"
+              type='button'
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className='flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50'
             >
               {t('common:cancel')}
             </button>
             <button
-              type="submit"
+              type='submit'
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className='flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50'
             >
               {loading ? t('common:creating') : t('common:create')}
             </button>

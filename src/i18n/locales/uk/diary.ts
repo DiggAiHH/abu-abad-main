@@ -41,7 +41,7 @@ const diary = {
   symptomSadness: 'Сум',
   symptomConcentration: 'Порушення концентрації',
   symptomAppetiteLoss: 'Втрата апетиту',
-  symptomMusclePain: 'М\'язовий біль',
+  symptomMusclePain: "М'язовий біль",
 
   // Тригери
   triggerStress: 'Стрес',

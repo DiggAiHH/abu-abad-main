@@ -1,12 +1,12 @@
 import {
-    MessageSquare,
-    Mic,
-    MicOff,
-    Monitor,
-    MonitorOff,
-    PhoneOff,
-    Video,
-    VideoOff
+  MessageSquare,
+  Mic,
+  MicOff,
+  Monitor,
+  MonitorOff,
+  PhoneOff,
+  Video,
+  VideoOff,
 } from 'lucide-react';
 import Peer, { MediaConnection } from 'peerjs';
 import { useEffect, useRef, useState } from 'react';
@@ -27,12 +27,12 @@ export default function VideoCall() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const { t } = useTranslation(['video', 'common']);
-  
+
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [peer, setPeer] = useState<Peer | null>(null);
   const [call, setCall] = useState<MediaConnection | null>(null);
-  
+
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isAudioOn, setIsAudioOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -40,7 +40,7 @@ export default function VideoCall() {
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [isAudioOnlyMode, setIsAudioOnlyMode] = useState(false);
   const [hasRemoteParticipant, setHasRemoteParticipant] = useState(false);
-  
+
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const screenShareStreamRef = useRef<MediaStream | null>(null);
@@ -86,15 +86,15 @@ export default function VideoCall() {
       navigate('/login');
       return;
     }
-    
+
     if (!roomId) {
       toast.error(t('video:noRoomId'));
       navigate('/dashboard');
       return;
     }
-    
+
     initializeCall();
-    
+
     return () => {
       cleanup();
     };
@@ -150,12 +150,12 @@ export default function VideoCall() {
 
     const evaluateDuplicate = (raw?: string | null) => {
       const store = parseStore(raw);
-      const duplicates = Object.values(store).filter((value) => value === roomId);
+      const duplicates = Object.values(store).filter(value => value === roomId);
       const hasDuplicate = duplicates.length > 1;
       if (hasDuplicate) {
         setConnectionError(t(DUPLICATE_MESSAGE));
       } else {
-        setConnectionError((prev) => (prev === t(DUPLICATE_MESSAGE) ? null : prev));
+        setConnectionError(prev => (prev === t(DUPLICATE_MESSAGE) ? null : prev));
       }
     };
 
@@ -183,8 +183,8 @@ export default function VideoCall() {
         sessionStorage.removeItem(userRoomKey);
       } else {
         sessionStorage.setItem(userRoomKey, JSON.stringify(store));
-        if (!Object.values(store).some((value) => value === roomId)) {
-          setConnectionError((prev) => (prev === t(DUPLICATE_MESSAGE) ? null : prev));
+        if (!Object.values(store).some(value => value === roomId)) {
+          setConnectionError(prev => (prev === t(DUPLICATE_MESSAGE) ? null : prev));
         }
       }
       window.removeEventListener('storage', handleStorage);
@@ -200,7 +200,11 @@ export default function VideoCall() {
       setConnectionError(prev => prev ?? t('video:connectionEndedInfo'));
     }
 
-    if (roomId.includes('patient1') && user.role === 'patient' && !user.email.includes('patient1')) {
+    if (
+      roomId.includes('patient1') &&
+      user.role === 'patient' &&
+      !user.email.includes('patient1')
+    ) {
       setConnectionError(prev => prev ?? t('video:connectionError'));
     }
   }, [roomId, user?.email, user?.role]);
@@ -231,7 +235,9 @@ export default function VideoCall() {
       }
 
       const roomEntry = parsed[roomId] || {};
-      const remoteEntries = Object.entries(roomEntry).filter(([participantId]) => participantId !== user.id);
+      const remoteEntries = Object.entries(roomEntry).filter(
+        ([participantId]) => participantId !== user.id
+      );
       const hasRemote = remoteEntries.length > 0;
       const previouslyHadRemote = remotePresenceRef.current;
       remotePresenceRef.current = hasRemote;
@@ -239,7 +245,7 @@ export default function VideoCall() {
 
       if (hasRemote) {
         setIsConnected(true);
-        setConnectionError((prev) => (prev === t('video:otherParticipantLeft') ? null : prev));
+        setConnectionError(prev => (prev === t('video:otherParticipantLeft') ? null : prev));
       } else if (previouslyHadRemote && !hasRemote) {
         setIsConnected(false);
         setRemoteStream(null);
@@ -341,11 +347,11 @@ export default function VideoCall() {
       ) {
         throw new Error(t('video:browserNoWebRTC'));
       }
-      
+
       // Helper for getUserMedia with timeout
       const getMedia = async (constraints: MediaStreamConstraints) => {
         const streamPromise = navigator.mediaDevices.getUserMedia(constraints);
-        const timeoutPromise = new Promise<never>((_, reject) => 
+        const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error(t('video:cameraTimeout'))), 10000)
         );
         return Promise.race([streamPromise, timeoutPromise]) as Promise<MediaStream>;
@@ -366,10 +372,14 @@ export default function VideoCall() {
         setIsAudioOnlyMode(false);
       } catch (err: any) {
         logger.warn('VideoCall: Video+Audio failed, trying Audio only', err);
-        
+
         // Versuch 2: Nur Audio (Fallback)
         // Wenn Kamera fehlt oder Zugriff verweigert wurde, versuche nur Audio
-        if (err.name === 'NotFoundError' || err.name === 'NotAllowedError' || err.name === 'OverconstrainedError') {
+        if (
+          err.name === 'NotFoundError' ||
+          err.name === 'NotAllowedError' ||
+          err.name === 'OverconstrainedError'
+        ) {
           try {
             stream = await getMedia({
               video: false,
@@ -392,7 +402,7 @@ export default function VideoCall() {
       }
 
       setLocalStream(stream);
-      
+
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
@@ -400,17 +410,42 @@ export default function VideoCall() {
       // Initialize PeerJS mit Error Handling
       // GDPR-COMPLIANCE: Self-hosted STUN/TURN Server (kein Google-Tracking)
       // SECURITY: Verhindert IP-Leakage an Drittanbieter (Art. 25 DSGVO)
+      const rawEnv = import.meta.env as unknown as Record<string, unknown>;
+      const peerHost =
+        (rawEnv.VITE_PEER_SERVER_HOST as string | undefined) ||
+        (rawEnv.VITE_PEER_HOST as string | undefined) ||
+        'localhost';
+
+      const peerPortRaw =
+        (rawEnv.VITE_PEER_SERVER_PORT as string | undefined) ??
+        (rawEnv.VITE_PEER_PORT as string | undefined);
+      const peerPortParsed = peerPortRaw ? Number(peerPortRaw) : NaN;
+      const peerPort = Number.isFinite(peerPortParsed)
+        ? peerPortParsed
+        : peerHost === 'localhost'
+          ? 3001
+          : window.location.protocol === 'https:'
+            ? 443
+            : 80;
+
+      const peerSecureRaw =
+        (rawEnv.VITE_PEER_SERVER_SECURE as string | undefined) ??
+        (rawEnv.VITE_PEER_SECURE as string | undefined);
+      const peerSecure = peerSecureRaw
+        ? peerSecureRaw === 'true'
+        : window.location.protocol === 'https:';
+
       const peerConfig = {
-        host: import.meta.env.VITE_PEER_SERVER_HOST || 'localhost',
-        port: Number(import.meta.env.VITE_PEER_SERVER_PORT) || 3001,
+        host: peerHost,
+        port: peerPort,
         path: '/peerjs',
-        secure: import.meta.env.VITE_PEER_SERVER_SECURE === 'true',
+        secure: peerSecure,
         config: {
           iceServers: [
             // GDPR-COMPLIANT: Self-hosted STUN server (keine IP-Übermittlung an Google)
             { urls: `stun:${import.meta.env.VITE_STUN_SERVER || 'localhost'}:3478` },
             // Optional: TURN server für NAT-Traversal (bei Bedarf aktivieren)
-            // { 
+            // {
             //   urls: `turn:${import.meta.env.VITE_TURN_SERVER || 'localhost'}:3478`,
             //   username: import.meta.env.VITE_TURN_USERNAME || '',
             //   credential: import.meta.env.VITE_TURN_CREDENTIAL || ''
@@ -418,39 +453,39 @@ export default function VideoCall() {
           ],
         },
       };
-      
+
       const newPeer = new Peer(user!.id, peerConfig);
 
-      newPeer.on('open', (id) => {
+      newPeer.on('open', id => {
         logger.debug('VideoCall: Peer connected', { id: String(id).slice(0, 8) });
         toast.success(t('video:connectionEstablished'));
         setConnectionError(null);
       });
 
-      newPeer.on('call', (incomingCall) => {
+      newPeer.on('call', incomingCall => {
         logger.debug('VideoCall: Incoming call');
-        
+
         try {
           incomingCall.answer(stream);
-          
-          incomingCall.on('stream', (remoteStream) => {
+
+          incomingCall.on('stream', remoteStream => {
             logger.debug('VideoCall: Received remote stream');
             setRemoteStream(remoteStream);
             setIsConnected(true);
-            
+
             if (remoteVideoRef.current) {
               remoteVideoRef.current.srcObject = remoteStream;
             }
-            
+
             toast.success(t('video:connectionEstablished'));
           });
-          
-          incomingCall.on('error', (err) => {
+
+          incomingCall.on('error', err => {
             logger.error('VideoCall: Call error', err);
             toast.error(t('video:connectionErrorDuringCall'));
             setConnectionError(t('video:connectionLost'));
           });
-          
+
           incomingCall.on('close', () => {
             logger.debug('VideoCall: Call closed by remote peer');
             toast(t('video:callEnded'), { icon: 'ℹ️' });
@@ -466,11 +501,11 @@ export default function VideoCall() {
         }
       });
 
-      newPeer.on('error', (error) => {
+      newPeer.on('error', error => {
         logger.error('VideoCall: Peer error', error);
-        
+
         let errorMessage = t('video:connectionError');
-        
+
         if (error.type === 'peer-unavailable') {
           errorMessage = t('video:peerUnavailable');
         } else if (error.type === 'network') {
@@ -478,15 +513,15 @@ export default function VideoCall() {
         } else if (error.type === 'server-error') {
           errorMessage = t('video:serverError');
         }
-        
+
         toast.error(errorMessage);
         setConnectionError(errorMessage);
       });
-      
+
       newPeer.on('disconnected', () => {
         logger.warn('VideoCall: Peer disconnected, attempting to reconnect');
         toast(t('video:connectionInterrupted'), { icon: '⚠️' });
-        
+
         // Automatischer Reconnect-Versuch
         setTimeout(() => {
           if (newPeer && !newPeer.destroyed) {
@@ -506,42 +541,42 @@ export default function VideoCall() {
             setConnectionError(t('video:therapistNotOnline'));
           }
         }, 30000);
-        
+
         setTimeout(() => {
           try {
             if (!newPeer || newPeer.destroyed) {
               throw new Error(t('video:peerNotInitialized'));
             }
-            
+
             const outgoingCall = newPeer.call(roomId, stream);
-            
+
             if (!outgoingCall) {
               throw new Error(t('video:callCouldNotStart'));
             }
-            
-            outgoingCall.on('stream', (remoteStream) => {
+
+            outgoingCall.on('stream', remoteStream => {
               logger.debug('VideoCall: Received remote stream');
               setRemoteStream(remoteStream);
               setIsConnected(true);
-              
+
               if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = remoteStream;
               }
-              
+
               toast.success(t('video:connectionEstablished'));
-              
+
               // Clear timeout bei erfolgreicher Verbindung
               if (connectionTimeoutRef.current) {
                 clearTimeout(connectionTimeoutRef.current);
               }
             });
-            
-            outgoingCall.on('error', (err) => {
+
+            outgoingCall.on('error', err => {
               logger.error('VideoCall: Outgoing call error', err);
               toast.error(t('video:errorConnectingTherapist'));
               setConnectionError(t('video:connectionToTherapistFailed'));
             });
-            
+
             outgoingCall.on('close', () => {
               logger.debug('VideoCall: Outgoing call closed');
               toast(t('video:connectionEndedInfo'), { icon: 'ℹ️' });
@@ -560,9 +595,9 @@ export default function VideoCall() {
       }
     } catch (error: any) {
       logger.error('VideoCall: Error initializing call', error);
-      
+
       let errorMessage = t('video:errorInitializingCall');
-      
+
       if (error.message === t('video:browserNoWebRTC')) {
         errorMessage = error.message;
       } else if (error.name === 'NotAllowedError') {
@@ -572,7 +607,7 @@ export default function VideoCall() {
       } else if (error.message?.includes('Timeout')) {
         errorMessage = error.message;
       }
-      
+
       toast.error(errorMessage);
       setConnectionError(errorMessage);
     }
@@ -580,26 +615,26 @@ export default function VideoCall() {
 
   const cleanup = () => {
     logger.debug('VideoCall: Cleaning up video call resources');
-    
+
     if (connectionTimeoutRef.current) {
       clearTimeout(connectionTimeoutRef.current);
     }
-    
+
     if (localStream) {
       localStream.getTracks().forEach(track => {
         track.stop();
         logger.debug('VideoCall: Stopped track', { kind: track.kind });
       });
     }
-    
+
     if (screenShareStreamRef.current) {
       screenShareStreamRef.current.getTracks().forEach(track => track.stop());
     }
-    
+
     if (call) {
       call.close();
     }
-    
+
     if (peer && !peer.destroyed) {
       peer.destroy();
     }
@@ -631,15 +666,13 @@ export default function VideoCall() {
         const screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: true,
         });
-        
+
         screenShareStreamRef.current = screenStream;
-        
+
         // Replace video track
         const screenTrack = screenStream.getVideoTracks()[0];
-        const sender = call?.peerConnection
-          ?.getSenders()
-          .find((s) => s.track?.kind === 'video');
-        
+        const sender = call?.peerConnection?.getSenders().find(s => s.track?.kind === 'video');
+
         if (sender) {
           sender.replaceTrack(screenTrack);
         }
@@ -663,10 +696,8 @@ export default function VideoCall() {
 
       if (localStream) {
         const videoTrack = localStream.getVideoTracks()[0];
-        const sender = call?.peerConnection
-          ?.getSenders()
-          .find((s) => s.track?.kind === 'video');
-        
+        const sender = call?.peerConnection?.getSenders().find(s => s.track?.kind === 'video');
+
         if (sender) {
           sender.replaceTrack(videoTrack);
         }
@@ -684,45 +715,44 @@ export default function VideoCall() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col relative">
+    <div className='min-h-screen bg-gray-900 flex flex-col relative'>
       {/* Connection Error Overlay */}
       {connectionError && (
         <div
-          data-testid="connection-error"
-          role="alert"
-          aria-live="assertive"
-          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg max-w-md"
+          data-testid='connection-error'
+          role='alert'
+          aria-live='assertive'
+          className='absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg max-w-md'
         >
-          <p className="font-medium text-center">{connectionError}</p>
-          <button
-            onClick={endCall}
-            className="mt-2 text-sm underline block mx-auto"
-          >
+          <p className='font-medium text-center'>{connectionError}</p>
+          <button onClick={endCall} className='mt-2 text-sm underline block mx-auto'>
             {t('video:backToDashboard')}
           </button>
         </div>
       )}
-      
+
       {/* Header */}
-      <div className="bg-gray-800 px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className='bg-gray-800 px-6 py-4'>
+        <div className='flex items-center justify-between'>
           <div>
-            <h1 className="text-white text-lg font-semibold">{t('video:title')}</h1>
-            <p data-testid="connection-status" className="text-gray-400 text-sm">
+            <h1 className='text-white text-lg font-semibold'>{t('video:title')}</h1>
+            <p data-testid='connection-status' className='text-gray-400 text-sm'>
               {isConnected ? t('video:connected') : t('video:waitingForConnection')}
             </p>
             {isAudioOnlyMode && (
               <span
-                data-testid="audio-only-indicator"
-                className="mt-1 inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-200 border border-yellow-500/40"
+                data-testid='audio-only-indicator'
+                className='mt-1 inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-200 border border-yellow-500/40'
               >
                 {t('video:audioOnlyMode')}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`} />
-            <span className="text-white text-sm">
+          <div className='flex items-center gap-2'>
+            <div
+              className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`}
+            />
+            <span className='text-white text-sm'>
               {isConnected ? t('video:live') : t('video:connecting')}
             </span>
           </div>
@@ -730,46 +760,46 @@ export default function VideoCall() {
       </div>
 
       {/* Video Grid */}
-      <div className="flex-1 p-4 relative">
+      <div className='flex-1 p-4 relative'>
         {/* Remote Video (Main) */}
-        <div className="w-full h-full bg-black rounded-lg overflow-hidden relative">
+        <div className='w-full h-full bg-black rounded-lg overflow-hidden relative'>
           {remoteStream ? (
             <video
               ref={remoteVideoRef}
               autoPlay
               playsInline
-              className="w-full h-full object-cover"
+              className='w-full h-full object-cover'
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center text-white">
-                <div className="w-24 h-24 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className='w-full h-full flex items-center justify-center'>
+              <div className='text-center text-white'>
+                <div className='w-24 h-24 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center'>
                   <Video size={48} />
                 </div>
-                <p className="text-lg">
+                <p className='text-lg'>
                   {hasRemoteParticipant
                     ? t('video:participantConnectedNoVideo')
                     : t('video:waitingForOtherParticipant')}
                 </p>
                 {isAudioOnlyMode && (
-                  <p className="text-sm text-gray-300 mt-2">{t('video:audioOnlyMode')}</p>
+                  <p className='text-sm text-gray-300 mt-2'>{t('video:audioOnlyMode')}</p>
                 )}
               </div>
             </div>
           )}
 
           {/* Local Video (PiP) */}
-          <div className="absolute bottom-4 right-4 w-64 h-48 bg-black rounded-lg overflow-hidden shadow-2xl border-2 border-gray-700">
+          <div className='absolute bottom-4 right-4 w-64 h-48 bg-black rounded-lg overflow-hidden shadow-2xl border-2 border-gray-700'>
             <video
               ref={localVideoRef}
               autoPlay
               muted
               playsInline
-              className="w-full h-full object-cover mirror"
+              className='w-full h-full object-cover mirror'
             />
             {!isVideoOn && (
-              <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
-                <VideoOff className="text-white" size={32} />
+              <div className='absolute inset-0 bg-gray-800 flex items-center justify-center'>
+                <VideoOff className='text-white' size={32} />
               </div>
             )}
           </div>
@@ -777,22 +807,26 @@ export default function VideoCall() {
       </div>
 
       {/* Controls */}
-      <div className="bg-gray-800 px-6 py-6">
-        <div className="flex items-center justify-center gap-4">
+      <div className='bg-gray-800 px-6 py-6'>
+        <div className='flex items-center justify-center gap-4'>
           {/* Video Toggle */}
           <button
             onClick={toggleVideo}
-            aria-label={isVideoOn ? t('video:cameraActiveAriaLabel') : t('video:cameraMutedAriaLabel')}
+            aria-label={
+              isVideoOn ? t('video:cameraActiveAriaLabel') : t('video:cameraMutedAriaLabel')
+            }
             aria-pressed={isVideoOn}
             className={`p-4 rounded-full transition ${
-              isVideoOn 
-                ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+              isVideoOn
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
                 : 'bg-red-600 hover:bg-red-700 text-white'
             }`}
             title={isVideoOn ? t('video:videoOff') : t('video:videoOn')}
           >
             {isVideoOn ? <Video size={24} /> : <VideoOff size={24} />}
-            <span className="sr-only">{isVideoOn ? t('video:cameraActiveAriaLabel') : t('video:cameraMutedAriaLabel')}</span>
+            <span className='sr-only'>
+              {isVideoOn ? t('video:cameraActiveAriaLabel') : t('video:cameraMutedAriaLabel')}
+            </span>
           </button>
 
           {/* Audio Toggle */}
@@ -801,21 +835,25 @@ export default function VideoCall() {
             aria-label={isAudioOn ? t('video:micActiveAriaLabel') : t('video:micMutedAriaLabel')}
             aria-pressed={isAudioOn}
             className={`p-4 rounded-full transition ${
-              isAudioOn 
-                ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+              isAudioOn
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
                 : 'bg-red-600 hover:bg-red-700 text-white'
             }`}
             title={isAudioOn ? t('video:micOff') : t('video:micOn')}
           >
             {isAudioOn ? <Mic size={24} /> : <MicOff size={24} />}
-            <span className="sr-only">{isAudioOn ? t('video:micActiveAriaLabel') : t('video:micMutedAriaLabel')}</span>
+            <span className='sr-only'>
+              {isAudioOn ? t('video:micActiveAriaLabel') : t('video:micMutedAriaLabel')}
+            </span>
           </button>
 
           {/* Screen Share (nur Therapeut) */}
           {user?.role === 'therapist' && (
             <button
               onClick={toggleScreenShare}
-              aria-label={isScreenSharing ? t('video:stopScreenShare') : t('video:startScreenShare')}
+              aria-label={
+                isScreenSharing ? t('video:stopScreenShare') : t('video:startScreenShare')
+              }
               aria-pressed={isScreenSharing}
               className={`p-4 rounded-full transition ${
                 isScreenSharing
@@ -825,13 +863,15 @@ export default function VideoCall() {
               title={isScreenSharing ? t('video:stopScreenShare') : t('video:startScreenShare')}
             >
               {isScreenSharing ? <MonitorOff size={24} /> : <Monitor size={24} />}
-              <span className="sr-only">{isScreenSharing ? t('video:stopScreenShare') : t('video:startScreenShare')}</span>
+              <span className='sr-only'>
+                {isScreenSharing ? t('video:stopScreenShare') : t('video:startScreenShare')}
+              </span>
             </button>
           )}
 
           {/* Chat */}
           <button
-            className="p-4 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition"
+            className='p-4 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition'
             title={t('video:openChat')}
             aria-label={t('video:openChat')}
           >
@@ -841,7 +881,7 @@ export default function VideoCall() {
           {/* End Call */}
           <button
             onClick={endCall}
-            className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition ms-4"
+            className='p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition ms-4'
             title={t('video:endCall')}
             aria-label={t('video:endCall')}
           >

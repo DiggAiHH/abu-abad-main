@@ -14,9 +14,9 @@ const notes = {
   sessionNumber: 'Номер сеансу',
 
   // SOAP
-  soapSubjective: 'Суб\'єктивно',
+  soapSubjective: "Суб'єктивно",
   soapSubjectivePlaceholder: 'Що повідомляє пацієнт?',
-  soapObjective: 'Об\'єктивно',
+  soapObjective: "Об'єктивно",
   soapObjectivePlaceholder: 'Спостереження терапевта',
   soapAssessment: 'Оцінка',
   soapAssessmentPlaceholder: 'Клінічна оцінка',
@@ -49,7 +49,7 @@ const notes = {
   interventionRelaxation: 'Техніки релаксації',
   interventionPsychoEducation: 'Психоедукація',
   interventionBehavioralActivation: 'Поведінкова активація',
-  interventionProblemSolving: 'Тренінг розв\'язання проблем',
+  interventionProblemSolving: "Тренінг розв'язання проблем",
   interventionSocialSkills: 'Тренінг соціальних навичок',
   interventionChairDialog: 'Діалог із порожнім кріслом',
   interventionEMDR: 'EMDR',

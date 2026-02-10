@@ -13,7 +13,8 @@ const errors = {
   errorReportCopied: '✓ گزارش خطا کپی شد!',
   goToHome: 'رفتن به صفحه اصلی',
   reloadPage: 'بارگذاری مجدد صفحه',
-  persistentErrorNotice: 'اگر مشکل همچنان ادامه دارد، گزارش خطا را کپی کرده و با پشتیبانی تماس بگیرید.',
+  persistentErrorNotice:
+    'اگر مشکل همچنان ادامه دارد، گزارش خطا را کپی کرده و با پشتیبانی تماس بگیرید.',
   errorReportCopiedAlert: 'گزارش خطا در کلیپ‌بورد کپی شد!',
   copyReportForSupport: 'کپی گزارش (برای پشتیبانی)',
 

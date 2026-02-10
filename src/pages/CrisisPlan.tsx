@@ -1,16 +1,16 @@
 import {
-    AlertTriangle,
-    ArrowLeft,
-    ChevronDown,
-    ChevronUp,
-    Heart,
-    Phone,
-    Plus,
-    Save,
-    Shield,
-    Star,
-    Trash2,
-    Users,
+  AlertTriangle,
+  ArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  Heart,
+  Phone,
+  Plus,
+  Save,
+  Shield,
+  Star,
+  Trash2,
+  Users,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -109,7 +109,11 @@ export default function CrisisPlan() {
       const planData = planRes.data ?? {};
       if (planData.exists && planData.plan) {
         setPlan({ ...EMPTY_PLAN, ...planData.plan });
-      } else if (planData.warningSignals || planData.copingStrategies || planData.emergencyContacts) {
+      } else if (
+        planData.warningSignals ||
+        planData.copingStrategies ||
+        planData.emergencyContacts
+      ) {
         // Demo-Modus: Daten kommen direkt ohne Wrapper
         setPlan({ ...EMPTY_PLAN, ...planData });
       } else {
@@ -150,26 +154,21 @@ export default function CrisisPlan() {
   };
 
   const addToArray = (field: keyof CrisisPlan, value: any) => {
-    setPlan((prev) => ({
+    setPlan(prev => ({
       ...prev,
       [field]: [...(prev[field] as any[]), value],
     }));
   };
 
   const removeFromArray = (field: keyof CrisisPlan, index: number) => {
-    setPlan((prev) => ({
+    setPlan(prev => ({
       ...prev,
       [field]: (prev[field] as any[]).filter((_, i) => i !== index),
     }));
   };
 
-  const updateArrayItem = (
-    field: keyof CrisisPlan,
-    index: number,
-    key: string,
-    value: any
-  ) => {
-    setPlan((prev) => ({
+  const updateArrayItem = (field: keyof CrisisPlan, index: number, key: string, value: any) => {
+    setPlan(prev => ({
       ...prev,
       [field]: (prev[field] as any[]).map((item, i) =>
         i === index ? { ...item, [key]: value } : item
@@ -179,8 +178,8 @@ export default function CrisisPlan() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner" />
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='spinner' />
       </div>
     );
   }
@@ -204,15 +203,15 @@ export default function CrisisPlan() {
       <div className={`bg-white rounded-lg shadow overflow-hidden border-l-4 ${color}`}>
         <button
           onClick={() => toggleSection(id)}
-          className="w-full p-4 flex items-center justify-between hover:bg-gray-50"
+          className='w-full p-4 flex items-center justify-between hover:bg-gray-50'
         >
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             {icon}
-            <h3 className="font-bold">{title}</h3>
+            <h3 className='font-bold'>{title}</h3>
           </div>
           {isExpanded ? <ChevronUp /> : <ChevronDown />}
         </button>
-        {isExpanded && <div className="px-4 pb-4">{children}</div>}
+        {isExpanded && <div className='px-4 pb-4'>{children}</div>}
       </div>
     );
   };
@@ -240,46 +239,43 @@ export default function CrisisPlan() {
 
     return (
       <div>
-        <div className="flex gap-2 mb-2">
+        <div className='flex gap-2 mb-2'>
           <input
-            type="text"
+            type='text'
             value={newItem}
-            onChange={(e) => setNewItem(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
+            onChange={e => setNewItem(e.target.value)}
+            onKeyPress={e => e.key === 'Enter' && handleAdd()}
             placeholder={placeholder}
-            className="flex-1 border rounded px-3 py-2"
+            className='flex-1 border rounded px-3 py-2'
           />
           <button
             onClick={handleAdd}
-            className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className='px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700'
           >
             <Plus size={20} />
           </button>
         </div>
         {examples && items.length === 0 && (
-          <div className="text-sm text-gray-500 mb-2">
+          <div className='text-sm text-gray-500 mb-2'>
             {t('common:more')}:{' '}
             {examples.map((ex, i) => (
               <button
                 key={i}
                 onClick={() => addToArray(field, ex)}
-                className="text-blue-600 hover:underline me-2"
+                className='text-blue-600 hover:underline me-2'
               >
                 {ex}
               </button>
             ))}
           </div>
         )}
-        <div className="flex flex-wrap gap-2">
+        <div className='flex flex-wrap gap-2'>
           {items.map((item, i) => (
-            <span
-              key={i}
-              className="px-3 py-1 bg-gray-100 rounded-full flex items-center gap-2"
-            >
+            <span key={i} className='px-3 py-1 bg-gray-100 rounded-full flex items-center gap-2'>
               {item}
               <button
                 onClick={() => removeFromArray(field, i)}
-                className="text-red-500 hover:text-red-700"
+                className='text-red-500 hover:text-red-700'
               >
                 ×
               </button>
@@ -291,32 +287,30 @@ export default function CrisisPlan() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className='min-h-screen bg-gray-50'>
       {/* Header */}
-      <header className="bg-red-600 text-white shadow-lg">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+      <header className='bg-red-600 text-white shadow-lg'>
+        <div className='max-w-4xl mx-auto px-4 py-4'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="p-2 hover:bg-red-700 rounded-lg"
+                className='p-2 hover:bg-red-700 rounded-lg'
               >
                 <ArrowLeft size={24} />
               </button>
               <div>
-                <h1 className="text-2xl font-bold flex items-center gap-2">
+                <h1 className='text-2xl font-bold flex items-center gap-2'>
                   <Shield size={28} />
                   {t('crisis:title')}
                 </h1>
-                <p className="text-red-100">
-                  {t('crisis:subtitle')}
-                </p>
+                <p className='text-red-100'>{t('crisis:subtitle')}</p>
               </div>
             </div>
             <button
               onClick={savePlan}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50"
+              className='flex items-center gap-2 px-4 py-2 bg-white text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50'
             >
               <Save size={20} />
               {saving ? t('common:saving') : t('common:save')}
@@ -325,14 +319,14 @@ export default function CrisisPlan() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-4">
+      <main className='max-w-4xl mx-auto px-4 py-6 space-y-4'>
         {/* Emergency Quick Access */}
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h3 className="font-bold text-red-700 flex items-center gap-2 mb-3">
+        <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+          <h3 className='font-bold text-red-700 flex items-center gap-2 mb-3'>
             <AlertTriangle />
             {t('crisis:crisisHotlines')}
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
             {(plan.crisisHotlines.length > 0
               ? plan.crisisHotlines
               : defaults?.crisisHotlines || []
@@ -340,14 +334,14 @@ export default function CrisisPlan() {
               <a
                 key={i}
                 href={`tel:${hotline.phone.replace(/\s/g, '')}`}
-                className="flex items-center gap-3 p-3 bg-white rounded-lg hover:bg-red-50 transition"
+                className='flex items-center gap-3 p-3 bg-white rounded-lg hover:bg-red-50 transition'
               >
-                <Phone className="text-red-600" />
+                <Phone className='text-red-600' />
                 <div>
-                  <p className="font-semibold">{hotline.name}</p>
-                  <p className="text-lg text-red-600">{hotline.phone}</p>
+                  <p className='font-semibold'>{hotline.name}</p>
+                  <p className='text-lg text-red-600'>{hotline.phone}</p>
                   {hotline.available && (
-                    <p className="text-xs text-gray-500">{hotline.available}</p>
+                    <p className='text-xs text-gray-500'>{hotline.available}</p>
                   )}
                 </div>
               </a>
@@ -357,52 +351,52 @@ export default function CrisisPlan() {
 
         {/* Warning Signs */}
         <Section
-          id="warning"
+          id='warning'
           title={t('crisis:warningSignsTitle')}
-          icon={<AlertTriangle className="text-orange-500" />}
-          color="border-orange-500"
+          icon={<AlertTriangle className='text-orange-500' />}
+          color='border-orange-500'
         >
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className='block text-sm font-medium mb-1'>
                 {t('crisis:warningSignsThoughts')}
               </label>
               <StringList
                 items={plan.warningSignsThoughts}
-                field="warningSignsThoughts"
+                field='warningSignsThoughts'
                 placeholder={t('crisis:warningSignsThoughts')}
                 examples={defaults?.warningSignExamples?.thoughts}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className='block text-sm font-medium mb-1'>
                 {t('crisis:warningSignsBehaviors')}
               </label>
               <StringList
                 items={plan.warningSignsBehaviors}
-                field="warningSignsBehaviors"
+                field='warningSignsBehaviors'
                 placeholder={t('crisis:warningSignsBehaviors')}
                 examples={defaults?.warningSignExamples?.behaviors}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className='block text-sm font-medium mb-1'>
                 {t('crisis:warningSignsPhysical')}
               </label>
               <StringList
                 items={plan.warningSignsPhysical}
-                field="warningSignsPhysical"
+                field='warningSignsPhysical'
                 placeholder={t('crisis:warningSignsPhysical')}
                 examples={defaults?.warningSignExamples?.physical}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className='block text-sm font-medium mb-1'>
                 {t('crisis:warningSignsEmotional')}
               </label>
               <StringList
                 items={plan.warningSignsEmotional}
-                field="warningSignsEmotional"
+                field='warningSignsEmotional'
                 placeholder={t('crisis:warningSignsEmotional')}
                 examples={defaults?.warningSignExamples?.emotional}
               />
@@ -412,34 +406,32 @@ export default function CrisisPlan() {
 
         {/* Coping Strategies */}
         <Section
-          id="coping"
+          id='coping'
           title={t('crisis:copingStrategies')}
-          icon={<Star className="text-yellow-500" />}
-          color="border-yellow-500"
+          icon={<Star className='text-yellow-500' />}
+          color='border-yellow-500'
         >
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div className='space-y-4'>
+            <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
               {defaults?.copingCategories?.map((cat: any) => (
-                <div key={cat.id} className="text-sm">
-                  <p className="font-medium">{cat.name}:</p>
-                  <p className="text-gray-500">{cat.examples.join(', ')}</p>
+                <div key={cat.id} className='text-sm'>
+                  <p className='font-medium'>{cat.name}:</p>
+                  <p className='text-gray-500'>{cat.examples.join(', ')}</p>
                 </div>
               ))}
             </div>
             <hr />
             {plan.copingStrategies.map((strategy, i) => (
-              <div key={i} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+              <div key={i} className='flex items-center gap-2 bg-gray-50 p-2 rounded'>
                 <input
-                  type="text"
+                  type='text'
                   value={strategy.strategy}
-                  onChange={(e) =>
-                    updateArrayItem('copingStrategies', i, 'strategy', e.target.value)
-                  }
-                  className="flex-1 border rounded px-2 py-1"
+                  onChange={e => updateArrayItem('copingStrategies', i, 'strategy', e.target.value)}
+                  className='flex-1 border rounded px-2 py-1'
                 />
                 <select
                   value={strategy.effectiveness || 3}
-                  onChange={(e) =>
+                  onChange={e =>
                     updateArrayItem(
                       'copingStrategies',
                       i,
@@ -447,7 +439,7 @@ export default function CrisisPlan() {
                       parseInt(e.target.value)
                     )
                   }
-                  className="border rounded px-2 py-1"
+                  className='border rounded px-2 py-1'
                 >
                   <option value={1}>★</option>
                   <option value={2}>★★</option>
@@ -457,7 +449,7 @@ export default function CrisisPlan() {
                 </select>
                 <button
                   onClick={() => removeFromArray('copingStrategies', i)}
-                  className="text-red-500"
+                  className='text-red-500'
                 >
                   <Trash2 size={16} />
                 </button>
@@ -471,7 +463,7 @@ export default function CrisisPlan() {
                   effectiveness: 3,
                 })
               }
-              className="text-blue-600 hover:underline flex items-center gap-1"
+              className='text-blue-600 hover:underline flex items-center gap-1'
             >
               <Plus size={16} /> {t('crisis:addStrategy')}
             </button>
@@ -480,45 +472,41 @@ export default function CrisisPlan() {
 
         {/* Emergency Contacts */}
         <Section
-          id="contacts"
+          id='contacts'
           title={t('crisis:emergencyContacts')}
-          icon={<Users className="text-blue-500" />}
-          color="border-blue-500"
+          icon={<Users className='text-blue-500' />}
+          color='border-blue-500'
         >
-          <div className="space-y-4">
-            <h4 className="font-medium">{t('crisis:emergencyContacts')}</h4>
+          <div className='space-y-4'>
+            <h4 className='font-medium'>{t('crisis:emergencyContacts')}</h4>
             {plan.emergencyContacts.map((contact, i) => (
-              <div key={i} className="grid grid-cols-4 gap-2 items-center">
+              <div key={i} className='grid grid-cols-4 gap-2 items-center'>
                 <input
-                  type="text"
+                  type='text'
                   value={contact.name}
-                  onChange={(e) =>
-                    updateArrayItem('emergencyContacts', i, 'name', e.target.value)
-                  }
+                  onChange={e => updateArrayItem('emergencyContacts', i, 'name', e.target.value)}
                   placeholder={t('crisis:contactName')}
-                  className="border rounded px-2 py-1"
+                  className='border rounded px-2 py-1'
                 />
                 <input
-                  type="text"
+                  type='text'
                   value={contact.relationship}
-                  onChange={(e) =>
+                  onChange={e =>
                     updateArrayItem('emergencyContacts', i, 'relationship', e.target.value)
                   }
                   placeholder={t('crisis:contactRelation')}
-                  className="border rounded px-2 py-1"
+                  className='border rounded px-2 py-1'
                 />
                 <input
-                  type="tel"
+                  type='tel'
                   value={contact.phone}
-                  onChange={(e) =>
-                    updateArrayItem('emergencyContacts', i, 'phone', e.target.value)
-                  }
+                  onChange={e => updateArrayItem('emergencyContacts', i, 'phone', e.target.value)}
                   placeholder={t('crisis:contactPhone')}
-                  className="border rounded px-2 py-1"
+                  className='border rounded px-2 py-1'
                 />
                 <button
                   onClick={() => removeFromArray('emergencyContacts', i)}
-                  className="text-red-500 justify-self-center"
+                  className='text-red-500 justify-self-center'
                 >
                   <Trash2 size={16} />
                 </button>
@@ -532,46 +520,42 @@ export default function CrisisPlan() {
                   phone: '',
                 })
               }
-              className="text-blue-600 hover:underline flex items-center gap-1"
+              className='text-blue-600 hover:underline flex items-center gap-1'
             >
               <Plus size={16} /> {t('crisis:addContact')}
             </button>
 
             <hr />
 
-            <h4 className="font-medium">{t('crisis:professionalContacts')}</h4>
+            <h4 className='font-medium'>{t('crisis:professionalContacts')}</h4>
             {plan.professionalContacts.map((contact, i) => (
-              <div key={i} className="grid grid-cols-4 gap-2 items-center">
+              <div key={i} className='grid grid-cols-4 gap-2 items-center'>
                 <input
-                  type="text"
+                  type='text'
                   value={contact.name}
-                  onChange={(e) =>
-                    updateArrayItem('professionalContacts', i, 'name', e.target.value)
-                  }
+                  onChange={e => updateArrayItem('professionalContacts', i, 'name', e.target.value)}
                   placeholder={t('crisis:contactName')}
-                  className="border rounded px-2 py-1"
+                  className='border rounded px-2 py-1'
                 />
                 <input
-                  type="text"
+                  type='text'
                   value={contact.role}
-                  onChange={(e) =>
-                    updateArrayItem('professionalContacts', i, 'role', e.target.value)
-                  }
+                  onChange={e => updateArrayItem('professionalContacts', i, 'role', e.target.value)}
                   placeholder={t('common:therapist')}
-                  className="border rounded px-2 py-1"
+                  className='border rounded px-2 py-1'
                 />
                 <input
-                  type="tel"
+                  type='tel'
                   value={contact.phone}
-                  onChange={(e) =>
+                  onChange={e =>
                     updateArrayItem('professionalContacts', i, 'phone', e.target.value)
                   }
                   placeholder={t('crisis:contactPhone')}
-                  className="border rounded px-2 py-1"
+                  className='border rounded px-2 py-1'
                 />
                 <button
                   onClick={() => removeFromArray('professionalContacts', i)}
-                  className="text-red-500 justify-self-center"
+                  className='text-red-500 justify-self-center'
                 >
                   <Trash2 size={16} />
                 </button>
@@ -585,7 +569,7 @@ export default function CrisisPlan() {
                   phone: '',
                 })
               }
-              className="text-blue-600 hover:underline flex items-center gap-1"
+              className='text-blue-600 hover:underline flex items-center gap-1'
             >
               <Plus size={16} /> {t('crisis:addContact')}
             </button>
@@ -594,48 +578,44 @@ export default function CrisisPlan() {
 
         {/* Reasons to Live */}
         <Section
-          id="reasons"
+          id='reasons'
           title={t('crisis:reasonsToLive')}
-          icon={<Heart className="text-pink-500" />}
-          color="border-pink-500"
+          icon={<Heart className='text-pink-500' />}
+          color='border-pink-500'
         >
-          <p className="text-gray-600 text-sm mb-4">
-            {t('crisis:addReason')}
-          </p>
+          <p className='text-gray-600 text-sm mb-4'>{t('crisis:addReason')}</p>
           <StringList
             items={plan.reasonsToLive}
-            field="reasonsToLive"
+            field='reasonsToLive'
             placeholder={t('crisis:addReason')}
           />
         </Section>
 
         {/* Safe Environment */}
         <Section
-          id="safe"
+          id='safe'
           title={t('crisis:safeEnvironment')}
-          icon={<Shield className="text-green-500" />}
-          color="border-green-500"
+          icon={<Shield className='text-green-500' />}
+          color='border-green-500'
         >
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <div>
-              <label className="block text-sm font-medium mb-1">
-                {t('crisis:safePlace')}
-              </label>
+              <label className='block text-sm font-medium mb-1'>{t('crisis:safePlace')}</label>
               <input
-                type="text"
+                type='text'
                 value={plan.safePlace}
-                onChange={(e) => setPlan({ ...plan, safePlace: e.target.value })}
+                onChange={e => setPlan({ ...plan, safePlace: e.target.value })}
                 placeholder={t('crisis:safePlacePlaceholder')}
-                className="w-full border rounded px-3 py-2"
+                className='w-full border rounded px-3 py-2'
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className='block text-sm font-medium mb-1'>
                 {t('crisis:safeEnvironmentSteps')}
               </label>
               <StringList
                 items={plan.safeEnvironmentSteps}
-                field="safeEnvironmentSteps"
+                field='safeEnvironmentSteps'
                 placeholder={t('crisis:safeEnvironmentSteps')}
               />
             </div>
@@ -643,16 +623,14 @@ export default function CrisisPlan() {
         </Section>
 
         {/* Additional Notes */}
-        <div className="bg-white rounded-lg shadow p-4">
-          <h3 className="font-bold mb-3">{t('crisis:additionalNotes')}</h3>
+        <div className='bg-white rounded-lg shadow p-4'>
+          <h3 className='font-bold mb-3'>{t('crisis:additionalNotes')}</h3>
           <textarea
             value={plan.additionalNotes}
-            onChange={(e) =>
-              setPlan({ ...plan, additionalNotes: e.target.value })
-            }
+            onChange={e => setPlan({ ...plan, additionalNotes: e.target.value })}
             rows={4}
             placeholder={t('crisis:additionalNotes')}
-            className="w-full border rounded px-3 py-2"
+            className='w-full border rounded px-3 py-2'
           />
         </div>
 
@@ -660,7 +638,7 @@ export default function CrisisPlan() {
         <button
           onClick={savePlan}
           disabled={saving}
-          className="w-full py-4 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-2"
+          className='w-full py-4 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-2'
         >
           <Save size={24} />
           {saving ? t('common:saving') : t('common:save')}

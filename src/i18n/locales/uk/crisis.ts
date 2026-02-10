@@ -23,7 +23,7 @@ const crisis = {
   safePlace: 'Безпечне місце',
   safePlacePlaceholder: 'Опишіть ваше безпечне місце...',
   emergencyContacts: 'Контакти для екстрених випадків',
-  contactName: 'Ім\'я',
+  contactName: "Ім'я",
   contactPhone: 'Телефон',
   contactRelation: 'Відносини',
   contactAvailability: 'Доступність',

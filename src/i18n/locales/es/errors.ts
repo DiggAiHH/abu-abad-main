@@ -13,7 +13,8 @@ const errors = {
   errorReportCopied: '✓ ¡Informe de error copiado!',
   goToHome: 'Ir a la página principal',
   reloadPage: 'Recargar página',
-  persistentErrorNotice: 'Si el problema persiste, copie el informe de error y contacte con el soporte.',
+  persistentErrorNotice:
+    'Si el problema persiste, copie el informe de error y contacte con el soporte.',
   errorReportCopiedAlert: '¡Informe de error copiado al portapapeles!',
   copyReportForSupport: 'Copiar informe (para soporte)',
 

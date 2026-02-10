@@ -54,7 +54,7 @@ const Billing = () => {
     iban: '',
     bic: '',
     invoiceFooter: '',
-    nextInvoiceNumber: 1000
+    nextInvoiceNumber: 1000,
   });
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +66,7 @@ const Billing = () => {
     dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     items: [{ description: '', code: '870', factor: 2.3, price: 100.55 }] as InvoiceItem[],
     taxRate: 0,
-    notes: ''
+    notes: '',
   });
 
   useEffect(() => {
@@ -78,10 +78,13 @@ const Billing = () => {
       const [invRes, setRes, patRes] = await Promise.all([
         api.get('/billing/invoices'),
         api.get('/billing/settings'),
-        api.get('/patients') // Assuming this endpoint exists
+        api.get('/patients'), // Assuming this endpoint exists
       ]);
       setInvoices(Array.isArray(invRes.data) ? invRes.data : []);
-      setSettings(prev => ({ ...prev, ...(setRes.data && typeof setRes.data === 'object' ? setRes.data : {}) }));
+      setSettings(prev => ({
+        ...prev,
+        ...(setRes.data && typeof setRes.data === 'object' ? setRes.data : {}),
+      }));
       setPatients(Array.isArray(patRes.data) ? patRes.data : []);
     } catch (error) {
       logger.error('Billing: Error fetching billing data', error);
@@ -109,7 +112,7 @@ const Billing = () => {
     try {
       await api.post('/billing/invoices', {
         ...newInvoice,
-        patientId: parseInt(newInvoice.patientId)
+        patientId: parseInt(newInvoice.patientId),
       });
       toast.success(t('billing:invoiceCreated'));
       setActiveTab('invoices');
@@ -135,7 +138,7 @@ const Billing = () => {
   const addItem = () => {
     setNewInvoice(prev => ({
       ...prev,
-      items: [...prev.items, { description: '', price: 0 }]
+      items: [...prev.items, { description: '', price: 0 }],
     }));
   };
 
@@ -148,24 +151,24 @@ const Billing = () => {
   const removeItem = (index: number) => {
     setNewInvoice(prev => ({
       ...prev,
-      items: prev.items.filter((_, i) => i !== index)
+      items: prev.items.filter((_, i) => i !== index),
     }));
   };
 
   if (user?.role !== 'therapist') {
-    return <div className="p-8 text-center">{t('common:error')}</div>;
+    return <div className='p-8 text-center'>{t('common:error')}</div>;
   }
 
-  if (loading) return <div className="p-8 text-center">{t('common:loading')}</div>;
+  if (loading) return <div className='p-8 text-center'>{t('common:loading')}</div>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-          <Euro className="w-8 h-8 text-blue-600" />
+    <div className='max-w-6xl mx-auto p-6'>
+      <div className='flex justify-between items-center mb-8'>
+        <h1 className='text-3xl font-bold text-gray-800 flex items-center gap-2'>
+          <Euro className='w-8 h-8 text-blue-600' />
           {t('billing:title')}
         </h1>
-        <div className="flex gap-2">
+        <div className='flex gap-2'>
           <button
             onClick={() => setActiveTab('invoices')}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${activeTab === 'invoices' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'}`}
@@ -188,40 +191,48 @@ const Billing = () => {
       </div>
 
       {activeTab === 'invoices' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-200">
+        <div className='bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden'>
+          <table className='w-full text-left'>
+            <thead className='bg-gray-50 border-b border-gray-200'>
               <tr>
-                <th className="p-4 font-semibold text-gray-600">{t('billing:invoiceNumber')}</th>
-                <th className="p-4 font-semibold text-gray-600">{t('common:patient')}</th>
-                <th className="p-4 font-semibold text-gray-600">{t('common:date')}</th>
-                <th className="p-4 font-semibold text-gray-600">{t('billing:amount')}</th>
-                <th className="p-4 font-semibold text-gray-600">{t('common:status')}</th>
-                <th className="p-4 font-semibold text-gray-600">{t('common:actions')}</th>
+                <th className='p-4 font-semibold text-gray-600'>{t('billing:invoiceNumber')}</th>
+                <th className='p-4 font-semibold text-gray-600'>{t('common:patient')}</th>
+                <th className='p-4 font-semibold text-gray-600'>{t('common:date')}</th>
+                <th className='p-4 font-semibold text-gray-600'>{t('billing:amount')}</th>
+                <th className='p-4 font-semibold text-gray-600'>{t('common:status')}</th>
+                <th className='p-4 font-semibold text-gray-600'>{t('common:actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className='divide-y divide-gray-100'>
               {invoices.map(inv => (
-                <tr key={inv.id} className="hover:bg-gray-50">
-                  <td className="p-4 font-medium">{inv.invoiceNumber}</td>
-                  <td className="p-4">{inv.patientName}</td>
-                  <td className="p-4">{new Date(inv.date).toLocaleDateString('de-DE')}</td>
-                  <td className="p-4 font-medium">{inv.total.toFixed(2)} €</td>
-                  <td className="p-4">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      inv.status === 'paid' ? 'bg-green-100 text-green-800' :
-                      inv.status === 'sent' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {inv.status === 'draft' ? t('billing:statusDraft') : 
-                       inv.status === 'sent' ? t('billing:statusSent') : 
-                       inv.status === 'paid' ? t('billing:statusPaid') : inv.status}
+                <tr key={inv.id} className='hover:bg-gray-50'>
+                  <td className='p-4 font-medium'>{inv.invoiceNumber}</td>
+                  <td className='p-4'>{inv.patientName}</td>
+                  <td className='p-4'>{new Date(inv.date).toLocaleDateString('de-DE')}</td>
+                  <td className='p-4 font-medium'>{inv.total.toFixed(2)} €</td>
+                  <td className='p-4'>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        inv.status === 'paid'
+                          ? 'bg-green-100 text-green-800'
+                          : inv.status === 'sent'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {inv.status === 'draft'
+                        ? t('billing:statusDraft')
+                        : inv.status === 'sent'
+                          ? t('billing:statusSent')
+                          : inv.status === 'paid'
+                            ? t('billing:statusPaid')
+                            : inv.status}
                     </span>
                   </td>
-                  <td className="p-4">
-                    <button 
+                  <td className='p-4'>
+                    <button
                       onClick={() => handleGenerateHtml(inv.id)}
-                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+                      className='text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm'
                     >
                       <Download size={16} /> {t('billing:generatePdf')}
                     </button>
@@ -230,7 +241,9 @@ const Billing = () => {
               ))}
               {invoices.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-500">{t('billing:noInvoices')}</td>
+                  <td colSpan={6} className='p-8 text-center text-gray-500'>
+                    {t('billing:noInvoices')}
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -239,81 +252,91 @@ const Billing = () => {
       )}
 
       {activeTab === 'create' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold mb-6">{t('billing:createInvoice')}</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6'>
+          <h2 className='text-xl font-semibold mb-6'>{t('billing:createInvoice')}</h2>
+
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-6'>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:patient')}</label>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
+                {t('common:patient')}
+              </label>
               <select
                 value={newInvoice.patientId}
-                onChange={(e) => setNewInvoice({...newInvoice, patientId: e.target.value})}
-                className="w-full p-2 border rounded-lg"
+                onChange={e => setNewInvoice({ ...newInvoice, patientId: e.target.value })}
+                className='w-full p-2 border rounded-lg'
               >
-                <option value="">{t('billing:selectPatient')}</option>
+                <option value=''>{t('billing:selectPatient')}</option>
                 {patients.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
                 ))}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:date')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('common:date')}
+                </label>
                 <input
-                  type="date"
+                  type='date'
                   value={newInvoice.date}
-                  onChange={(e) => setNewInvoice({...newInvoice, date: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  onChange={e => setNewInvoice({ ...newInvoice, date: e.target.value })}
+                  className='w-full p-2 border rounded-lg'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('billing:dueDate')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('billing:dueDate')}
+                </label>
                 <input
-                  type="date"
+                  type='date'
                   value={newInvoice.dueDate}
-                  onChange={(e) => setNewInvoice({...newInvoice, dueDate: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  onChange={e => setNewInvoice({ ...newInvoice, dueDate: e.target.value })}
+                  className='w-full p-2 border rounded-lg'
                 />
               </div>
             </div>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('billing:itemDescription')}</label>
-            <div className="space-y-2">
+          <div className='mb-6'>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              {t('billing:itemDescription')}
+            </label>
+            <div className='space-y-2'>
               {newInvoice.items.map((item, idx) => (
-                <div key={idx} className="flex gap-2 items-start">
+                <div key={idx} className='flex gap-2 items-start'>
                   <input
                     placeholder={t('billing:itemDescription')}
                     value={item.description}
-                    onChange={(e) => updateItem(idx, 'description', e.target.value)}
-                    className="flex-grow p-2 border rounded-lg"
+                    onChange={e => updateItem(idx, 'description', e.target.value)}
+                    className='flex-grow p-2 border rounded-lg'
                   />
                   <input
                     placeholder={t('billing:itemCode')}
                     value={item.code || ''}
-                    onChange={(e) => updateItem(idx, 'code', e.target.value)}
-                    className="w-20 p-2 border rounded-lg"
+                    onChange={e => updateItem(idx, 'code', e.target.value)}
+                    className='w-20 p-2 border rounded-lg'
                   />
                   <input
-                    type="number"
+                    type='number'
                     placeholder={t('billing:itemFactor')}
                     value={item.factor || ''}
-                    onChange={(e) => updateItem(idx, 'factor', parseFloat(e.target.value))}
-                    className="w-20 p-2 border rounded-lg"
-                    step="0.1"
+                    onChange={e => updateItem(idx, 'factor', parseFloat(e.target.value))}
+                    className='w-20 p-2 border rounded-lg'
+                    step='0.1'
                   />
                   <input
-                    type="number"
+                    type='number'
                     placeholder={t('billing:itemPrice')}
                     value={item.price}
-                    onChange={(e) => updateItem(idx, 'price', parseFloat(e.target.value))}
-                    className="w-24 p-2 border rounded-lg"
-                    step="0.01"
+                    onChange={e => updateItem(idx, 'price', parseFloat(e.target.value))}
+                    className='w-24 p-2 border rounded-lg'
+                    step='0.01'
                   />
                   <button
                     onClick={() => removeItem(idx)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                    className='p-2 text-red-500 hover:bg-red-50 rounded-lg'
                   >
                     ×
                   </button>
@@ -322,25 +345,25 @@ const Billing = () => {
             </div>
             <button
               onClick={addItem}
-              className="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className='mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium'
             >
               + {t('billing:addItem')}
             </button>
           </div>
 
-          <div className="flex justify-end gap-4 border-t pt-6">
-            <div className="text-right">
-              <div className="text-sm text-gray-600 mb-1">{t('billing:totalAmount')}</div>
-              <div className="text-2xl font-bold">
+          <div className='flex justify-end gap-4 border-t pt-6'>
+            <div className='text-right'>
+              <div className='text-sm text-gray-600 mb-1'>{t('billing:totalAmount')}</div>
+              <div className='text-2xl font-bold'>
                 {newInvoice.items.reduce((sum, i) => sum + (i.price || 0), 0).toFixed(2)} €
               </div>
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end">
+          <div className='mt-6 flex justify-end'>
             <button
               onClick={handleCreateInvoice}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2'
             >
               <Save size={18} /> {t('billing:createInvoice')}
             </button>
@@ -349,110 +372,132 @@ const Billing = () => {
       )}
 
       {activeTab === 'settings' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold mb-6">{t('billing:settings')}</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h3 className="font-medium text-gray-900 border-b pb-2">{t('common:name')}</h3>
+        <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6'>
+          <h2 className='text-xl font-semibold mb-6'>{t('billing:settings')}</h2>
+
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='space-y-4'>
+              <h3 className='font-medium text-gray-900 border-b pb-2'>{t('common:name')}</h3>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:name')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('common:name')}
+                </label>
                 <input
                   value={settings.practiceName || ''}
-                  onChange={(e) => setSettings({...settings, practiceName: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  onChange={e => setSettings({ ...settings, practiceName: e.target.value })}
+                  className='w-full p-2 border rounded-lg'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:address')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('common:address')}
+                </label>
                 <input
                   value={settings.addressLine1 || ''}
-                  onChange={(e) => setSettings({...settings, addressLine1: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  onChange={e => setSettings({ ...settings, addressLine1: e.target.value })}
+                  className='w-full p-2 border rounded-lg'
                 />
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:address')}</label>
+              <div className='grid grid-cols-3 gap-4'>
+                <div className='col-span-1'>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
+                    {t('common:address')}
+                  </label>
                   <input
                     value={settings.zipCode || ''}
-                    onChange={(e) => setSettings({...settings, zipCode: e.target.value})}
-                    className="w-full p-2 border rounded-lg"
+                    onChange={e => setSettings({ ...settings, zipCode: e.target.value })}
+                    className='w-full p-2 border rounded-lg'
                   />
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:address')}</label>
+                <div className='col-span-2'>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
+                    {t('common:address')}
+                  </label>
                   <input
                     value={settings.city || ''}
-                    onChange={(e) => setSettings({...settings, city: e.target.value})}
-                    className="w-full p-2 border rounded-lg"
+                    onChange={e => setSettings({ ...settings, city: e.target.value })}
+                    className='w-full p-2 border rounded-lg'
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="font-medium text-gray-900 border-b pb-2">{t('billing:bankName')}</h3>
+            <div className='space-y-4'>
+              <h3 className='font-medium text-gray-900 border-b pb-2'>{t('billing:bankName')}</h3>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('billing:bankName')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('billing:bankName')}
+                </label>
                 <input
                   value={settings.bankName || ''}
-                  onChange={(e) => setSettings({...settings, bankName: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  onChange={e => setSettings({ ...settings, bankName: e.target.value })}
+                  className='w-full p-2 border rounded-lg'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('billing:iban')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('billing:iban')}
+                </label>
                 <input
                   value={settings.iban || ''}
-                  onChange={(e) => setSettings({...settings, iban: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  onChange={e => setSettings({ ...settings, iban: e.target.value })}
+                  className='w-full p-2 border rounded-lg'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('billing:bic')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('billing:bic')}
+                </label>
                 <input
                   value={settings.bic || ''}
-                  onChange={(e) => setSettings({...settings, bic: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  onChange={e => setSettings({ ...settings, bic: e.target.value })}
+                  className='w-full p-2 border rounded-lg'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('billing:taxId')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('billing:taxId')}
+                </label>
                 <input
                   value={settings.taxId || ''}
-                  onChange={(e) => setSettings({...settings, taxId: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  onChange={e => setSettings({ ...settings, taxId: e.target.value })}
+                  className='w-full p-2 border rounded-lg'
                 />
               </div>
             </div>
 
-            <div className="md:col-span-2 space-y-4">
-              <h3 className="font-medium text-gray-900 border-b pb-2">{t('billing:settings')}</h3>
+            <div className='md:col-span-2 space-y-4'>
+              <h3 className='font-medium text-gray-900 border-b pb-2'>{t('billing:settings')}</h3>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('billing:invoiceFooter')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('billing:invoiceFooter')}
+                </label>
                 <textarea
                   value={settings.invoiceFooter || ''}
-                  onChange={(e) => setSettings({...settings, invoiceFooter: e.target.value})}
-                  className="w-full p-2 border rounded-lg h-20"
+                  onChange={e => setSettings({ ...settings, invoiceFooter: e.target.value })}
+                  className='w-full p-2 border rounded-lg h-20'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('billing:nextInvoiceNumber')}</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  {t('billing:nextInvoiceNumber')}
+                </label>
                 <input
-                  type="number"
+                  type='number'
                   value={settings.nextInvoiceNumber || ''}
-                  onChange={(e) => setSettings({...settings, nextInvoiceNumber: parseInt(e.target.value)})}
-                  className="w-full p-2 border rounded-lg max-w-xs"
+                  onChange={e =>
+                    setSettings({ ...settings, nextInvoiceNumber: parseInt(e.target.value) })
+                  }
+                  className='w-full p-2 border rounded-lg max-w-xs'
                 />
               </div>
             </div>
           </div>
 
-          <div className="mt-8 flex justify-end">
+          <div className='mt-8 flex justify-end'>
             <button
               onClick={handleSaveSettings}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2'
             >
               <Save size={18} /> {t('billing:saveSettings')}
             </button>

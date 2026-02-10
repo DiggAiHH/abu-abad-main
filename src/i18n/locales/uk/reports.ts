@@ -40,7 +40,7 @@ const reports = {
   recommendations: 'Рекомендації',
 
   // Одержувач
-  recipientName: 'Ім\'я одержувача',
+  recipientName: "Ім'я одержувача",
   recipientInstitution: 'Установа',
   recipientAddress: 'Адреса',
 };

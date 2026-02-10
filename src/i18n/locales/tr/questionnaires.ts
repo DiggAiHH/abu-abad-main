@@ -55,7 +55,7 @@ const questionnaires = {
   progress: 'İlerleme',
 
   // İçe aktarma
-  importFromPdf: 'PDF\'den içe aktar',
+  importFromPdf: "PDF'den içe aktar",
   importing: 'İçe aktarılıyor...',
   importSuccess: 'İçe aktarma başarılı',
   importFailed: 'İçe aktarma başarısız',

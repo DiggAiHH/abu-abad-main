@@ -14,7 +14,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module",
     "ecmaFeatures": { "jsx": true },
-    "project": "./tsconfig.json"
+    "project": ["./tsconfig.json", "./tsconfig.node.json"]
   },
   "plugins": ["@typescript-eslint", "react-refresh"],
   "rules": {

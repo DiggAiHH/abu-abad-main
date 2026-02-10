@@ -20,7 +20,7 @@ const appointments = {
   priceEur: 'Prix (€)',
   slotCreated: 'Créneau de rendez-vous créé !',
   appointmentExpired: 'Le rendez-vous a expiré. Veuillez prendre un nouveau rendez-vous.',
-  appointmentNotAuthorized: "Non autorisé, ce rendez-vous appartient à un autre patient.",
+  appointmentNotAuthorized: 'Non autorisé, ce rendez-vous appartient à un autre patient.',
   noAppointments: 'Aucun rendez-vous',
   with: 'avec',
   at: 'à',

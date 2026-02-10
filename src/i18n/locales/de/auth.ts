@@ -11,7 +11,8 @@ const auth = {
   loginSuccess: 'Erfolgreich angemeldet!',
   invalidCredentials: 'Ungültige E-Mail oder Passwort',
   accountDeactivated: 'Account deaktiviert. Bitte kontaktieren Sie den Support.',
-  noConnectionLogin: 'Keine Verbindung zum Server möglich. Bitte prüfen Sie Ihre Internetverbindung.',
+  noConnectionLogin:
+    'Keine Verbindung zum Server möglich. Bitte prüfen Sie Ihre Internetverbindung.',
   fillAllFields: 'Bitte füllen Sie alle Felder aus',
   enterValidEmail: 'Bitte geben Sie eine gültige E-Mail-Adresse ein',
   noAccountYet: 'Noch kein Konto?',
@@ -43,7 +44,8 @@ const auth = {
   confirmPasswordPlaceholder: 'Passwort bestätigen',
   iAmLabel: 'Ich bin... *',
   roleSelectAriaLabel: 'Benutzerrolle auswählen',
-  gdprConsentText: 'Ich akzeptiere die Datenschutzerklärung (DSGVO) und stimme der Verarbeitung meiner Daten zu medizinischen Zwecken zu. *',
+  gdprConsentText:
+    'Ich akzeptiere die Datenschutzerklärung (DSGVO) und stimme der Verarbeitung meiner Daten zu medizinischen Zwecken zu. *',
   gdprLinkText: 'Datenschutzerklärung',
   registerButton: 'Registrieren',
   registering: 'Wird registriert...',
@@ -76,7 +78,8 @@ const auth = {
   twoFAErrorLoading: 'Fehler beim Laden der 2FA-Daten',
   twoFAInvalidCode: 'Bitte geben Sie einen gültigen 6-stelligen Code ein',
   twoFAInvalidCodeGeneric: 'Ungültiger Code',
-  twoFAImportantNotice: '⚠️ Wichtig: Speichern Sie das Secret an einem sicheren Ort. Bei Verlust des Authenticators können Sie Ihr Konto nur mit diesem Secret wiederherstellen.',
+  twoFAImportantNotice:
+    '⚠️ Wichtig: Speichern Sie das Secret an einem sicheren Ort. Bei Verlust des Authenticators können Sie Ihr Konto nur mit diesem Secret wiederherstellen.',
   twoFACodeChanges: 'Der Code ändert sich alle 30 Sekunden.',
   twoFAVerifying: 'Wird verifiziert...',
   twoFAVerify: 'Verifizieren',

@@ -31,7 +31,7 @@ const auth = {
 
   // ─── Kayıt ──────────────────────────────────────
   registerTitle: 'Abu-Abbad Kayıt',
-  registerSubtitle: 'Abu-Abbad\'a hoş geldiniz - GDPR uyumlu terapist platformunuz',
+  registerSubtitle: "Abu-Abbad'a hoş geldiniz - GDPR uyumlu terapist platformunuz",
   firstNameLabel: 'Ad *',
   firstNamePlaceholder: 'Adınız',
   lastNameLabel: 'Soyad *',
@@ -43,7 +43,8 @@ const auth = {
   confirmPasswordPlaceholder: 'Şifrenizi tekrar girin',
   iAmLabel: 'Ben... *',
   roleSelectAriaLabel: 'Kullanıcı rolü seçin',
-  gdprConsentText: 'Gizlilik politikasını (KVKK/GDPR) kabul ediyorum ve verilerimin tıbbi amaçlarla işlenmesine onay veriyorum. *',
+  gdprConsentText:
+    'Gizlilik politikasını (KVKK/GDPR) kabul ediyorum ve verilerimin tıbbi amaçlarla işlenmesine onay veriyorum. *',
   gdprLinkText: 'Gizlilik Politikası',
   registerButton: 'Kayıt ol',
   registering: 'Kayıt yapılıyor...',
@@ -76,7 +77,8 @@ const auth = {
   twoFAErrorLoading: '2FA verileri yüklenirken hata oluştu',
   twoFAInvalidCode: 'Lütfen geçerli bir 6 haneli kod girin',
   twoFAInvalidCodeGeneric: 'Geçersiz kod',
-  twoFAImportantNotice: '⚠️ Önemli: Gizli anahtarı güvenli bir yere kaydedin. Authenticator uygulamanızı kaybetmeniz durumunda hesabınızı yalnızca bu anahtarla kurtarabilirsiniz.',
+  twoFAImportantNotice:
+    '⚠️ Önemli: Gizli anahtarı güvenli bir yere kaydedin. Authenticator uygulamanızı kaybetmeniz durumunda hesabınızı yalnızca bu anahtarla kurtarabilirsiniz.',
   twoFACodeChanges: 'Kod her 30 saniyede bir değişir.',
   twoFAVerifying: 'Doğrulanıyor...',
   twoFAVerify: 'Doğrula',

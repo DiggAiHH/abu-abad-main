@@ -26,7 +26,7 @@ const dashboard = {
   questionnairesManage: 'Gérer',
   documentsRequests: 'Demandes',
   patientsOverview: 'Aperçu des patients',
-  todaySchedule: "Planning du jour",
+  todaySchedule: 'Planning du jour',
   recentNotes: 'Notes récentes',
 };
 

@@ -13,7 +13,8 @@ const errors = {
   errorReportCopied: '✓ Hata raporu kopyalandı!',
   goToHome: 'Ana sayfaya git',
   reloadPage: 'Sayfayı yenile',
-  persistentErrorNotice: 'Sorun devam ederse hata raporunu kopyalayıp destek ekibiyle iletişime geçin.',
+  persistentErrorNotice:
+    'Sorun devam ederse hata raporunu kopyalayıp destek ekibiyle iletişime geçin.',
   errorReportCopiedAlert: 'Hata raporu panoya kopyalandı!',
   copyReportForSupport: 'Raporu kopyala (destek için)',
 

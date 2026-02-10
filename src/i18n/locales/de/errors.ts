@@ -13,7 +13,8 @@ const errors = {
   errorReportCopied: '✓ Fehlerbericht kopiert!',
   goToHome: 'Zur Startseite',
   reloadPage: 'Seite neu laden',
-  persistentErrorNotice: 'Wenn das Problem weiterhin besteht, kopieren Sie den Fehlerbericht und kontaktieren Sie den Support.',
+  persistentErrorNotice:
+    'Wenn das Problem weiterhin besteht, kopieren Sie den Fehlerbericht und kontaktieren Sie den Support.',
   errorReportCopiedAlert: 'Fehlerbericht in die Zwischenablage kopiert!',
   copyReportForSupport: 'Bericht kopieren (für Support)',
 

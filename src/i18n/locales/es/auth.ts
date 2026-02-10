@@ -11,7 +11,8 @@ const auth = {
   loginSuccess: '¡Sesión iniciada correctamente!',
   invalidCredentials: 'Correo electrónico o contraseña no válidos',
   accountDeactivated: 'Cuenta desactivada. Por favor, contacte con el soporte.',
-  noConnectionLogin: 'No se puede conectar con el servidor. Por favor, compruebe su conexión a Internet.',
+  noConnectionLogin:
+    'No se puede conectar con el servidor. Por favor, compruebe su conexión a Internet.',
   fillAllFields: 'Por favor, complete todos los campos',
   enterValidEmail: 'Por favor, introduzca una dirección de correo electrónico válida',
   noAccountYet: '¿Aún no tiene cuenta?',
@@ -26,7 +27,8 @@ const auth = {
   demoTherapistButton: '▶ Demo: Panel del terapeuta',
   demoPatientLogin: 'Demo: Sesión iniciada como paciente',
   demoTherapistLogin: 'Demo: Sesión iniciada como terapeuta',
-  demoModeDescription: 'Modo demo: Acceso completo a todas las funciones de la interfaz con datos de ejemplo.',
+  demoModeDescription:
+    'Modo demo: Acceso completo a todas las funciones de la interfaz con datos de ejemplo.',
   gdprNotice: 'Esta aplicación cumple con el RGPD y cifra todos los datos.',
 
   // ─── Registro ────────────────────────────────────
@@ -43,7 +45,8 @@ const auth = {
   confirmPasswordPlaceholder: 'Confirmar contraseña',
   iAmLabel: 'Soy... *',
   roleSelectAriaLabel: 'Seleccionar rol de usuario',
-  gdprConsentText: 'Acepto la política de privacidad (RGPD) y consiento el tratamiento de mis datos con fines médicos. *',
+  gdprConsentText:
+    'Acepto la política de privacidad (RGPD) y consiento el tratamiento de mis datos con fines médicos. *',
   gdprLinkText: 'Política de privacidad',
   registerButton: 'Registrarse',
   registering: 'Registrando...',
@@ -76,7 +79,8 @@ const auth = {
   twoFAErrorLoading: 'Error al cargar los datos de 2FA',
   twoFAInvalidCode: 'Por favor, introduzca un código válido de 6 dígitos',
   twoFAInvalidCodeGeneric: 'Código no válido',
-  twoFAImportantNotice: '⚠️ Importante: Guarde el secreto en un lugar seguro. Si pierde el autenticador, solo podrá recuperar su cuenta con este secreto.',
+  twoFAImportantNotice:
+    '⚠️ Importante: Guarde el secreto en un lugar seguro. Si pierde el autenticador, solo podrá recuperar su cuenta con este secreto.',
   twoFACodeChanges: 'El código cambia cada 30 segundos.',
   twoFAVerifying: 'Verificando...',
   twoFAVerify: 'Verificar',

@@ -11,22 +11,24 @@ const auth = {
   loginSuccess: 'Connexion réussie !',
   invalidCredentials: 'E-mail ou mot de passe invalide',
   accountDeactivated: 'Compte désactivé. Veuillez contacter le support.',
-  noConnectionLogin: 'Impossible de se connecter au serveur. Veuillez vérifier votre connexion Internet.',
+  noConnectionLogin:
+    'Impossible de se connecter au serveur. Veuillez vérifier votre connexion Internet.',
   fillAllFields: 'Veuillez remplir tous les champs',
   enterValidEmail: 'Veuillez entrer une adresse e-mail valide',
-  noAccountYet: "Pas encore de compte ?",
+  noAccountYet: 'Pas encore de compte ?',
   registerNow: "S'inscrire maintenant",
-  testCredentials: "🧪 Identifiants de test :",
+  testCredentials: '🧪 Identifiants de test :',
   testPatient: 'Patient : patient@test.fr / Test123!',
   testTherapist: 'Thérapeute : therapeute@test.fr / Test123!',
 
   // ─── Démo ────────────────────────────────────────
-  demoAccessTitle: "🚀 Accès démo (pas de backend requis) :",
+  demoAccessTitle: '🚀 Accès démo (pas de backend requis) :',
   demoPatientButton: '▶ Démo : Tableau de bord patient',
   demoTherapistButton: '▶ Démo : Tableau de bord thérapeute',
   demoPatientLogin: 'Démo : Connecté en tant que patient',
   demoTherapistLogin: 'Démo : Connecté en tant que thérapeute',
-  demoModeDescription: "Mode démo : Accès complet à toutes les fonctionnalités de l'interface avec des données d'exemple.",
+  demoModeDescription:
+    "Mode démo : Accès complet à toutes les fonctionnalités de l'interface avec des données d'exemple.",
   gdprNotice: 'Cette application est conforme au RGPD et chiffre toutes les données.',
 
   // ─── Inscription ─────────────────────────────────
@@ -43,7 +45,8 @@ const auth = {
   confirmPasswordPlaceholder: 'Confirmer le mot de passe',
   iAmLabel: 'Je suis... *',
   roleSelectAriaLabel: "Sélectionner le rôle de l'utilisateur",
-  gdprConsentText: "J'accepte la politique de confidentialité (RGPD) et je consens au traitement de mes données à des fins médicales. *",
+  gdprConsentText:
+    "J'accepte la politique de confidentialité (RGPD) et je consens au traitement de mes données à des fins médicales. *",
   gdprLinkText: 'Politique de confidentialité',
   registerButton: "S'inscrire",
   registering: 'Inscription en cours...',
@@ -76,7 +79,8 @@ const auth = {
   twoFAErrorLoading: 'Erreur lors du chargement des données 2FA',
   twoFAInvalidCode: 'Veuillez entrer un code valide à 6 chiffres',
   twoFAInvalidCodeGeneric: 'Code invalide',
-  twoFAImportantNotice: "⚠️ Important : Conservez le secret dans un endroit sûr. En cas de perte de l'authentificateur, vous ne pourrez récupérer votre compte qu'avec ce secret.",
+  twoFAImportantNotice:
+    "⚠️ Important : Conservez le secret dans un endroit sûr. En cas de perte de l'authentificateur, vous ne pourrez récupérer votre compte qu'avec ce secret.",
   twoFACodeChanges: 'Le code change toutes les 30 secondes.',
   twoFAVerifying: 'Vérification en cours...',
   twoFAVerify: 'Vérifier',

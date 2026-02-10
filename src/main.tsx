@@ -10,5 +10,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <GlobalErrorBoundary>
       <App />
     </GlobalErrorBoundary>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

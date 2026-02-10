@@ -74,13 +74,19 @@ function coerceNumber(value: string): number | '' {
   return Number.isFinite(n) ? n : '';
 }
 
-export function QuestionnaireFormFields(props: {
+interface QuestionnaireFormFieldsProps {
   formSchema: any;
   responses: FormResponses;
   onResponsesChange: (next: FormResponses) => void;
   readOnly?: boolean;
-}): JSX.Element {
-  const { formSchema, responses, onResponsesChange, readOnly = false } = props;
+}
+
+export function QuestionnaireFormFields({ 
+  formSchema, 
+  responses, 
+  onResponsesChange, 
+  readOnly = false,
+}: QuestionnaireFormFieldsProps): JSX.Element {
   const normalized = useMemo(() => normalizeFormSchema(formSchema), [formSchema]);
 
   const requiredFields: string[] = Array.isArray(normalized.required) ? normalized.required : [];
@@ -100,16 +106,16 @@ export function QuestionnaireFormFields(props: {
       case 'string':
         if (fieldSchema.enum) {
           return (
-            <div className="space-y-2">
+            <div className='space-y-2'>
               {fieldSchema.enum.map((option: string) => (
-                <label key={option} className="flex items-center gap-2">
+                <label key={option} className='flex items-center gap-2'>
                   <input
-                    type="radio"
+                    type='radio'
                     name={fieldId}
                     value={option}
                     checked={value === option}
-                    onChange={(e) => handleChange(e.target.value)}
-                    className="rounded"
+                    onChange={e => handleChange(e.target.value)}
+                    className='rounded'
                     disabled={readOnly}
                   />
                   <span>{option}</span>
@@ -123,7 +129,7 @@ export function QuestionnaireFormFields(props: {
           return (
             <textarea
               value={value || ''}
-              onChange={(e) => handleChange(e.target.value)}
+              onChange={e => handleChange(e.target.value)}
               className={commonClasses}
               rows={4}
               placeholder={fieldSchema.description}
@@ -136,7 +142,7 @@ export function QuestionnaireFormFields(props: {
           <input
             type={fieldSchema.format || 'text'}
             value={value || ''}
-            onChange={(e) => handleChange(e.target.value)}
+            onChange={e => handleChange(e.target.value)}
             className={commonClasses}
             placeholder={fieldSchema.description}
             readOnly={readOnly}
@@ -146,9 +152,9 @@ export function QuestionnaireFormFields(props: {
       case 'number':
         return (
           <input
-            type="number"
+            type='number'
             value={value ?? ''}
-            onChange={(e) => handleChange(coerceNumber(e.target.value))}
+            onChange={e => handleChange(coerceNumber(e.target.value))}
             className={commonClasses}
             placeholder={fieldSchema.description}
             readOnly={readOnly}
@@ -159,13 +165,13 @@ export function QuestionnaireFormFields(props: {
         if (fieldSchema.items?.enum) {
           const selected = Array.isArray(value) ? value : [];
           return (
-            <div className="space-y-2">
+            <div className='space-y-2'>
               {fieldSchema.items.enum.map((option: string) => (
-                <label key={option} className="flex items-center gap-2">
+                <label key={option} className='flex items-center gap-2'>
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={selected.includes(option)}
-                    onChange={(e) => {
+                    onChange={e => {
                       if (readOnly) return;
                       if (e.target.checked) {
                         handleChange([...selected, option]);
@@ -173,7 +179,7 @@ export function QuestionnaireFormFields(props: {
                         handleChange(selected.filter((x: string) => x !== option));
                       }
                     }}
-                    className="rounded"
+                    className='rounded'
                     disabled={readOnly}
                   />
                   <span>{option}</span>
@@ -185,9 +191,9 @@ export function QuestionnaireFormFields(props: {
 
         return (
           <input
-            type="text"
+            type='text'
             value={value || ''}
-            onChange={(e) => handleChange(e.target.value)}
+            onChange={e => handleChange(e.target.value)}
             className={commonClasses}
             readOnly={readOnly}
           />
@@ -196,9 +202,9 @@ export function QuestionnaireFormFields(props: {
       default:
         return (
           <input
-            type="text"
+            type='text'
             value={value || ''}
-            onChange={(e) => handleChange(e.target.value)}
+            onChange={e => handleChange(e.target.value)}
             className={commonClasses}
             readOnly={readOnly}
           />
@@ -207,28 +213,23 @@ export function QuestionnaireFormFields(props: {
   };
 
   return (
-    <div className="space-y-6">
-      {Object.entries(normalized.properties || {}).map(
-        ([fieldId, fieldSchema]: [string, any]) => {
-          const isRequired = requiredFields.includes(fieldId);
+    <div className='space-y-6'>
+      {Object.entries(normalized.properties || {}).map(([fieldId, fieldSchema]: [string, any]) => {
+        const isRequired = requiredFields.includes(fieldId);
 
-          return (
-            <div
-              key={fieldId}
-              className="border-b border-gray-200 pb-6 last:border-0"
-            >
-              <label className="block mb-2">
-                <span className="text-gray-900 font-medium">
-                  {fieldSchema.title}
-                  {isRequired && <span className="text-red-600 ml-1">*</span>}
-                </span>
-              </label>
+        return (
+          <div key={fieldId} className='border-b border-gray-200 pb-6 last:border-0'>
+            <label className='block mb-2'>
+              <span className='text-gray-900 font-medium'>
+                {fieldSchema.title}
+                {isRequired && <span className='text-red-600 ml-1'>*</span>}
+              </span>
+            </label>
 
-              {renderField(fieldId, fieldSchema)}
-            </div>
-          );
-        }
-      )}
+            {renderField(fieldId, fieldSchema)}
+          </div>
+        );
+      })}
     </div>
   );
 }

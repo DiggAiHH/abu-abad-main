@@ -12,9 +12,12 @@ import Exercises from './pages/Exercises';
 import Login from './pages/Login';
 import MedicationTracker from './pages/MedicationTracker';
 import NotFound from './pages/NotFound';
+import PartnerTransparency from './pages/PartnerTransparency';
 import PatientDashboard from './pages/PatientDashboard';
 import PatientMaterials from './pages/PatientMaterials';
 import PatientQuestionnaires from './pages/PatientQuestionnaires';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ProjectTracking from './pages/ProjectTracking';
 import PsychScreenings from './pages/PsychScreenings';
 import QuestionnaireBuilder from './pages/QuestionnaireBuilder';
 import Register from './pages/Register';
@@ -39,8 +42,12 @@ function App() {
   }, [checkAuth]);
 
   const spinner = (
-    <div className="flex items-center justify-center min-h-screen" role="status" aria-label={t('common:loading')}>
-      <div className="spinner"></div>
+    <div
+      className='flex items-center justify-center min-h-screen'
+      role='status'
+      aria-label={t('common:loading')}
+    >
+      <div className='spinner'></div>
     </div>
   );
 
@@ -48,242 +55,265 @@ function App() {
     <ErrorBoundary>
       <BrowserRouter>
         {/* A11y: Skip-to-Content Link */}
-        <a href="#main-content" className="skip-to-content">
+        <a href='#main-content' className='skip-to-content'>
           {t('common:skipToContent')}
         </a>
-        <div aria-live="polite" aria-atomic="true">
-          <Toaster position="top-right" toastOptions={{ ariaProps: { role: 'status', 'aria-live': 'polite' } }} />
+        <div aria-live='polite' aria-atomic='true'>
+          <Toaster
+            position='top-right'
+            toastOptions={{ ariaProps: { role: 'status', 'aria-live': 'polite' } }}
+          />
         </div>
         <DemoBadge />
-        <div className="fixed top-2 end-2 z-50">
+        <div className='fixed top-2 end-2 z-50'>
           <LanguageSwitcher />
         </div>
         <Routes>
-          <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
-          <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
+          <Route path='/login' element={!user ? <Login /> : <Navigate to='/dashboard' />} />
+          <Route path='/register' element={!user ? <Register /> : <Navigate to='/dashboard' />} />
 
           <Route
-            path="/2fa/setup"
-            element={loading ? spinner : user ? <TwoFASetup /> : <Navigate to="/login" />}
+            path='/2fa/setup'
+            element={loading ? spinner : user ? <TwoFASetup /> : <Navigate to='/login' />}
           />
           <Route
-            path="/2fa/verify"
-            element={loading ? spinner : user ? <Navigate to="/dashboard" /> : <TwoFAVerify />}
+            path='/2fa/verify'
+            element={loading ? spinner : user ? <Navigate to='/dashboard' /> : <TwoFAVerify />}
           />
-          
+
           <Route
-            path="/dashboard"
+            path='/dashboard'
             element={
               loading ? (
                 spinner
               ) : user ? (
-                user.role === 'therapist' ? <TherapistDashboard /> : <PatientDashboard />
+                user.role === 'therapist' ? (
+                  <TherapistDashboard />
+                ) : (
+                  <PatientDashboard />
+                )
               ) : (
-                <Navigate to="/login" />
+                <Navigate to='/login' />
               )
             }
           />
-          
+
           <Route
-            path="/call/:roomId"
-            element={loading ? spinner : user ? <VideoCall /> : <Navigate to="/login" />}
+            path='/call/:roomId'
+            element={loading ? spinner : user ? <VideoCall /> : <Navigate to='/login' />}
           />
-          
+
           {/* Patient Pre-Session Materials */}
           <Route
-            path="/materials"
-            element={loading ? spinner : user ? <PatientMaterials /> : <Navigate to="/login" />}
+            path='/materials'
+            element={loading ? spinner : user ? <PatientMaterials /> : <Navigate to='/login' />}
           />
-          
+
           {/* Questionnaire System */}
           <Route
-            path="/questionnaires"
+            path='/questionnaires'
             element={
               loading ? (
                 spinner
               ) : user ? (
-                user.role === 'therapist' ? <QuestionnaireBuilder /> : <PatientQuestionnaires />
+                user.role === 'therapist' ? (
+                  <QuestionnaireBuilder />
+                ) : (
+                  <PatientQuestionnaires />
+                )
               ) : (
-                <Navigate to="/login" />
+                <Navigate to='/login' />
               )
             }
           />
-          
+
           {/* Document Requests */}
           <Route
-            path="/documents"
-            element={loading ? spinner : user ? <DocumentRequests /> : <Navigate to="/login" />}
+            path='/documents'
+            element={loading ? spinner : user ? <DocumentRequests /> : <Navigate to='/login' />}
           />
-          
+
           {/* Symptom Diary - Patient Only */}
           <Route
-            path="/diary"
+            path='/diary'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'patient' ? (
                 <SymptomDiary />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
-          
+
           {/* Therapy Notes - Therapist Only */}
           <Route
-            path="/therapy-notes"
+            path='/therapy-notes'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'therapist' ? (
                 <TherapyNotes />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
           <Route
-            path="/therapy-notes/:patientId"
+            path='/therapy-notes/:patientId'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'therapist' ? (
                 <TherapyNotes />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
-          
+
           {/* Psychological Screenings - Patient Only */}
           <Route
-            path="/screenings"
+            path='/screenings'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'patient' ? (
                 <PsychScreenings />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
-          
+
           {/* Crisis Plan - Patient Only */}
           <Route
-            path="/crisis-plan"
+            path='/crisis-plan'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'patient' ? (
                 <CrisisPlan />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
-          
+
           {/* Medication Tracker - Patient Only */}
           <Route
-            path="/medications"
+            path='/medications'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'patient' ? (
                 <MedicationTracker />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
-          
+
           {/* Exercises & Homework - Patient Only */}
           <Route
-            path="/exercises"
+            path='/exercises'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'patient' ? (
                 <Exercises />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
-          
+
           {/* Reminder Settings - Both Roles */}
           <Route
-            path="/reminders"
-            element={loading ? spinner : user ? <ReminderSettings /> : <Navigate to="/login" />}
+            path='/reminders'
+            element={loading ? spinner : user ? <ReminderSettings /> : <Navigate to='/login' />}
           />
-          
+
           {/* Treatment Reports - Therapist Only */}
           <Route
-            path="/reports"
+            path='/reports'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'therapist' ? (
                 <Reports />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
-          
+
           {/* Waiting Room - Patient Only */}
           <Route
-            path="/waiting-room"
+            path='/waiting-room'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'patient' ? (
                 <WaitingRoom />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
-          
+
           {/* Therapist Queue - Therapist Only */}
           <Route
-            path="/queue"
+            path='/queue'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'therapist' ? (
                 <TherapistQueue />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
 
           {/* Billing - Therapist Only */}
           <Route
-            path="/billing"
+            path='/billing'
             element={
               loading ? (
                 spinner
               ) : user?.role === 'therapist' ? (
                 <Billing />
               ) : (
-                <Navigate to="/dashboard" />
+                <Navigate to='/dashboard' />
               )
             }
           />
 
           {/* 2FA Setup - Authenticated Users */}
           <Route
-            path="/2fa-setup"
-            element={loading ? spinner : user ? <TwoFASetup /> : <Navigate to="/login" />}
+            path='/2fa-setup'
+            element={loading ? spinner : user ? <TwoFASetup /> : <Navigate to='/login' />}
           />
 
           {/* 2FA Verify - Public (for login flow) */}
-          <Route path="/2fa-verify" element={<TwoFAVerify />} />
-          
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path='/2fa-verify' element={<TwoFAVerify />} />
+
+          {/* Projekt-Tracking — nur für eingeloggte Benutzer */}
+          <Route
+            path='/project-tracking'
+            element={loading ? spinner : user ? <ProjectTracking /> : <Navigate to='/login' />}
+          />
+
+          {/* Partner-Transparenz — öffentlich zugänglich (keine sensiblen Daten) */}
+          <Route path='/partner-view' element={<PartnerTransparency />} />
+
+          {/* Datenschutzerklärung — öffentlich zugänglich (DSGVO-Pflicht) */}
+          <Route path='/privacy' element={<PrivacyPolicy />} />
+
+          <Route path='/' element={<Navigate to='/dashboard' />} />
+          <Route path='*' element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </ErrorBoundary>

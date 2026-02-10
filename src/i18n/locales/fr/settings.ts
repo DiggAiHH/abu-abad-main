@@ -36,7 +36,7 @@ const settings = {
   smsType: 'SMS',
   smsDescription: 'Rappels par SMS (Premium)',
   reminderTimesTitle: 'Horaires des rappels',
-  reminderTimesDescription: "Choisissez quand vous souhaitez être rappelé avant un rendez-vous",
+  reminderTimesDescription: 'Choisissez quand vous souhaitez être rappelé avant un rendez-vous',
   dailySummaryTitle: 'Résumé quotidien',
   dailySummaryToggle: 'Activer le résumé quotidien',
   dailySummaryDescription: 'E-mail matinal avec tous les rendez-vous de la journée',

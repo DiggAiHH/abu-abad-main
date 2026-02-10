@@ -1,16 +1,16 @@
 const video = {
   title: 'Відеосеанс',
   // ─── З\'єднання ──────────────────────────────────
-  connectionEstablished: 'З\'єднання встановлено',
-  connectionErrorDuringCall: 'Помилка з\'єднання під час дзвінка',
-  connectionLost: 'З\'єднання втрачено',
-  connectionError: 'Помилка з\'єднання',
-  connectionInterrupted: 'З\'єднання перервано, спроба відновлення...',
-  connectionEndedInfo: 'З\'єднання завершено',
-  connectionLostReconnect: 'З\'єднання втрачено. Будь ласка, підключіться знову.',
+  connectionEstablished: "З'єднання встановлено",
+  connectionErrorDuringCall: "Помилка з'єднання під час дзвінка",
+  connectionLost: "З'єднання втрачено",
+  connectionError: "Помилка з'єднання",
+  connectionInterrupted: "З'єднання перервано, спроба відновлення...",
+  connectionEndedInfo: "З'єднання завершено",
+  connectionLostReconnect: "З'єднання втрачено. Будь ласка, підключіться знову.",
   connecting: 'Підключення...',
   connected: 'Підключено',
-  waitingForConnection: 'Очікування з\'єднання...',
+  waitingForConnection: "Очікування з'єднання...",
   live: 'Наживо',
 
   // ─── Дзвінок ─────────────────────────────────────
@@ -28,11 +28,11 @@ const video = {
   // ─── Peer/Мережа ─────────────────────────────────
   peerUnavailable: 'Інша сторона недоступна. Зачекайте, поки терапевт приєднається.',
   peerServerUnreachable: 'PeerJS-сервер недоступний. Підключення не вдалося.',
-  peerNotInitialized: 'Peer-з\'єднання не ініціалізовано',
+  peerNotInitialized: "Peer-з'єднання не ініціалізовано",
   serverError: 'Помилка сервера. Будь ласка, спробуйте пізніше.',
   timeoutTherapist: 'Терапевт не відповідає. Будь ласка, спробуйте пізніше.',
   therapistNotOnline: 'Терапевт не в мережі або недоступний',
-  slowNetwork: 'Виявлено повільне мережеве з\'єднання. Якість знижено.',
+  slowNetwork: "Виявлено повільне мережеве з'єднання. Якість знижено.",
 
   // ─── Медіа/Камера ────────────────────────────────
   browserNoWebRTC: 'Браузер не підтримує WebRTC.',
@@ -99,7 +99,8 @@ const video = {
   queueTitle: 'Огляд залу очікування',
   patientsWaiting: '{{count}} пацієнт(ів) очікує',
   noPatientsWaiting: 'Немає пацієнтів, що очікують',
-  patientsAppearHere: 'Нові пацієнти з\'являться тут, як тільки вони приєднаються до залу очікування.',
+  patientsAppearHere:
+    "Нові пацієнти з'являться тут, як тільки вони приєднаються до залу очікування.",
   appointment: 'Запис:',
   waitingTime: 'Очікує: {{min}} хв.',
   viewQuestionnaire: 'Опитувальник',

@@ -33,7 +33,8 @@ const nav = {
   createQuestionnaire: 'Crear cuestionario',
   createQuestionnaireSubtitle: 'Anamnesis, verificación de síntomas o cuestionarios individuales',
   requestDocuments: 'Solicitar documentos',
-  requestDocumentsSubtitle: 'Solicitar escáneres, resultados o documentación específica a los pacientes',
+  requestDocumentsSubtitle:
+    'Solicitar escáneres, resultados o documentación específica a los pacientes',
   patientMaterials: 'Materiales del paciente',
   patientMaterialsSubtitle: 'Ver notas y preparaciones de los pacientes',
   billing: 'Facturación',

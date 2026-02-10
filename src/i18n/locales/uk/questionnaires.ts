@@ -25,7 +25,7 @@ const questionnaires = {
   deleteField: 'Видалити поле',
   fieldLabel: 'Мітка',
   fieldLabelPlaceholder: 'Підпис поля',
-  fieldRequired: 'Обов\'язкове поле',
+  fieldRequired: "Обов'язкове поле",
   fieldOptions: 'Варіанти',
   addOption: 'Додати варіант',
   noFields: 'Полів поки немає',

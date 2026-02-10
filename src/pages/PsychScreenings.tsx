@@ -1,11 +1,11 @@
 import { format, parseISO } from 'date-fns';
 import {
-    AlertTriangle,
-    ArrowLeft,
-    CheckCircle,
-    ChevronRight,
-    ClipboardCheck,
-    Clock,
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle,
+  ChevronRight,
+  ClipboardCheck,
+  Clock,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -132,9 +132,7 @@ export default function PsychScreenings() {
     if (!activeScreening) return;
 
     // Prüfen ob alle Fragen beantwortet
-    const unanswered = activeScreening.questions.filter(
-      (q) => answers[q.id] === undefined
-    );
+    const unanswered = activeScreening.questions.filter(q => answers[q.id] === undefined);
     if (unanswered.length > 0) {
       toast.error(t('screenings:answerAllQuestions'));
       return;
@@ -170,8 +168,8 @@ export default function PsychScreenings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner" />
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='spinner' />
       </div>
     );
   }
@@ -180,49 +178,45 @@ export default function PsychScreenings() {
   if (showResult) {
     const data = showResult.result_data;
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-          <div className="text-center mb-6">
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold">{t('screenings:completed')}</h2>
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
+        <div className='bg-white rounded-xl shadow-xl max-w-md w-full p-6'>
+          <div className='text-center mb-6'>
+            <CheckCircle className='w-16 h-16 text-green-500 mx-auto mb-4' />
+            <h2 className='text-2xl font-bold'>{t('screenings:completed')}</h2>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-600 mb-2">{showResult.screening_type}</p>
-            <div className="flex justify-between items-center">
-              <span className="text-4xl font-bold">{data.totalScore}</span>
-              <span className="text-gray-400">/ {data.maxScore}</span>
+          <div className='bg-gray-50 rounded-lg p-4 mb-6'>
+            <p className='text-sm text-gray-600 mb-2'>{showResult.screening_type}</p>
+            <div className='flex justify-between items-center'>
+              <span className='text-4xl font-bold'>{data.totalScore}</span>
+              <span className='text-gray-400'>/ {data.maxScore}</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
+            <div className='w-full bg-gray-200 rounded-full h-3 mt-2'>
               <div
                 className={`h-3 rounded-full ${
                   data.percentage <= 30
                     ? 'bg-green-500'
                     : data.percentage <= 60
-                    ? 'bg-yellow-500'
-                    : 'bg-red-500'
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500'
                 }`}
                 style={{ width: `${data.percentage}%` }}
               />
             </div>
           </div>
 
-          <div
-            className={`rounded-lg p-4 mb-6 ${
-              SEVERITY_COLORS[data.severity] || 'bg-gray-100'
-            }`}
-          >
-            <p className="font-semibold text-lg">{data.severityLabel}</p>
+          <div className={`rounded-lg p-4 mb-6 ${SEVERITY_COLORS[data.severity] || 'bg-gray-100'}`}>
+            <p className='font-semibold text-lg'>{data.severityLabel}</p>
           </div>
 
           {data.criticalAlert && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="text-red-500 flex-shrink-0" />
+            <div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6'>
+              <div className='flex items-start gap-3'>
+                <AlertTriangle className='text-red-500 flex-shrink-0' />
                 <div>
-                  <p className="font-bold text-red-700">{t('common:error')}</p>
-                  <p className="text-sm text-red-600">{data.criticalAlert}</p>
-                  <p className="text-sm text-red-600 mt-2">
+                  <p className='font-bold text-red-700'>{t('common:error')}</p>
+                  <p className='text-sm text-red-600'>{data.criticalAlert}</p>
+                  <p className='text-sm text-red-600 mt-2'>
                     {t('crisis:crisisHotlines')}: 0800 111 0 111
                   </p>
                 </div>
@@ -232,7 +226,7 @@ export default function PsychScreenings() {
 
           <button
             onClick={() => setShowResult(null)}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className='w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition'
           >
             {t('common:back')}
           </button>
@@ -247,48 +241,49 @@ export default function PsychScreenings() {
     const progress = (answeredCount / activeScreening.questions.length) * 100;
 
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm sticky top-0 z-10">
-          <div className="max-w-3xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
+      <div className='min-h-screen bg-gray-50'>
+        <header className='bg-white shadow-sm sticky top-0 z-10'>
+          <div className='max-w-3xl mx-auto px-4 py-4'>
+            <div className='flex items-center justify-between'>
               <button
                 onClick={() => setActiveScreening(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className='p-2 hover:bg-gray-100 rounded-lg'
               >
-                <ArrowLeft size={24} className="rtl:flip" />
+                <ArrowLeft size={24} className='rtl:flip' />
               </button>
-              <span className="text-sm text-gray-500">
+              <span className='text-sm text-gray-500'>
                 {answeredCount} / {activeScreening.questions.length}
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+            <div className='w-full bg-gray-200 rounded-full h-2 mt-2'>
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className='bg-blue-600 h-2 rounded-full transition-all duration-300'
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
         </header>
 
-        <main className="max-w-3xl mx-auto px-4 py-6">
-          <h2 className="text-xl font-bold mb-2">{activeScreening.name}</h2>
-          <p className="text-gray-600 mb-6">
-            {t('screenings:questionOf', { current: answeredCount, total: activeScreening.questions.length })}
+        <main className='max-w-3xl mx-auto px-4 py-6'>
+          <h2 className='text-xl font-bold mb-2'>{activeScreening.name}</h2>
+          <p className='text-gray-600 mb-6'>
+            {t('screenings:questionOf', {
+              current: answeredCount,
+              total: activeScreening.questions.length,
+            })}
           </p>
 
-          <div className="space-y-6">
+          <div className='space-y-6'>
             {activeScreening.questions.map((question, index) => (
-              <div key={question.id} className="bg-white rounded-lg shadow p-4">
-                <p className="font-medium mb-4">
+              <div key={question.id} className='bg-white rounded-lg shadow p-4'>
+                <p className='font-medium mb-4'>
                   {index + 1}. {question.text}
                 </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {activeScreening.options.map((option) => (
+                <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
+                  {activeScreening.options.map(option => (
                     <button
                       key={option.value}
-                      onClick={() =>
-                        setAnswers({ ...answers, [question.id]: option.value })
-                      }
+                      onClick={() => setAnswers({ ...answers, [question.id]: option.value })}
                       className={`p-3 rounded-lg text-sm transition ${
                         answers[question.id] === option.value
                           ? 'bg-blue-600 text-white'
@@ -306,7 +301,7 @@ export default function PsychScreenings() {
           <button
             onClick={submitScreening}
             disabled={answeredCount < activeScreening.questions.length}
-            className="w-full mt-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className='w-full mt-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {t('screenings:submitScreening')}
           </button>
@@ -317,51 +312,47 @@ export default function PsychScreenings() {
 
   // Main Dashboard
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4">
+    <div className='min-h-screen bg-gray-50'>
+      <header className='bg-white shadow-sm'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
+          <div className='flex items-center gap-4'>
             <button
               onClick={() => navigate('/dashboard')}
-              className="p-2 hover:bg-gray-100 rounded-lg"
+              className='p-2 hover:bg-gray-100 rounded-lg'
             >
-              <ArrowLeft size={24} className="rtl:flip" />
+              <ArrowLeft size={24} className='rtl:flip' />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {t('screenings:title')}
-              </h1>
-              <p className="text-sm text-gray-600">
-                {t('screenings:subtitle')}
-              </p>
+              <h1 className='text-2xl font-bold text-gray-900'>{t('screenings:title')}</h1>
+              <p className='text-sm text-gray-600'>{t('screenings:subtitle')}</p>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Pending Assignments */}
         {pending.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Clock className="text-orange-500" />
+          <div className='mb-8'>
+            <h2 className='text-lg font-bold mb-4 flex items-center gap-2'>
+              <Clock className='text-orange-500' />
               {t('screenings:pending')}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pending.map((assignment) => (
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              {pending.map(assignment => (
                 <div
                   key={assignment.id}
-                  className="bg-orange-50 border border-orange-200 rounded-lg p-4"
+                  className='bg-orange-50 border border-orange-200 rounded-lg p-4'
                 >
-                  <div className="flex justify-between items-start">
+                  <div className='flex justify-between items-start'>
                     <div>
-                      <p className="font-semibold">{assignment.screening_type}</p>
-                      <p className="text-sm text-gray-600">
+                      <p className='font-semibold'>{assignment.screening_type}</p>
+                      <p className='text-sm text-gray-600'>
                         {t('screenings:assignedBy')} Dr. {assignment.therapist_first}{' '}
                         {assignment.therapist_last}
                       </p>
                       {assignment.due_date && (
-                        <p className="text-sm text-orange-600">
+                        <p className='text-sm text-orange-600'>
                           {t('screenings:dueDate')}:{' '}
                           {format(parseISO(assignment.due_date), 'dd.MM.yyyy', {
                             locale: getDateLocale(),
@@ -371,15 +362,13 @@ export default function PsychScreenings() {
                     </div>
                     <button
                       onClick={() => startScreening(assignment.screening_type)}
-                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                      className='px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600'
                     >
                       {t('screenings:startTest')}
                     </button>
                   </div>
                   {assignment.message && (
-                    <p className="mt-2 text-sm italic text-gray-600">
-                      "{assignment.message}"
-                    </p>
+                    <p className='mt-2 text-sm italic text-gray-600'>"{assignment.message}"</p>
                   )}
                 </div>
               ))}
@@ -388,29 +377,28 @@ export default function PsychScreenings() {
         )}
 
         {/* Available Templates */}
-        <div className="mb-8">
-          <h2 className="text-lg font-bold mb-4">{t('screenings:available')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {templates.map((template) => (
+        <div className='mb-8'>
+          <h2 className='text-lg font-bold mb-4'>{t('screenings:available')}</h2>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+            {templates.map(template => (
               <div
                 key={template.id}
-                className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition cursor-pointer"
+                className='bg-white rounded-lg shadow p-4 hover:shadow-lg transition cursor-pointer'
                 onClick={() => startScreening(template.id)}
               >
-                <div className="flex items-start justify-between">
+                <div className='flex items-start justify-between'>
                   <div>
-                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                    <span className='text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full'>
                       {template.category}
                     </span>
-                    <h3 className="font-bold mt-2">{template.id}</h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {template.description}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-2">
-                      {template.questionCount} {t('screenings:questionOf', { current: '', total: '' }).trim()}
+                    <h3 className='font-bold mt-2'>{template.id}</h3>
+                    <p className='text-sm text-gray-600 mt-1'>{template.description}</p>
+                    <p className='text-xs text-gray-400 mt-2'>
+                      {template.questionCount}{' '}
+                      {t('screenings:questionOf', { current: '', total: '' }).trim()}
                     </p>
                   </div>
-                  <ChevronRight className="text-gray-400 rtl:flip" />
+                  <ChevronRight className='text-gray-400 rtl:flip' />
                 </div>
               </div>
             ))}
@@ -419,25 +407,28 @@ export default function PsychScreenings() {
 
         {/* Previous Results */}
         <div>
-          <h2 className="text-lg font-bold mb-4">{t('screenings:myResults')}</h2>
+          <h2 className='text-lg font-bold mb-4'>{t('screenings:myResults')}</h2>
           {results.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-8 text-center">
-              <ClipboardCheck className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">{t('screenings:noResults')}</p>
+            <div className='bg-white rounded-lg shadow p-8 text-center'>
+              <ClipboardCheck className='w-12 h-12 text-gray-400 mx-auto mb-4' />
+              <p className='text-gray-600'>{t('screenings:noResults')}</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {results.map((result) => {
-                const data = result.result_data || { totalScore: 0, maxScore: 1, percentage: 0, severity: 'none', severityLabel: '–' };
+            <div className='space-y-3'>
+              {results.map(result => {
+                const data = result.result_data || {
+                  totalScore: 0,
+                  maxScore: 1,
+                  percentage: 0,
+                  severity: 'none',
+                  severityLabel: '–',
+                };
                 return (
-                  <div
-                    key={result.id}
-                    className="bg-white rounded-lg shadow p-4"
-                  >
-                    <div className="flex justify-between items-center">
+                  <div key={result.id} className='bg-white rounded-lg shadow p-4'>
+                    <div className='flex justify-between items-center'>
                       <div>
-                        <p className="font-semibold">{result.screening_type}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className='font-semibold'>{result.screening_type}</p>
+                        <p className='text-sm text-gray-500'>
                           {result.created_at
                             ? format(parseISO(result.created_at), 'dd.MM.yyyy HH:mm', {
                                 locale: getDateLocale(),
@@ -445,7 +436,7 @@ export default function PsychScreenings() {
                             : '–'}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className='text-right'>
                         <p className={`text-2xl font-bold ${getScoreColor(data.percentage)}`}>
                           {data.totalScore}/{data.maxScore}
                         </p>

@@ -43,7 +43,8 @@ const auth = {
   confirmPasswordPlaceholder: 'Confirm password',
   iAmLabel: 'I am... *',
   roleSelectAriaLabel: 'Select user role',
-  gdprConsentText: 'I accept the privacy policy (GDPR) and consent to the processing of my data for medical purposes. *',
+  gdprConsentText:
+    'I accept the privacy policy (GDPR) and consent to the processing of my data for medical purposes. *',
   gdprLinkText: 'Privacy policy',
   registerButton: 'Register',
   registering: 'Registering...',
@@ -76,7 +77,8 @@ const auth = {
   twoFAErrorLoading: 'Error loading 2FA data',
   twoFAInvalidCode: 'Please enter a valid 6-digit code',
   twoFAInvalidCodeGeneric: 'Invalid code',
-  twoFAImportantNotice: '⚠️ Important: Save the secret in a secure location. If you lose your authenticator, you can only recover your account with this secret.',
+  twoFAImportantNotice:
+    '⚠️ Important: Save the secret in a secure location. If you lose your authenticator, you can only recover your account with this secret.',
   twoFACodeChanges: 'The code changes every 30 seconds.',
   twoFAVerifying: 'Verifying...',
   twoFAVerify: 'Verify',

@@ -42,8 +42,11 @@ function validateEnv(): EnvConfig {
 
   // Kritische Prüfung in Production
   if (config.IS_PRODUCTION) {
-    if (config.VITE_STRIPE_PUBLISHABLE_KEY && config.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_test_')) {
-      // eslint-disable-next-line no-console
+    if (
+      config.VITE_STRIPE_PUBLISHABLE_KEY &&
+      config.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_test_')
+    ) {
+       
       console.error('[Env] ⚠️  Stripe Test-Key in Produktion erkannt!');
     }
   }

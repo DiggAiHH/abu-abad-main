@@ -7,7 +7,7 @@ const billing = {
   invoiceCreated: 'Facture créée',
   invoiceNumber: 'Numéro de facture',
   amount: 'Montant',
-  dueDate: 'Date d\'échéance',
+  dueDate: "Date d'échéance",
   selectPatient: 'Veuillez sélectionner un patient',
   enterTitle: 'Veuillez saisir un titre',
   noInvoices: 'Aucune facture disponible',

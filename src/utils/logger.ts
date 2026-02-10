@@ -141,7 +141,7 @@ export const logger = {
   warn(context: string, meta?: unknown) {
     if (!shouldLog('warn')) return;
     const safeMeta = isProd ? sanitizeError(meta) : meta;
-    // eslint-disable-next-line no-console
+     
     console.warn(formatPrefix('warn'), context, safeMeta ?? '');
   },
 
@@ -156,7 +156,7 @@ export const logger = {
       if (!allowErrorLog(signature)) return;
     }
 
-    // eslint-disable-next-line no-console
+     
     console.error(formatPrefix('error'), context, safeError ?? '', safeMeta ?? '');
   },
 };

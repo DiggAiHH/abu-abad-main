@@ -55,10 +55,7 @@ function unwrapAxiosResponse(maybeResponse: unknown): unknown {
 /**
  * Safe response parser with fallback
  */
-export function parseApiResponse<T>(
-  response: unknown,
-  schema: z.ZodType<T>
-): T | null {
+export function parseApiResponse<T>(response: unknown, schema: z.ZodType<T>): T | null {
   try {
     return schema.parse(response);
   } catch (error) {

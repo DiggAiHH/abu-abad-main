@@ -3,11 +3,7 @@ import { persist } from 'zustand/middleware';
 import { authAPI, setLogoutInProgress } from '../api/client';
 import { registerDemoStateProvider } from '../api/demoStateBridge';
 import { extractToken, extractUser } from '../api/types';
-import {
-    clearAccessToken,
-    getAccessToken,
-    setAccessToken,
-} from '../auth/token';
+import { clearAccessToken, getAccessToken, setAccessToken } from '../auth/token';
 import { User } from '../types';
 
 interface AuthState {
@@ -41,7 +37,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    set => ({
       user: null,
       token: getAccessToken(),
       twoFactorRequired: false,
@@ -102,7 +98,9 @@ export const useAuthStore = create<AuthState>()(
 
           const response = await authAPI.login(email, password);
 
-          const responseData = (response as { data?: { twoFactorRequired?: boolean; tempToken?: string } })?.data;
+          const responseData = (
+            response as { data?: { twoFactorRequired?: boolean; tempToken?: string } }
+          )?.data;
           const twoFactorRequired = Boolean(responseData?.twoFactorRequired);
           const tempToken = responseData?.tempToken;
           if (twoFactorRequired) {
@@ -136,14 +134,23 @@ export const useAuthStore = create<AuthState>()(
           }
 
           setAccessToken(token);
-          set({ user, token, error: null, loading: false, twoFactorRequired: false, twoFactorTempToken: null });
+          set({
+            user,
+            token,
+            error: null,
+            loading: false,
+            twoFactorRequired: false,
+            twoFactorTempToken: null,
+          });
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : 'Login fehlgeschlagen';
+          const errorMessage = error instanceof Error ? error.message : 'Login fehlgeschlagen';
           set({ error: errorMessage, loading: false });
           // Log to error tracking service if available
           if (typeof window !== 'undefined' && 'logError' in window) {
-            (window as Window & { logError?: (err: unknown, context: string) => void }).logError?.(error, 'authStore.login');
+            (window as Window & { logError?: (err: unknown, context: string) => void }).logError?.(
+              error,
+              'authStore.login'
+            );
           }
           throw error;
         }
@@ -185,7 +192,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      devBypassLogin: async (role) => {
+      devBypassLogin: async role => {
         set({ loading: true, error: null });
         try {
           const response = await authAPI.devBypass(role);
@@ -198,7 +205,14 @@ export const useAuthStore = create<AuthState>()(
           }
 
           setAccessToken(token);
-          set({ user, token, error: null, loading: false, twoFactorRequired: false, twoFactorTempToken: null });
+          set({
+            user,
+            token,
+            error: null,
+            loading: false,
+            twoFactorRequired: false,
+            twoFactorTempToken: null,
+          });
         } catch (error) {
           const errorMessage =
             error instanceof Error ? error.message : 'Dev-Bypass Login fehlgeschlagen';
@@ -213,7 +227,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      demoLogin: (role) => {
+      demoLogin: role => {
         const demoUser: User = {
           id: role === 'therapist' ? 'demo-therapist-001' : 'demo-patient-001',
           email: role === 'therapist' ? 'therapeut@demo.de' : 'patient@demo.de',
@@ -235,7 +249,7 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
-      register: async (data) => {
+      register: async data => {
         set({ loading: true, error: null });
 
         if (!data.email || !data.password || !data.firstName || !data.lastName) {
@@ -257,7 +271,14 @@ export const useAuthStore = create<AuthState>()(
         }
 
         setAccessToken(token);
-        set({ user, token, error: null, loading: false, twoFactorRequired: false, twoFactorTempToken: null });
+        set({
+          user,
+          token,
+          error: null,
+          loading: false,
+          twoFactorRequired: false,
+          twoFactorTempToken: null,
+        });
       },
 
       logout: async () => {
@@ -274,7 +295,15 @@ export const useAuthStore = create<AuthState>()(
           } catch (e) {
             if (import.meta.env.DEV) console.warn('[Auth] sessionStorage cleanup failed', e);
           }
-          set({ user: null, token: null, twoFactorRequired: false, twoFactorTempToken: null, error: null, loading: false, isDemo: false });
+          set({
+            user: null,
+            token: null,
+            twoFactorRequired: false,
+            twoFactorTempToken: null,
+            error: null,
+            loading: false,
+            isDemo: false,
+          });
           setLogoutInProgress(false);
         }
       },

@@ -19,7 +19,7 @@ const questionnaires = {
   templateTitle: 'Titre',
   templateTitlePlaceholder: 'Nom du questionnaire',
   templateDescription: 'Description',
-  templateDescriptionPlaceholder: 'Décrire l\'objectif du questionnaire...',
+  templateDescriptionPlaceholder: "Décrire l'objectif du questionnaire...",
   addField: 'Ajouter un champ',
   editField: 'Modifier le champ',
   deleteField: 'Supprimer le champ',

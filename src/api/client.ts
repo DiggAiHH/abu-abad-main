@@ -40,7 +40,7 @@ export const api = axios.create({
 // Fängt ALLE Requests im Demo-Modus ab und gibt Mock-Daten zurück.
 // Nutzt demoStateBridge um zirkuläre Abhängigkeiten zu vermeiden.
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const demoState = getDemoState();
 
     if (demoState && demoState.isDemo) {
@@ -72,19 +72,19 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 // Request Interceptor: Add JWT Token
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 // Response Interceptor: Handle Errors
@@ -133,7 +133,7 @@ async function refreshAccessToken(): Promise<string | null> {
 }
 
 api.interceptors.response.use(
-  (response) => response,
+  response => response,
   async (error: AxiosError<{ error: string }>) => {
     const message = coerceErrorMessage(error.response?.data);
     const originalRequest = error.config as typeof error.config & { _retry?: boolean };
@@ -141,7 +141,7 @@ api.interceptors.response.use(
     const isAuthLoginCall = requestUrl.includes('/auth/login');
     const isAuthRefreshCall = requestUrl.includes('/auth/refresh');
     const isAuth2FALoginVerifyCall = requestUrl.includes('/auth/2fa/login-verify');
-    
+
     if (error.response?.status === 401) {
       // IMPORTANT: Niemals Refresh auf Refresh/Login anwenden (sonst Deadlocks/Loops)
       if (isAuthRefreshCall || isAuthLoginCall || isAuth2FALoginVerifyCall) {
@@ -181,26 +181,25 @@ api.interceptors.response.use(
     } else {
       toast.error(message);
     }
-    
+
     // Error reporting (typed, no unsafe window access)
     if (import.meta.env.DEV && typeof window !== 'undefined') {
       const win = window as Window & { logError?: (err: unknown, ctx: string) => void };
       win.logError?.(error, 'axios.response');
     }
-    
+
     return Promise.reject(error);
   }
 );
 
 // Auth API
 export const authAPI = {
-  login: (email: string, password: string) =>
-    api.post('/auth/login', { email, password }),
+  login: (email: string, password: string) => api.post('/auth/login', { email, password }),
 
   // DEV ONLY: UI-/Smoke-Tests ohne DB
   devBypass: (role: 'therapist' | 'patient', email?: string) =>
     api.post('/auth/dev-bypass', { role, ...(email ? { email } : {}) }),
-  
+
   register: (data: {
     email: string;
     password: string;
@@ -210,11 +209,11 @@ export const authAPI = {
     phone?: string;
     gdprConsent: boolean;
   }) => api.post('/auth/register', data),
-  
+
   getMe: () => api.get('/auth/me'),
 
   refresh: () => api.post('/auth/refresh', {}),
-  
+
   logout: () => api.post('/auth/logout'),
 
   // 2FA (TOTP)
@@ -227,24 +226,22 @@ export const authAPI = {
 
 // Appointment API
 export const appointmentAPI = {
-  getAll: (params?: { status?: string; date?: string }) =>
-    api.get('/appointments', { params }),
-  
+  getAll: (params?: { status?: string; date?: string }) => api.get('/appointments', { params }),
+
   getById: (id: string) => api.get(`/appointments/${id}`),
-  
+
   create: (data: {
     startTime: string;
     endTime: string;
     appointmentType: 'video' | 'audio' | 'in-person';
     price?: number;
   }) => api.post('/appointments', data),
-  
+
   book: (id: string, patientNotes?: string) =>
     api.post(`/appointments/${id}/book`, { patientNotes }),
-  
-  cancel: (id: string, reason?: string) =>
-    api.post(`/appointments/${id}/cancel`, { reason }),
-  
+
+  cancel: (id: string, reason?: string) => api.post(`/appointments/${id}/cancel`, { reason }),
+
   complete: (id: string, therapistNotes?: string) =>
     api.post(`/appointments/${id}/complete`, { therapistNotes }),
 };
@@ -252,12 +249,11 @@ export const appointmentAPI = {
 // Message API
 export const messageAPI = {
   getAll: () => api.get('/messages'),
-  
+
   getConversation: (userId: string) => api.get(`/messages/conversation/${userId}`),
-  
-  send: (receiverId: string, content: string) =>
-    api.post('/messages', { receiverId, content }),
-  
+
+  send: (receiverId: string, content: string) => api.post('/messages', { receiverId, content }),
+
   markAsRead: (messageId: string) => api.put(`/messages/${messageId}/read`),
 };
 
@@ -265,21 +261,17 @@ export const messageAPI = {
 export const paymentAPI = {
   createCheckout: (appointmentId: string) =>
     api.post('/payments/create-checkout', { appointmentId }),
-  
-  getByAppointment: (appointmentId: string) =>
-    api.get(`/payments/appointment/${appointmentId}`),
+
+  getByAppointment: (appointmentId: string) => api.get(`/payments/appointment/${appointmentId}`),
 };
 
 // User API
 export const userAPI = {
   getProfile: () => api.get('/users/profile'),
-  
-  updateProfile: (data: {
-    firstName?: string;
-    lastName?: string;
-    phone?: string;
-  }) => api.put('/users/profile', data),
-  
+
+  updateProfile: (data: { firstName?: string; lastName?: string; phone?: string }) =>
+    api.put('/users/profile', data),
+
   getTherapists: () => api.get('/users/therapists'),
 };
 

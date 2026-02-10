@@ -29,7 +29,7 @@ const notes = {
   homework: 'Devoirs',
   riskAssessment: 'Évaluation des risques',
   suicidalIdeation: 'Idées suicidaires',
-  mentalStatus: 'Examen de l\'état mental',
+  mentalStatus: "Examen de l'état mental",
   progressRating: 'Évaluation des progrès',
   goalsAddressed: 'Objectifs abordés',
   followUpRequired: 'Suivi nécessaire',

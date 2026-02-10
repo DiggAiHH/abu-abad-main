@@ -1,22 +1,22 @@
 import { format, parseISO } from 'date-fns';
 import {
-    Activity,
-    AlertTriangle,
-    ArrowLeft,
-    Calendar,
-    Edit2,
-    Frown,
-    Meh,
-    Minus,
-    Moon,
-    Pill,
-    Plus,
-    Save,
-    Smile,
-    Trash2,
-    TrendingDown,
-    TrendingUp,
-    X,
+  Activity,
+  AlertTriangle,
+  ArrowLeft,
+  Calendar,
+  Edit2,
+  Frown,
+  Meh,
+  Minus,
+  Moon,
+  Pill,
+  Plus,
+  Save,
+  Smile,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -98,32 +98,27 @@ const ACTIVITY_KEYS = [
 
 // ===== HELPER COMPONENTS =====
 function MoodIcon({ score }: { score: number }) {
-  if (score >= 7)
-    return <Smile className="text-green-500" size={24} />;
-  if (score >= 4)
-    return <Meh className="text-yellow-500" size={24} />;
-  return <Frown className="text-red-500" size={24} />;
+  if (score >= 7) return <Smile className='text-green-500' size={24} />;
+  if (score >= 4) return <Meh className='text-yellow-500' size={24} />;
+  return <Frown className='text-red-500' size={24} />;
 }
 
 function TrendIcon({ trend }: { trend: string }) {
   switch (trend) {
     case 'improving':
-      return <TrendingUp className="text-green-500" size={20} />;
+      return <TrendingUp className='text-green-500' size={20} />;
     case 'declining':
-      return <TrendingDown className="text-red-500" size={20} />;
+      return <TrendingDown className='text-red-500' size={20} />;
     default:
-      return <Minus className="text-gray-500" size={20} />;
+      return <Minus className='text-gray-500' size={20} />;
   }
 }
 
 function ScoreBar({ value, max, color }: { value: number; max: number; color: string }) {
   const percentage = (value / max) * 100;
   return (
-    <div className="w-full bg-gray-200 rounded-full h-2">
-      <div
-        className={`h-2 rounded-full ${color}`}
-        style={{ width: `${percentage}%` }}
-      />
+    <div className='w-full bg-gray-200 rounded-full h-2'>
+      <div className={`h-2 rounded-full ${color}`} style={{ width: `${percentage}%` }} />
     </div>
   );
 }
@@ -196,7 +191,7 @@ export default function SymptomDiary() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       if (editingEntry) {
         await api.put(`/symptom-diary/${editingEntry.id}`, formData);
@@ -205,7 +200,7 @@ export default function SymptomDiary() {
         await api.post('/symptom-diary', formData);
         toast.success(t('diary:entrySaved'));
       }
-      
+
       setShowForm(false);
       resetForm();
       loadData();
@@ -233,7 +228,7 @@ export default function SymptomDiary() {
       medications: (entry.medications || []).map(med => ({
         name: med.name,
         dosage: (med.dosage || '') as string,
-        taken: med.taken
+        taken: med.taken,
       })) as { name: string; dosage: string; taken: boolean }[],
       notes: entry.notes || '',
     });
@@ -243,7 +238,7 @@ export default function SymptomDiary() {
 
   const handleDelete = async (id: string) => {
     if (!confirm(t('common:confirmDelete'))) return;
-    
+
     try {
       await api.delete(`/symptom-diary/${id}`);
       toast.success(t('diary:entryDeleted'));
@@ -253,20 +248,17 @@ export default function SymptomDiary() {
     }
   };
 
-  const toggleArrayItem = (
-    field: 'symptoms' | 'triggers' | 'activities',
-    item: string
-  ) => {
-    setFormData((prev) => ({
+  const toggleArrayItem = (field: 'symptoms' | 'triggers' | 'activities', item: string) => {
+    setFormData(prev => ({
       ...prev,
       [field]: prev[field].includes(item)
-        ? prev[field].filter((i) => i !== item)
+        ? prev[field].filter(i => i !== item)
         : [...prev[field], item],
     }));
   };
 
   const addMedication = () => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       medications: [...prev.medications, { name: '', dosage: '', taken: false }],
     }));
@@ -277,7 +269,7 @@ export default function SymptomDiary() {
     field: 'name' | 'dosage' | 'taken',
     value: string | boolean
   ) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       medications: prev.medications.map((med, i) =>
         i === index ? { ...med, [field]: value } : med
@@ -286,7 +278,7 @@ export default function SymptomDiary() {
   };
 
   const removeMedication = (index: number) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       medications: prev.medications.filter((_, i) => i !== index),
     }));
@@ -294,32 +286,28 @@ export default function SymptomDiary() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner" />
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='spinner' />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className='min-h-screen bg-gray-50'>
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
+      <header className='bg-white shadow-sm'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
+          <div className='flex justify-between items-center'>
+            <div className='flex items-center gap-4'>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className='p-2 hover:bg-gray-100 rounded-lg'
               >
-                <ArrowLeft size={24} className="rtl:flip" />
+                <ArrowLeft size={24} className='rtl:flip' />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {t('diary:title')}
-                </h1>
-                <p className="text-sm text-gray-600">
-                  {t('diary:subtitle')}
-                </p>
+                <h1 className='text-2xl font-bold text-gray-900'>{t('diary:title')}</h1>
+                <p className='text-sm text-gray-600'>{t('diary:subtitle')}</p>
               </div>
             </div>
             <button
@@ -327,7 +315,7 @@ export default function SymptomDiary() {
                 resetForm();
                 setShowForm(true);
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className='flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition'
             >
               <Plus size={20} />
               {t('diary:newEntry')}
@@ -336,48 +324,42 @@ export default function SymptomDiary() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Stats Overview */}
         {stats && stats.totalEntries > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white rounded-lg shadow p-4">
-              <div className="flex items-center justify-between">
+          <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-8'>
+            <div className='bg-white rounded-lg shadow p-4'>
+              <div className='flex items-center justify-between'>
                 <div>
-                  <p className="text-sm text-gray-600">{t('diary:averageMood')}</p>
-                  <p className="text-2xl font-bold">
-                    {stats.averages?.mood?.toFixed(1) || '-'}
-                  </p>
+                  <p className='text-sm text-gray-600'>{t('diary:averageMood')}</p>
+                  <p className='text-2xl font-bold'>{stats.averages?.mood?.toFixed(1) || '-'}</p>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className='flex items-center gap-1'>
                   <TrendIcon trend={stats.moodTrend} />
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">{t('diary:averageSleep')}</p>
-              <p className="text-2xl font-bold">
-                {stats.averages?.sleepHours?.toFixed(1) || '-'}h
-              </p>
+            <div className='bg-white rounded-lg shadow p-4'>
+              <p className='text-sm text-gray-600'>{t('diary:averageSleep')}</p>
+              <p className='text-2xl font-bold'>{stats.averages?.sleepHours?.toFixed(1) || '-'}h</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">{t('diary:averageAnxiety')}</p>
-              <p className="text-2xl font-bold">
-                {stats.averages?.anxiety?.toFixed(1) || '-'}/10
-              </p>
+            <div className='bg-white rounded-lg shadow p-4'>
+              <p className='text-sm text-gray-600'>{t('diary:averageAnxiety')}</p>
+              <p className='text-2xl font-bold'>{stats.averages?.anxiety?.toFixed(1) || '-'}/10</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">{t('diary:totalEntries')}</p>
-              <p className="text-2xl font-bold">{stats.totalEntries}</p>
+            <div className='bg-white rounded-lg shadow p-4'>
+              <p className='text-sm text-gray-600'>{t('diary:totalEntries')}</p>
+              <p className='text-2xl font-bold'>{stats.totalEntries}</p>
             </div>
           </div>
         )}
 
         {/* Entry Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-                <h2 className="text-xl font-bold">
+          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
+            <div className='bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto'>
+              <div className='sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center'>
+                <h2 className='text-xl font-bold'>
                   {editingEntry ? t('diary:editEntry') : t('diary:newEntry')}
                 </h2>
                 <button
@@ -385,51 +367,49 @@ export default function SymptomDiary() {
                     setShowForm(false);
                     resetForm();
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-full"
+                  className='p-2 hover:bg-gray-100 rounded-full'
                 >
                   <X size={24} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <form onSubmit={handleSubmit} className='p-6 space-y-6'>
                 {/* Date */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Calendar className="inline me-2" size={16} />
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    <Calendar className='inline me-2' size={16} />
                     {t('common:date')}
                   </label>
                   <input
-                    type="date"
+                    type='date'
                     value={formData.date}
-                    onChange={(e) =>
-                      setFormData({ ...formData, date: e.target.value })
-                    }
+                    onChange={e => setFormData({ ...formData, date: e.target.value })}
                     max={format(new Date(), 'yyyy-MM-dd')}
-                    className="w-full border rounded-lg px-3 py-2"
+                    className='w-full border rounded-lg px-3 py-2'
                     disabled={!!editingEntry}
                   />
                 </div>
 
                 {/* Mood Score */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Smile className="inline me-2" size={16} />
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    <Smile className='inline me-2' size={16} />
                     {t('diary:mood')}: {formData.moodScore}/10
                   </label>
                   <input
-                    type="range"
-                    min="1"
-                    max="10"
+                    type='range'
+                    min='1'
+                    max='10'
                     value={formData.moodScore}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({
                         ...formData,
                         moodScore: parseInt(e.target.value),
                       })
                     }
-                    className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-blue-600"
+                    className='w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-blue-600'
                   />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <div className='flex justify-between text-xs text-gray-500 mt-1'>
                     <span>{t('common:less')}</span>
                     <span>{t('common:more')}</span>
                   </div>
@@ -437,41 +417,41 @@ export default function SymptomDiary() {
 
                 {/* Anxiety Level */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <AlertTriangle className="inline me-2" size={16} />
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    <AlertTriangle className='inline me-2' size={16} />
                     {t('diary:anxiety')}: {formData.anxietyLevel}/10
                   </label>
                   <input
-                    type="range"
-                    min="0"
-                    max="10"
+                    type='range'
+                    min='0'
+                    max='10'
                     value={formData.anxietyLevel}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({
                         ...formData,
                         anxietyLevel: parseInt(e.target.value),
                       })
                     }
-                    className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-orange-500"
+                    className='w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-orange-500'
                   />
                 </div>
 
                 {/* Sleep */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <Moon className="inline me-2" size={16} />
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      <Moon className='inline me-2' size={16} />
                       {t('diary:sleepQuality')}
                     </label>
                     <select
                       value={formData.sleepQuality}
-                      onChange={(e) =>
+                      onChange={e =>
                         setFormData({
                           ...formData,
                           sleepQuality: parseInt(e.target.value),
                         })
                       }
-                      className="w-full border rounded-lg px-3 py-2"
+                      className='w-full border rounded-lg px-3 py-2'
                     >
                       <option value={1}>{t('common:less')}</option>
                       <option value={2}>{t('screenings:severityMild')}</option>
@@ -481,195 +461,189 @@ export default function SymptomDiary() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
                       {t('diary:sleepHours')}
                     </label>
                     <input
-                      type="number"
-                      min="0"
-                      max="24"
-                      step="0.5"
+                      type='number'
+                      min='0'
+                      max='24'
+                      step='0.5'
                       value={formData.sleepHours}
-                      onChange={(e) =>
+                      onChange={e =>
                         setFormData({
                           ...formData,
                           sleepHours: parseFloat(e.target.value),
                         })
                       }
-                      className="w-full border rounded-lg px-3 py-2"
+                      className='w-full border rounded-lg px-3 py-2'
                     />
                   </div>
                 </div>
 
                 {/* Energy & Stress */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <Activity className="inline me-2" size={16} />
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      <Activity className='inline me-2' size={16} />
                       {t('diary:energy')}: {formData.energyLevel}/10
                     </label>
                     <input
-                      type="range"
-                      min="1"
-                      max="10"
+                      type='range'
+                      min='1'
+                      max='10'
                       value={formData.energyLevel}
-                      onChange={(e) =>
+                      onChange={e =>
                         setFormData({
                           ...formData,
                           energyLevel: parseInt(e.target.value),
                         })
                       }
-                      className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-green-500"
+                      className='w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-green-500'
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
                       {t('diary:stress')}: {formData.stressLevel}/10
                     </label>
                     <input
-                      type="range"
-                      min="0"
-                      max="10"
+                      type='range'
+                      min='0'
+                      max='10'
                       value={formData.stressLevel}
-                      onChange={(e) =>
+                      onChange={e =>
                         setFormData({
                           ...formData,
                           stressLevel: parseInt(e.target.value),
                         })
                       }
-                      className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-red-500"
+                      className='w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-red-500'
                     />
                   </div>
                 </div>
 
                 {/* Symptoms */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
                     {t('diary:symptoms')}
                   </label>
-                  <div className="flex flex-wrap gap-2">
-                    {SYMPTOM_KEYS.map((key) => {
+                  <div className='flex flex-wrap gap-2'>
+                    {SYMPTOM_KEYS.map(key => {
                       const label = t(key);
                       return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => toggleArrayItem('symptoms', label)}
-                        className={`px-3 py-1 rounded-full text-sm transition ${
-                          formData.symptoms.includes(label)
-                            ? 'bg-red-100 text-red-700 border-red-300 border'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
+                        <button
+                          key={key}
+                          type='button'
+                          onClick={() => toggleArrayItem('symptoms', label)}
+                          className={`px-3 py-1 rounded-full text-sm transition ${
+                            formData.symptoms.includes(label)
+                              ? 'bg-red-100 text-red-700 border-red-300 border'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
                     })}
                   </div>
                 </div>
 
                 {/* Triggers */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
                     {t('diary:triggers')}
                   </label>
-                  <div className="flex flex-wrap gap-2">
-                    {TRIGGER_KEYS.map((key) => {
+                  <div className='flex flex-wrap gap-2'>
+                    {TRIGGER_KEYS.map(key => {
                       const label = t(key);
                       return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => toggleArrayItem('triggers', label)}
-                        className={`px-3 py-1 rounded-full text-sm transition ${
-                          formData.triggers.includes(label)
-                            ? 'bg-orange-100 text-orange-700 border-orange-300 border'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
+                        <button
+                          key={key}
+                          type='button'
+                          onClick={() => toggleArrayItem('triggers', label)}
+                          className={`px-3 py-1 rounded-full text-sm transition ${
+                            formData.triggers.includes(label)
+                              ? 'bg-orange-100 text-orange-700 border-orange-300 border'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
                     })}
                   </div>
                 </div>
 
                 {/* Activities */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
                     {t('diary:activities')}
                   </label>
-                  <div className="flex flex-wrap gap-2">
-                    {ACTIVITY_KEYS.map((key) => {
+                  <div className='flex flex-wrap gap-2'>
+                    {ACTIVITY_KEYS.map(key => {
                       const label = t(key);
                       return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => toggleArrayItem('activities', label)}
-                        className={`px-3 py-1 rounded-full text-sm transition ${
-                          formData.activities.includes(label)
-                            ? 'bg-green-100 text-green-700 border-green-300 border'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
+                        <button
+                          key={key}
+                          type='button'
+                          onClick={() => toggleArrayItem('activities', label)}
+                          className={`px-3 py-1 rounded-full text-sm transition ${
+                            formData.activities.includes(label)
+                              ? 'bg-green-100 text-green-700 border-green-300 border'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
                     })}
                   </div>
                 </div>
 
                 {/* Medications */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Pill className="inline me-2" size={16} />
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    <Pill className='inline me-2' size={16} />
                     {t('common:patient')}
                   </label>
                   {formData.medications.map((med, index) => (
-                    <div key={index} className="flex gap-2 mb-2">
+                    <div key={index} className='flex gap-2 mb-2'>
                       <input
-                        type="text"
+                        type='text'
                         placeholder={t('medications:medicationName')}
                         value={med.name}
-                        onChange={(e) =>
-                          updateMedication(index, 'name', e.target.value)
-                        }
-                        className="flex-1 border rounded-lg px-3 py-2"
+                        onChange={e => updateMedication(index, 'name', e.target.value)}
+                        className='flex-1 border rounded-lg px-3 py-2'
                       />
                       <input
-                        type="text"
+                        type='text'
                         placeholder={t('medications:dosage')}
                         value={med.dosage}
-                        onChange={(e) =>
-                          updateMedication(index, 'dosage', e.target.value)
-                        }
-                        className="w-28 border rounded-lg px-3 py-2"
+                        onChange={e => updateMedication(index, 'dosage', e.target.value)}
+                        className='w-28 border rounded-lg px-3 py-2'
                       />
-                      <label className="flex items-center gap-1">
+                      <label className='flex items-center gap-1'>
                         <input
-                          type="checkbox"
+                          type='checkbox'
                           checked={med.taken}
-                          onChange={(e) =>
-                            updateMedication(index, 'taken', e.target.checked)
-                          }
-                          className="rounded"
+                          onChange={e => updateMedication(index, 'taken', e.target.checked)}
+                          className='rounded'
                         />
-                        <span className="text-sm">✓</span>
+                        <span className='text-sm'>✓</span>
                       </label>
                       <button
-                        type="button"
+                        type='button'
                         onClick={() => removeMedication(index)}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded"
+                        className='p-2 text-red-500 hover:bg-red-50 rounded'
                       >
                         <Trash2 size={16} />
                       </button>
                     </div>
                   ))}
                   <button
-                    type="button"
+                    type='button'
                     onClick={addMedication}
-                    className="text-sm text-blue-600 hover:text-blue-700"
+                    className='text-sm text-blue-600 hover:text-blue-700'
                   >
                     + {t('medications:addMedication')}
                   </button>
@@ -677,36 +651,34 @@ export default function SymptomDiary() {
 
                 {/* Notes */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
                     {t('common:notes')}
                   </label>
                   <textarea
                     value={formData.notes}
-                    onChange={(e) =>
-                      setFormData({ ...formData, notes: e.target.value })
-                    }
+                    onChange={e => setFormData({ ...formData, notes: e.target.value })}
                     rows={4}
                     placeholder={t('diary:notesPlaceholder')}
-                    className="w-full border rounded-lg px-3 py-2 resize-none"
+                    className='w-full border rounded-lg px-3 py-2 resize-none'
                     maxLength={2000}
                   />
                 </div>
 
                 {/* Submit */}
-                <div className="flex gap-4">
+                <div className='flex gap-4'>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => {
                       setShowForm(false);
                       resetForm();
                     }}
-                    className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+                    className='flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50'
                   >
                     {t('common:cancel')}
                   </button>
                   <button
-                    type="submit"
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    type='submit'
+                    className='flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'
                   >
                     <Save size={20} />
                     {t('common:save')}
@@ -719,56 +691,52 @@ export default function SymptomDiary() {
 
         {/* Entries List */}
         {entries.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <div className="text-gray-400 mb-4">
-              <Calendar size={48} className="mx-auto" />
+          <div className='bg-white rounded-lg shadow p-8 text-center'>
+            <div className='text-gray-400 mb-4'>
+              <Calendar size={48} className='mx-auto' />
             </div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              {t('diary:noEntries')}
-            </h3>
-            <p className="text-gray-500 mb-4">
-              {t('diary:startTracking')}
-            </p>
+            <h3 className='text-lg font-semibold text-gray-700 mb-2'>{t('diary:noEntries')}</h3>
+            <p className='text-gray-500 mb-4'>{t('diary:startTracking')}</p>
             <button
               onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'
             >
               {t('diary:newEntry')}
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
-            {entries.map((entry) => (
+          <div className='space-y-4'>
+            {entries.map(entry => (
               <div
                 key={entry.id}
-                className="bg-white rounded-lg shadow p-4 hover:shadow-md transition"
+                className='bg-white rounded-lg shadow p-4 hover:shadow-md transition'
               >
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-3">
+                <div className='flex justify-between items-start'>
+                  <div className='flex items-center gap-3'>
                     <MoodIcon score={entry.mood_score} />
                     <div>
-                      <p className="font-semibold">
+                      <p className='font-semibold'>
                         {format(parseISO(entry.entry_date), 'EEEE, d. MMMM yyyy', {
                           locale: getDateLocale(),
                         })}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className='text-sm text-gray-600'>
                         {t('diary:mood')}: {entry.mood_score}/10 | {t('diary:sleep')}:{' '}
                         {entry.sleep_hours}h | {t('diary:anxiety')}: {entry.anxiety_level || 0}
                         /10
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className='flex gap-2'>
                     <button
                       onClick={() => handleEdit(entry)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                      className='p-2 text-blue-600 hover:bg-blue-50 rounded'
                     >
                       <Edit2 size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(entry.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded"
+                      className='p-2 text-red-600 hover:bg-red-50 rounded'
                     >
                       <Trash2 size={16} />
                     </button>
@@ -776,30 +744,18 @@ export default function SymptomDiary() {
                 </div>
 
                 {/* Visual Bars */}
-                <div className="grid grid-cols-3 gap-4 mt-4">
+                <div className='grid grid-cols-3 gap-4 mt-4'>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">{t('diary:mood')}</p>
-                    <ScoreBar
-                      value={entry.mood_score}
-                      max={10}
-                      color="bg-blue-500"
-                    />
+                    <p className='text-xs text-gray-500 mb-1'>{t('diary:mood')}</p>
+                    <ScoreBar value={entry.mood_score} max={10} color='bg-blue-500' />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">{t('diary:energy')}</p>
-                    <ScoreBar
-                      value={entry.energy_level || 5}
-                      max={10}
-                      color="bg-green-500"
-                    />
+                    <p className='text-xs text-gray-500 mb-1'>{t('diary:energy')}</p>
+                    <ScoreBar value={entry.energy_level || 5} max={10} color='bg-green-500' />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">{t('diary:stress')}</p>
-                    <ScoreBar
-                      value={entry.stress_level || 0}
-                      max={10}
-                      color="bg-red-500"
-                    />
+                    <p className='text-xs text-gray-500 mb-1'>{t('diary:stress')}</p>
+                    <ScoreBar value={entry.stress_level || 0} max={10} color='bg-red-500' />
                   </div>
                 </div>
 
@@ -807,27 +763,27 @@ export default function SymptomDiary() {
                 {(entry.symptoms?.length > 0 ||
                   entry.triggers?.length > 0 ||
                   entry.activities?.length > 0) && (
-                  <div className="mt-4 flex flex-wrap gap-1">
-                    {entry.symptoms?.map((s) => (
+                  <div className='mt-4 flex flex-wrap gap-1'>
+                    {entry.symptoms?.map(s => (
                       <span
                         key={s}
-                        className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full"
+                        className='px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full'
                       >
                         {s}
                       </span>
                     ))}
-                    {entry.triggers?.map((trigger) => (
+                    {entry.triggers?.map(trigger => (
                       <span
                         key={trigger}
-                        className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full"
+                        className='px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full'
                       >
                         {trigger}
                       </span>
                     ))}
-                    {entry.activities?.map((a) => (
+                    {entry.activities?.map(a => (
                       <span
                         key={a}
-                        className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full"
+                        className='px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full'
                       >
                         {a}
                       </span>
@@ -837,9 +793,7 @@ export default function SymptomDiary() {
 
                 {/* Notes Preview */}
                 {entry.notes && (
-                  <p className="mt-3 text-sm text-gray-600 italic line-clamp-2">
-                    "{entry.notes}"
-                  </p>
+                  <p className='mt-3 text-sm text-gray-600 italic line-clamp-2'>"{entry.notes}"</p>
                 )}
               </div>
             ))}

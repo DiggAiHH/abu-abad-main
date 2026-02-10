@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import i18n, {
-    LANGUAGE_FLAGS,
-    LANGUAGE_LABELS,
-    SUPPORTED_LANGUAGES,
-    applyDirection,
-    isRTL
+  LANGUAGE_FLAGS,
+  LANGUAGE_LABELS,
+  SUPPORTED_LANGUAGES,
+  applyDirection,
+  isRTL,
 } from './index';
 
 // Namespace imports
@@ -19,15 +19,38 @@ import tr from './locales/tr';
 import uk from './locales/uk';
 
 const ALL_LOCALES: Record<string, Record<string, Record<string, unknown>>> = {
-  de, en, ar, fa, es, fr, ru, uk, tr,
+  de,
+  en,
+  ar,
+  fa,
+  es,
+  fr,
+  ru,
+  uk,
+  tr,
 };
 
 const NAMESPACES = [
-  'common', 'auth', 'nav', 'dashboard', 'appointments',
-  'medications', 'diary', 'exercises', 'screenings',
-  'materials', 'messages', 'notes', 'crisis', 'billing',
-  'reports', 'documents', 'questionnaires', 'settings',
-  'video', 'errors',
+  'common',
+  'auth',
+  'nav',
+  'dashboard',
+  'appointments',
+  'medications',
+  'diary',
+  'exercises',
+  'screenings',
+  'materials',
+  'messages',
+  'notes',
+  'crisis',
+  'billing',
+  'reports',
+  'documents',
+  'questionnaires',
+  'settings',
+  'video',
+  'errors',
 ] as const;
 
 describe('i18n Konfiguration', () => {
@@ -202,7 +225,10 @@ describe('Namespace-Zugriff', () => {
       const firstKey = Object.keys(locale)[0];
       if (firstKey && typeof locale[firstKey] === 'string') {
         const result = i18n.t(`${ns}:${firstKey}`);
-        expect(result, `Namespace "${ns}" Key "${firstKey}" konnte nicht geladen werden`).toBeTruthy();
+        expect(
+          result,
+          `Namespace "${ns}" Key "${firstKey}" konnte nicht geladen werden`
+        ).toBeTruthy();
       }
     }
   });

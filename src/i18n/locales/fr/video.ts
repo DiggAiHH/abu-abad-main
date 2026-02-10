@@ -17,7 +17,7 @@ const video = {
   callEnded: 'Appel terminé',
   callEndedSuccess: 'Appel terminé',
   callCouldNotStart: "L'appel n'a pas pu être démarré",
-  callAlreadyOpen: "Un appel est déjà en cours dans un autre onglet",
+  callAlreadyOpen: 'Un appel est déjà en cours dans un autre onglet',
   endCall: "Terminer l'appel",
   errorAnsweringCall: "Erreur lors de la réponse à l'appel",
   errorStartingCall: "Erreur lors du démarrage de l'appel",
@@ -26,7 +26,8 @@ const video = {
   connectionToTherapistFailed: 'La connexion avec le thérapeute a échoué',
 
   // ─── Pair/Réseau ─────────────────────────────────
-  peerUnavailable: "L'interlocuteur n'est pas disponible. Veuillez attendre que le thérapeute se connecte.",
+  peerUnavailable:
+    "L'interlocuteur n'est pas disponible. Veuillez attendre que le thérapeute se connecte.",
   peerServerUnreachable: 'Serveur PeerJS inaccessible. Échec de la connexion.',
   peerNotInitialized: 'Connexion pair non initialisée',
   serverError: 'Erreur serveur. Veuillez réessayer plus tard.',
@@ -36,7 +37,8 @@ const video = {
 
   // ─── Média/Caméra ────────────────────────────────
   browserNoWebRTC: 'Le navigateur ne prend pas en charge WebRTC.',
-  cameraAccessDenied: 'Accès à la caméra/au microphone refusé. Veuillez vérifier les autorisations.',
+  cameraAccessDenied:
+    'Accès à la caméra/au microphone refusé. Veuillez vérifier les autorisations.',
   noDeviceFound: 'Aucune caméra ou microphone trouvé.',
   cameraTimeout: 'Délai de la caméra dépassé – mode audio uniquement utilisé',
   audioOnlyMode: 'Mode audio uniquement actif',
@@ -99,7 +101,8 @@ const video = {
   queueTitle: "Aperçu de la salle d'attente",
   patientsWaiting: '{{count}} patient(s) en attente',
   noPatientsWaiting: 'Aucun patient en attente',
-  patientsAppearHere: "Les nouveaux patients apparaîtront ici dès qu'ils rejoindront la salle d'attente.",
+  patientsAppearHere:
+    "Les nouveaux patients apparaîtront ici dès qu'ils rejoindront la salle d'attente.",
   appointment: 'Rendez-vous :',
   waitingTime: 'En attente : {{min}} min.',
   viewQuestionnaire: 'Questionnaire',

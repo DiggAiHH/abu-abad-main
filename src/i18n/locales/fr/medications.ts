@@ -53,7 +53,7 @@ const medications = {
   categoryAntidepressant: 'Antidépresseur',
   categoryAnxiolytic: 'Anxiolytique',
   categoryAntipsychotic: 'Antipsychotique',
-  categoryMoodStabilizer: "Thymorégulateur",
+  categoryMoodStabilizer: 'Thymorégulateur',
   categoryStimulant: 'Stimulant',
   categorySedative: 'Sédatif',
   categorySupplement: 'Complément alimentaire',

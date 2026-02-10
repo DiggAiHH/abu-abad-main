@@ -35,7 +35,7 @@ const video = {
   slowNetwork: 'Yavaş ağ bağlantısı algılandı. Kalite düşürüldü.',
 
   // ─── Medya/Kamera ───────────────────────────────
-  browserNoWebRTC: 'Tarayıcınız WebRTC\'yi desteklemiyor.',
+  browserNoWebRTC: "Tarayıcınız WebRTC'yi desteklemiyor.",
   cameraAccessDenied: 'Kamera/mikrofon erişimi reddedildi. Lütfen izinleri kontrol edin.',
   noDeviceFound: 'Kamera veya mikrofon bulunamadı.',
   cameraTimeout: 'Kamera zaman aşımı – yalnızca ses modu kullanılıyor',
