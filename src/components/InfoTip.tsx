@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef } from 'react';
+import { useToggle } from '../hooks/useToggle';
 import { Info } from 'lucide-react';
 
 interface InfoTipProps {
@@ -8,7 +9,7 @@ interface InfoTipProps {
 }
 
 export function InfoTip({ label, title, children }: InfoTipProps): JSX.Element {
-  const [open, setOpen] = useState(false);
+  const [open, toggleOpen] = useToggle(false);
   const id = useId();
   const panelId = `${id}-panel`;
   const containerRef = useRef<HTMLSpanElement | null>(null);
@@ -42,7 +43,7 @@ export function InfoTip({ label, title, children }: InfoTipProps): JSX.Element {
         aria-label={label}
         aria-expanded={open}
         aria-controls={panelId}
-        onClick={() => setOpen(v => !v)}
+        onClick={toggleOpen}
         className='ms-2 inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-500 hover:text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500'
       >
         <Info className='h-4 w-4' />
