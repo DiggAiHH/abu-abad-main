@@ -99,7 +99,12 @@ export function LegalDisclaimer({
   );
 }
 
-export function MedicalDeviceDisclaimer({ className = '' }: { className?: string }): JSX.Element {
+interface MedicalDeviceDisclaimerProps {
+  /** Zusätzliche CSS-Klassen */
+  className?: string;
+}
+
+export function MedicalDeviceDisclaimer({ className = '' }: MedicalDeviceDisclaimerProps): JSX.Element {
   return (
     <div
       className={`flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm ${className}`}
