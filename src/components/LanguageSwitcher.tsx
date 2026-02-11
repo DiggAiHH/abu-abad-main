@@ -20,11 +20,11 @@ const LanguageSwitcher = React.memo(function LanguageSwitcher({ currentLang: pro
   const { i18n, t } = useTranslation(['common']);
   const { isOpen: open, toggle, ref } = useToggleMenu(false);
 
-  const currentLang = useMemo(() => (
-    propCurrentLang || i18n.language?.substring(0, 2) || 'de'
-  ) as SupportedLanguage, [propCurrentLang, i18n.language]);
+  const currentLang = useMemo(() => {
+    return (propCurrentLang || i18n.language?.substring(0, 2) || 'de') as SupportedLanguage;
+  }, [propCurrentLang, i18n.language]);
 
-  const changeLanguage = useCallback<SupportedLanguage>(()=>(lang: SupportedLanguage) => {
+  const changeLanguage = useCallback((lang: SupportedLanguage) => {
     i18n.changeLanguage(lang);
     toggle();
   }, [i18n, toggle]);
@@ -63,7 +63,7 @@ const LanguageSwitcher = React.memo(function LanguageSwitcher({ currentLang: pro
               type='button'
               role='option'
               aria-selected={lang === currentLang}
-              onClick={() => changeLanguage(lang)}
+              onClick={changeLanguage}
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
                 lang === currentLang ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
               }`}
