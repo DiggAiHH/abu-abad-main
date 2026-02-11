@@ -18,13 +18,13 @@ export function InfoTip({ label, title, children }: InfoTipProps): JSX.Element {
     if (!open) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') toggleOpen(false);
     };
 
     const onMouseDown = (e: MouseEvent) => {
       const target = e.target as Node | null;
       if (target && containerRef.current && !containerRef.current.contains(target)) {
-        setOpen(false);
+        toggleOpen(false);
       }
     };
 
@@ -34,7 +34,7 @@ export function InfoTip({ label, title, children }: InfoTipProps): JSX.Element {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('mousedown', onMouseDown);
     };
-  }, [open]);
+  }, [open, toggleOpen]);
 
   return (
     <span ref={containerRef} className='relative inline-flex items-center'>

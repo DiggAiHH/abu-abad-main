@@ -2,7 +2,7 @@ import { AlertTriangle } from 'lucide-react';
 import { Component, ErrorInfo, ReactNode } from 'react';
 import i18n from '../i18n';
 
-interface Props {
+interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
 }
@@ -20,7 +20,7 @@ interface State {
  * Fängt React-Fehler und zeigt Fallback-UI
  */
 class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
