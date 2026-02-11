@@ -1,6 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 
+/**
+ * Props für die DemoBadge-Komponente
+ *
+ * Aktuell enthält diese Komponente keine spezifischen Props.
+ * Dieses Interface dient als Basis für zukünftige Erweiterungen.
+ */
 interface DemoBadgeProps {}
 
 /**
