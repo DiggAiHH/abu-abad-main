@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-export type FormResponses = Record<string, any>;
+export type FormResponses = Record<string, string | number | boolean | Array<string | number | boolean>>;
 
-export function normalizeFormSchema(input: Record<string, unknown>): { type: string, properties: Record<string, unknown>, required: string[] } {
+export function normalizeFormSchema(input: Record<string, any>): { type: string, properties: Record<string, any>, required: string[] } {
   if (!input || typeof input !== 'object') {
     return { type: 'object', properties: {}, required: [] };
   }
