@@ -40,7 +40,7 @@ export function InfoTip({ label, title, children }: InfoTipProps): JSX.Element {
     <span ref={containerRef} className='relative inline-flex items-center'>
       <button
         type='button'
-        aria-label={label}
+        aria-label={label} aria-describedby={title}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={toggleOpen}
@@ -52,7 +52,7 @@ export function InfoTip({ label, title, children }: InfoTipProps): JSX.Element {
       {open && (
         <div
           id={panelId}
-          role='dialog'
+          role='tooltip'
           aria-label={title ?? label}
           className='absolute right-0 top-8 z-50 w-80 rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-700 shadow-lg'
         >

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 export type FormResponses = Record<string, any>;
 
-export function normalizeFormSchema(input: any): any {
+export function normalizeFormSchema(input: Record<string, unknown>): { type: string, properties: Record<string, unknown>, required: string[] } {
   if (!input || typeof input !== 'object') {
     return { type: 'object', properties: {}, required: [] };
   }
@@ -75,7 +75,7 @@ function coerceNumber(value: string): number | '' {
 }
 
 interface QuestionnaireFormFieldsProps {
-  formSchema: any;
+  formSchema: { type: string; properties: Record<string, any>; required: string[] };
   responses: FormResponses;
   onResponsesChange: (next: FormResponses) => void;
   readOnly?: boolean;
