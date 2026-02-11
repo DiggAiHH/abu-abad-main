@@ -16,15 +16,15 @@ type LanguageSwitcherProps = {
  * Language Switcher Dropdown – zeigt Flagge + Sprachname
  * Unterstützt alle 9 Sprachen inkl. RTL (ar, fa)
  */
-export default function LanguageSwitcher({ currentLang: propCurrentLang }: LanguageSwitcherProps) {
+const LanguageSwitcher = React.memo(function LanguageSwitcher({ currentLang: propCurrentLang }: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation(['common']);
   const { isOpen: open, toggle, ref } = useToggleMenu(false);
 
-  const currentLang = (
+  const currentLang = useMemo(() => (
     propCurrentLang || i18n.language?.substring(0, 2) || 'de'
-  ) as SupportedLanguage;
+  ) as SupportedLanguage, [propCurrentLang, i18n.language]);
 
-  const changeLanguage = (lang: SupportedLanguage) => {
+  const changeLanguage = useCallback((lang: SupportedLanguage) => {
     i18n.changeLanguage(lang);
     toggle();
   };
@@ -34,7 +34,7 @@ export default function LanguageSwitcher({ currentLang: propCurrentLang }: Langu
       <button
         type='button'
         onClick={toggle}
-        className='inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors'
+        className='inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition'
         aria-label={t('common:selectLanguage', 'Select language')}
         aria-expanded={open}
         aria-haspopup='listbox'
