@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { logger } from '../utils/logger';
 
+interface ReportsProps {}
+
 interface Report {
   id: number;
   patientId: number;
@@ -43,7 +45,7 @@ interface Patient {
   email: string;
 }
 
-const Reports: React.FC = () => {
+const Reports: React.FC<ReportsProps> = (props: ReportsProps) => {
   const { t } = useTranslation(['reports', 'common']);
   const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
