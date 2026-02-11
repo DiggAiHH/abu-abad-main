@@ -87,11 +87,27 @@ export default function CrisisPlan({}: CrisisPlanProps) {
 
       if (planData.exists && planData.plan) {
         setPlan({ ...EMPTY_PLAN, ...planData.plan });
-      } else setPlan(EMPTY_PLAN)
-    }catch{
-        postAPI
-}
+      } else {
+        setPlan(EMPTY_PLAN);
+      }
+    } catch (error) {
+      logger.error('Error loading crisis plan:', error);
+      toast.error(t('common:error_occurred'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-return"ALS ...
-      ---UID .q Layout. truncated IOException vacature
-    
+  return (
+    <div>
+      {loading ? (
+        <p>{t('common:loading')}</p>
+      ) : (
+        <div>
+          <h1>{t('crisis:title')}</h1>
+          <pre>{JSON.stringify(plan, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
+}
