@@ -7,13 +7,18 @@ import { useAuthStore } from '../store/authStore';
  * Aktuell enthält diese Komponente keine spezifischen Props.
  * Dieses Interface dient als Basis für zukünftige Erweiterungen.
  */
-interface DemoBadgeProps {}
+interface DemoBadgeProps {
+  /** Gibt an, ob der Demo-Badge angezeigt wird */
+  isDemo: boolean;
+  /** Function, um den Nutzer auszuloggen */
+  logout: () => void;
+}
 
 /**
  * Demo-Modus Badge – wird angezeigt wenn isDemo === true.
  * Zeigt dem Benutzer klar an, dass er im Demo-Modus ist.
  */
-export default function DemoBadge(_: DemoBadgeProps): JSX.Element | null {
+export default function DemoBadge({ isDemo, logout }: DemoBadgeProps): JSX.Element | null {
   const { t } = useTranslation(['errors']);
   const isDemo = useAuthStore(s => s.isDemo);
   const logout = useAuthStore(s => s.logout);
