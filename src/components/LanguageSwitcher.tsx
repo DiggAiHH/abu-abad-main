@@ -24,7 +24,7 @@ const LanguageSwitcher = React.memo(function LanguageSwitcher({ currentLang: pro
     propCurrentLang || i18n.language?.substring(0, 2) || 'de'
   ) as SupportedLanguage, [propCurrentLang, i18n.language]);
 
-  const changeLanguage = useCallback((lang: SupportedLanguage) => {
+  const changeLanguage = useCallback<SupportedLanguage>(()=>(lang: SupportedLanguage) => {
     i18n.changeLanguage(lang);
     toggle();
   }, [i18n, toggle]);
