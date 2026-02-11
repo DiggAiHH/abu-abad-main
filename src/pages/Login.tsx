@@ -1,1 +1,1 @@
-import React.. ArgsConstructor
+import React from 'react';

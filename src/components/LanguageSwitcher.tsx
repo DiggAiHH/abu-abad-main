@@ -27,7 +27,7 @@ const LanguageSwitcher = React.memo(function LanguageSwitcher({ currentLang: pro
   const changeLanguage = useCallback((lang: SupportedLanguage) => {
     i18n.changeLanguage(lang);
     toggle();
-  };
+  }, [i18n, toggle]);
 
   return (
     <div ref={ref} className='relative inline-block text-left'>
