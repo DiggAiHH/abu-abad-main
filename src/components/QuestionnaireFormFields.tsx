@@ -153,7 +153,7 @@ export function QuestionnaireFormFields({
         return (
           <input
             type='number'
-            value={value ?? ''}
+            value={typeof value === 'string' || typeof value === 'number' ? value : ''}
             onChange={e => handleChange(coerceNumber(e.target.value))}
             className={commonClasses}
             placeholder={fieldSchema.description}
@@ -163,7 +163,7 @@ export function QuestionnaireFormFields({
 
       case 'array':
         if (fieldSchema.items?.enum) {
-          const selected = Array.isArray(value) ? value : [];
+          const selected = Array.isArray(value) ? (value.filter(x => typeof x === 'string' || typeof x === 'number' || typeof x === 'boolean')) : [];
           return (
             <div className='space-y-2'>
               {fieldSchema.items.enum.map((option: string) => (

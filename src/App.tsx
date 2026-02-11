@@ -1,9 +1,11 @@
-import React from "react";
-
 interface AppProps {}
 
-function App(props: AppProps): JSX.Element {
-  // Vorhandener Code bleibt unverändert...
+function App(): JSX.Element {
+  return (
+    <div>
+      <h1>Willkommen bei Abu-Abad</h1>
+    </div>
+  );
 }
 
 export default App;
