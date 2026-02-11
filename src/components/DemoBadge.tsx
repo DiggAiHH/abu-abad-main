@@ -32,9 +32,8 @@ export default function DemoBadge({ isDemo: propIsDemo, logout: propLogout }: De
       <span className='inline-block w-2 h-2 bg-white rounded-full animate-pulse' />
       {t('errors:demoMode')}
       <button
-        onClick={() => void activeLogout()
-        className='ms-2 bg-amber-600 hover:bg-amber-700 px-2 py-0.5 rounded text-xs transition-colors'
-      >
+        onClick={() => void activeLogout()}
+        className='ms-2 bg-amber-600 hover:bg-amber-700 px-2 py-0.5 rounded text-xs transition-colors'>
         {t('errors:endDemo')}
       </button>
     </div>
