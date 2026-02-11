@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useDropdown } from '../hooks/useDropdown';
 import { useTranslation } from 'react-i18next';
 import {
   LANGUAGE_FLAGS,
@@ -18,34 +18,22 @@ type LanguageSwitcherProps = {
  */
 export default function LanguageSwitcher({ currentLang: propCurrentLang }: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation(['common']);
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const { isOpen: open, toggle, ref } = useDropdown();
 
   const currentLang = (
     propCurrentLang || i18n.language?.substring(0, 2) || 'de'
   ) as SupportedLanguage;
 
-  // Schließe Dropdown bei Klick außerhalb
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const changeLanguage = (lang: SupportedLanguage) => {
     i18n.changeLanguage(lang);
-    setOpen(false);
+    toggle();
   };
 
   return (
     <div ref={ref} className='relative inline-block text-left'>
       <button
         type='button'
-        onClick={() => setOpen(!open)}
+        onClick={toggle}
         className='inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors'
         aria-label={t('common:selectLanguage', 'Select language')}
         aria-expanded={open}
