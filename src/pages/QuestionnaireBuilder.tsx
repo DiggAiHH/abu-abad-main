@@ -58,7 +58,7 @@ export default function QuestionnaireBuilder() {
   const [importing, setImporting] = useState(false);
   const [importStatus, setImportStatus] = useState<string | null>(null);
 
-  const previewSchema = useMemo(() => ({ fields }), [fields]);
+  const previewSchema = useMemo(() => ({ fields, type: 'object', properties: {}, required: [] }), [fields]);
 
   useEffect(() => {
     loadTemplates();

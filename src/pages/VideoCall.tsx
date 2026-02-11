@@ -1,5 +1,3 @@
-import React from "react";
-
 interface VideoCallProps {}
 
 function VideoCall({}: VideoCallProps) {
