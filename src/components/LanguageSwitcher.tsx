@@ -1,4 +1,4 @@
-import { useDropdown } from '../hooks/useDropdown';
+import { useToggleMenu } from '../hooks/useToggleMenu';
 import { useTranslation } from 'react-i18next';
 import {
   LANGUAGE_FLAGS,
@@ -18,7 +18,7 @@ type LanguageSwitcherProps = {
  */
 export default function LanguageSwitcher({ currentLang: propCurrentLang }: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation(['common']);
-  const { isOpen: open, toggle, ref } = useDropdown();
+  const { isOpen: open, toggle, ref } = useToggleMenu(false);
 
   const currentLang = (
     propCurrentLang || i18n.language?.substring(0, 2) || 'de'
