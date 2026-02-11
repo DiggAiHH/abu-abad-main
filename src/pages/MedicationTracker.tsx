@@ -5,7 +5,7 @@ interface MedicationTrackerProps {
 }
 
 function MedicationTracker({}: MedicationTrackerProps): JSX.Element {
-  // Vorhandener Inhalt bleibt.
+  return <div>Medication Tracker Placeholder</div>;
 }
 
 export default MedicationTracker
