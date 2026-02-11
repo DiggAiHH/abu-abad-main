@@ -18,19 +18,21 @@ interface DemoBadgeProps {
  * Demo-Modus Badge – wird angezeigt wenn isDemo === true.
  * Zeigt dem Benutzer klar an, dass er im Demo-Modus ist.
  */
-export default function DemoBadge({ isDemo, logout }: DemoBadgeProps): JSX.Element | null {
+export default function DemoBadge({ isDemo: propIsDemo, logout: propLogout }: DemoBadgeProps): JSX.Element | null {
   const { t } = useTranslation(['errors']);
-  const isDemo = useAuthStore(s => s.isDemo);
-  const logout = useAuthStore(s => s.logout);
+  const storeIsDemo = useAuthStore(s => s.isDemo);
+  const storeLogout = useAuthStore(s => s.logout);
+  const isActiveDemo = propIsDemo ?? storeIsDemo; // Prioritize propIsDemo if provided
+  const activeLogout = propLogout ?? storeLogout;
 
-  if (!isDemo) return null;
+  if (!isActiveDemo) return null;
 
   return (
     <div className='fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium'>
       <span className='inline-block w-2 h-2 bg-white rounded-full animate-pulse' />
       {t('errors:demoMode')}
       <button
-        onClick={() => void logout()}
+        onClick={() => void activeLogout()
         className='ms-2 bg-amber-600 hover:bg-amber-700 px-2 py-0.5 rounded text-xs transition-colors'
       >
         {t('errors:endDemo')}
