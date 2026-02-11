@@ -19,15 +19,13 @@ import { useMemo } from 'react';
 import { calculateProjectSummary, regulatoryStatus, workPackages } from '../data/projectData';
 import type { WorkPackage } from '../types/projectTypes';
 
-function ProgressRing({
-  value,
-  size = 120,
-  strokeWidth = 10,
-}: {
+interface ProgressRingProps {
   value: number;
   size?: number;
   strokeWidth?: number;
-}): JSX.Element {
+}
+
+function ProgressRing({ value, size = 120, strokeWidth = 10 }: ProgressRingProps): JSX.Element {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (value / 100) * circumference;
@@ -78,7 +76,11 @@ function ProgressRing({
   );
 }
 
-function MilestoneTimeline({ packages }: { packages: readonly WorkPackage[] }): JSX.Element {
+interface MilestoneTimelineProps {
+  packages: readonly WorkPackage[];
+}
+
+function MilestoneTimeline({ packages }: MilestoneTimelineProps): JSX.Element {
   const allMilestones = useMemo(() => {
     return packages
       .flatMap(wp => wp.milestones.map(ms => ({ ...ms, wpNumber: wp.wpNumber, wpTitle: wp.title })))
@@ -115,7 +117,11 @@ function MilestoneTimeline({ packages }: { packages: readonly WorkPackage[] }): 
   );
 }
 
-function BudgetOverview({ packages }: { packages: readonly WorkPackage[] }): JSX.Element {
+interface BudgetOverviewProps {
+  packages: readonly WorkPackage[];
+}
+
+function BudgetOverview({ packages }: BudgetOverviewProps): JSX.Element {
   const summary = useMemo(() => calculateProjectSummary(packages), [packages]);
   const percent =
     summary.totalBudget > 0 ? Math.round((summary.totalSpent / summary.totalBudget) * 100) : 0;
@@ -161,7 +167,11 @@ function BudgetOverview({ packages }: { packages: readonly WorkPackage[] }): JSX
   );
 }
 
-function RiskMatrix({ packages }: { packages: readonly WorkPackage[] }): JSX.Element {
+interface RiskMatrixProps {
+  packages: readonly WorkPackage[];
+}
+
+function RiskMatrix({ packages }: RiskMatrixProps): JSX.Element {
   const allRisks = useMemo(
     () => packages.flatMap(wp => wp.risks.map(r => ({ ...r, wpNumber: wp.wpNumber }))),
     [packages]
@@ -216,6 +226,7 @@ function RiskMatrix({ packages }: { packages: readonly WorkPackage[] }): JSX.Ele
 }
 
 export default function PartnerTransparency(): JSX.Element {
+  // Hauptkomponente hat keine Props, daher ist hier kein Interface erforderlich
   const summary = useMemo(() => calculateProjectSummary(workPackages), []);
 
   return (
