@@ -2,12 +2,21 @@ import { useEffect, useId, useRef } from 'react';
 import { useToggle } from '../hooks/useToggle';
 import { Info } from 'lucide-react';
 
+// Props interface for InfoTip component
 interface InfoTipProps {
-  label: string;
-  title?: string;
-  children: string;
+  label: string; // Accessible label for the button
+  title?: string; // Optional title displayed in the tooltip
+  children: React.ReactNode; // Content of the tooltip
 }
 
+/**
+ * InfoTip component
+ * Displays a tooltip with additional information when the info icon is clicked.
+ * 
+ * @param label - Accessible label for the button
+ * @param title - Optional title for the tooltip (defaults to the label if not provided)
+ * @param children - Tooltip content
+ */
 export function InfoTip({ label, title, children }: InfoTipProps): JSX.Element {
   const [open, toggleOpen] = useToggle(false);
   const id = useId();
