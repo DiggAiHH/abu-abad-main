@@ -55,7 +55,7 @@ const LanguageSwitcher = React.memo(function LanguageSwitcher({ currentLang: pro
         <div
           className='absolute end-0 z-50 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-80 overflow-y-auto'
           role='listbox'
-          aria-label={t('common:availableLanguages')}
+          aria-label={t('common:availableLanguages', 'Available Languages')}
         >
           {SUPPORTED_LANGUAGES.map(lang => (
             <button
@@ -63,7 +63,7 @@ const LanguageSwitcher = React.memo(function LanguageSwitcher({ currentLang: pro
               type='button'
               role='option'
               aria-selected={lang === currentLang}
-              onClick={changeLanguage}
+              onClick={() => changeLanguage(lang)}
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
                 lang === currentLang ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
               }`}
@@ -89,4 +89,6 @@ const LanguageSwitcher = React.memo(function LanguageSwitcher({ currentLang: pro
       )}
     </div>
   );
-}
+});
+
+export default LanguageSwitcher;
