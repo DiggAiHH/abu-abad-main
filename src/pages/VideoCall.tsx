@@ -1,6 +1,4 @@
-interface VideoCallProps {}
-
-function VideoCall({}: VideoCallProps): JSX.Element {
+function VideoCall(): JSX.Element {
   return (
     <div>
       {/* Komponentencode hier */}
