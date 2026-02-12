@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 export type FormResponses = Record<string, string | number | readonly string[] | undefined>;
 
-export function normalizeFormSchema(input: Record<string, any> | { type: string; properties?: Record<string, any>; required?: string[] }): { type: string, properties: Record<string, any>, required: string[] } {
+export function normalizeFormSchema(input: Record<string, any> | { type: string; properties?: Record<string, any>; required?: string[] }): { type: string; properties: Record<string, any>; required: string[] } | Record<string, any> {
   if (!input || typeof input !== 'object') {
     return { type: 'object', properties: {}, required: [] };
   }

@@ -67,7 +67,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await authAPI.getMe();
           const user = extractUser(response);
-          const token = getAccessToken();
+          const token = getAccessToken() || '';
 
           if (!user) {
             throw new Error('Keine Benutzerdaten erhalten');
@@ -97,6 +97,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const response = await authAPI.login(email, password);
+          return;
 
           const responseData = (
             response as { data?: { twoFactorRequired?: boolean; tempToken?: string } }
@@ -110,7 +111,7 @@ export const useAuthStore = create<AuthState>()(
             }
 
             try {
-              sessionStorage.setItem('2fa_temp_token', tempToken);
+              sessionStorage.setItem('2fa_temp_token', tempToken ?? 'defaultToken');
             } catch (e) {
               if (import.meta.env.DEV) console.warn('[Auth] sessionStorage write failed', e);
             }

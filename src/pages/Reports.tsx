@@ -45,7 +45,7 @@ interface Patient {
   email: string;
 }
 
-const Reports: React.FC<ReportsProps> = (props: ReportsProps) => {
+const Reports: React.FC<ReportsProps> = () => {
   const { t } = useTranslation(['reports', 'common']);
   const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);

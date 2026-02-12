@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
-interface TwoFAVerifyProps {}
+/* interface TwoFAVerifyProps {} */
 
-export default function TwoFAVerify(props: TwoFAVerifyProps) {
+export default function TwoFAVerify() {
   const { t } = useTranslation(['auth', 'common']);
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
