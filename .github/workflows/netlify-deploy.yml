@@ -1,0 +1,33 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    - name: Install Node Modules
+      run: npm ci
+
+    - name: Install Netlify CLI
+      run: |
+        npm install netlify-cli -g
+
+    - name: Deploy to Netlify
+      run: |
+        netlify deploy --prod --auth=$NETLIFY_AUTH_TOKEN --dir=dist --site OpenClawFrontendDeploy
