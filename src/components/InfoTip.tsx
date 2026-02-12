@@ -27,13 +27,13 @@ export function InfoTip({ label, title, children }: InfoTipProps): JSX.Element {
     if (!open) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') toggleOpen(false);
+      if (e.key === 'Escape') toggleOpen();
     };
 
     const onMouseDown = (e: MouseEvent) => {
       const target = e.target as Node | null;
       if (target && containerRef.current && !containerRef.current.contains(target)) {
-        toggleOpen(false);
+        toggleOpen();
       }
     };
 

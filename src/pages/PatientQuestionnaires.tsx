@@ -19,7 +19,7 @@ interface QuestionnaireRequest {
   id: string;
   templateTitle: string;
   templateDescription?: string;
-  formSchema: any;
+  formSchema: { type: string; properties: Record<string, any>; required: string[] };
   dueDate?: string;
   priority: 'low' | 'normal' | 'high' | 'urgent';
   status: 'pending' | 'in_progress' | 'completed';

@@ -1,4 +1,3 @@
-import React from 'react';
 
 interface DocumentRequestProps {
   /** Eine optionale Liste von Dokumenten */
