@@ -19,7 +19,7 @@ interface State {
  * Error Boundary Component
  * Fängt React-Fehler und zeigt Fallback-UI
  */
-class ErrorBoundary extends Component<Props, State> {
+class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
