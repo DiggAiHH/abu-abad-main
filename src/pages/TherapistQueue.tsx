@@ -44,7 +44,9 @@ interface PreSessionDetails {
   } | null;
 }
 
-export default function TherapistQueue() {
+interface TherapistQueueProps {} // Leeres Props-Interface für künftige Erweiterungen
+
+export default function TherapistQueue(props: TherapistQueueProps) {
   const { t } = useTranslation(['video', 'common', 'appointments']);
   const navigate = useNavigate();
   const [queue, setQueue] = useState<QueueItem[]>([]);
