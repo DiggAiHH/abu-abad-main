@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-export type FormResponses = Record<string, string | number | boolean | Array<string | number | boolean>>;
+export type FormResponses = Record<string, string | number | readonly string[] | undefined>;
 
 export function normalizeFormSchema(input: Record<string, any>): { type: string, properties: Record<string, any>, required: string[] } {
   if (!input || typeof input !== 'object') {
@@ -87,7 +87,7 @@ export function QuestionnaireFormFields({
   onResponsesChange, 
   readOnly = false,
 }: QuestionnaireFormFieldsProps): JSX.Element {
-  const normalized = useMemo(() => normalizeFormSchema(formSchema), [formSchema]);
+  const normalized = useMemo(() => normalizeFormSchema(formSchema) as { type: string; properties: Record<string, any>; required: string[] }, [formSchema]);
 
   const requiredFields: string[] = Array.isArray(normalized.required) ? normalized.required : [];
 
@@ -163,7 +163,7 @@ export function QuestionnaireFormFields({
 
       case 'array':
         if (fieldSchema.items?.enum) {
-          const selected = Array.isArray(value) ? (value.filter(x => typeof x === 'string' || typeof x === 'number' || typeof x === 'boolean')) : [];
+          const selected = Array.isArray(value) ? (value.filter((x: string | number | boolean): x is string => typeof x === 'string')) : [];
           return (
             <div className='space-y-2'>
               {fieldSchema.items.enum.map((option: string) => (
